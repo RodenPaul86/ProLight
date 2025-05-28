@@ -1,0 +1,151 @@
+{
+  "identifier" : "4D04C76C",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "0.99",
+      "familyShareable" : false,
+      "internalID" : "5C7ABEC7",
+      "localizations" : [
+        {
+          "description" : "You rock! Thanks for chipping in.",
+          "displayName" : "Spare Change",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "pl_2022_T1",
+      "referenceName" : "Tip_Nice",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "1.99",
+      "familyShareable" : false,
+      "internalID" : "E88C37F5",
+      "localizations" : [
+        {
+          "description" : "Awesome! Thank you so much!",
+          "displayName" : "2 Buck Chuck",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "pl_2022_T2",
+      "referenceName" : "Tip_Generous",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "81AB1940",
+      "localizations" : [
+        {
+          "description" : "Whoa! Your support means a lot!",
+          "displayName" : "The Fiver",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "pl_2022_T3",
+      "referenceName" : "Tip_Amazing",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "9.99",
+      "familyShareable" : false,
+      "internalID" : "C7D5024A",
+      "localizations" : [
+        {
+          "description" : "Words can't even describe how great you are!",
+          "displayName" : "The Hamiltonian",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "pl_2022_T4",
+      "referenceName" : "Tip_4",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "19.99",
+      "familyShareable" : false,
+      "internalID" : "C1BB1E92",
+      "localizations" : [
+        {
+          "description" : "I can't even. We are SO grateful for you!",
+          "displayName" : "Moolah-LAH!",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "pl_2022_T5",
+      "referenceName" : "Tip_5",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "8244D190",
+      "localizations" : [
+
+      ],
+      "name" : "plus",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "4.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "4BFE435A",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "The gift that keeps on giving!",
+              "displayName" : "Monthly Tip",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "pl_2022_1m",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Pro Monthly",
+          "subscriptionGroupID" : "8244D190",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "9.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "5BFAAE18",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Thanks for your ongoing support!",
+              "displayName" : "Annual Tip",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "pl_2022_1y",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Pro Yearly",
+          "subscriptionGroupID" : "8244D190",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 1,
+    "minor" : 2
+  }
+}

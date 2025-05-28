@@ -1,0 +1,105 @@
+
+/* Class = "UIButton"; normalTitle = "Strobing"; ObjectID = "42I-us-8Vr"; */
+"42I-us-8Vr.normalTitle" = "Stroboscope";
+
+/* Class = "UILabel"; text = "Haptics On"; ObjectID = "6iw-hX-6k8"; */
+"6iw-hX-6k8.text" = "Haptique activée";
+
+/* Class = "UILabel"; text = "ProLight"; ObjectID = "82w-IG-4GI"; */
+"82w-IG-4GI.text" = "ProLight";
+
+/* Class = "UILabel"; text = "LED: High"; ObjectID = "9B9-vZ-S0P"; */
+"9B9-vZ-S0P.text" = "LED: High";
+
+/* Class = "UILabel"; text = "--- --, ----"; ObjectID = "AWF-13-n4W"; */
+"AWF-13-n4W.text" = "--- --, ----";
+
+/* Class = "UILabel"; text = "Settings"; ObjectID = "CaT-V1-qMo"; */
+"CaT-V1-qMo.text" = "Réglages";
+
+/* Class = "UIButton"; normalTitle = "Tip Jar"; ObjectID = "FoK-fz-iIh"; */
+"FoK-fz-iIh.normalTitle" = "Astuce Pot";
+
+/* Class = "UISegmentedControl"; GEu-u6-9g7.segmentTitles[0] = "Slow"; ObjectID = "GEu-u6-9g7"; */
+"GEu-u6-9g7.segmentTitles[0]" = "Ralentir";
+
+/* Class = "UISegmentedControl"; GEu-u6-9g7.segmentTitles[1] = "Normal"; ObjectID = "GEu-u6-9g7"; */
+"GEu-u6-9g7.segmentTitles[1]" = "Normale";
+
+/* Class = "UISegmentedControl"; GEu-u6-9g7.segmentTitles[2] = "Fast"; ObjectID = "GEu-u6-9g7"; */
+"GEu-u6-9g7.segmentTitles[2]" = "Vite";
+
+/* Class = "UISegmentedControl"; GEu-u6-9g7.segmentTitles[3] = "Faster"; ObjectID = "GEu-u6-9g7"; */
+"GEu-u6-9g7.segmentTitles[3]" = "Plus rapide";
+
+/* Class = "UISegmentedControl"; GEu-u6-9g7.segmentTitles[4] = "Double"; ObjectID = "GEu-u6-9g7"; */
+"GEu-u6-9g7.segmentTitles[4]" = "Double";
+
+/* Class = "UILabel"; text = "Hide Clock"; ObjectID = "NM6-zh-UFS"; */
+"NM6-zh-UFS.text" = "Masquer l'horloge";
+
+/* Class = "UIBarButtonItem"; title = "---%"; ObjectID = "QhI-l1-u5u"; */
+"QhI-l1-u5u.title" = "---%";
+
+/* Class = "UILabel"; text = "Celsius"; ObjectID = "S1o-GD-92K"; */
+"S1o-GD-92K.text" = "Celsius";
+
+/* Class = "UIButton"; normalTitle = "Share With Friends"; ObjectID = "SIz-9Q-ede"; */
+"SIz-9Q-ede.normalTitle" = "Partager avec des amis";
+
+/* Class = "UILabel"; text = "-- : --"; ObjectID = "TMb-dC-ibC"; */
+"TMb-dC-ibC.text" = "-- : --";
+
+/* Class = "UIButton"; normalTitle = "Manage Subscriptions"; ObjectID = "Tda-xC-Dlc"; */
+"Tda-xC-Dlc.normalTitle" = "Manage Subscriptions";
+
+/* Class = "UIButton"; normalTitle = "Manage Subscriptions"; ObjectID = "VFp-f2-yJt"; */
+"VFp-f2-yJt.normalTitle" = "Manage Subscriptions";
+
+/* Class = "UILabel"; text = "Mute Sounds"; ObjectID = "VUF-Im-dnI"; */
+"VUF-Im-dnI.text" = "Couper les sons";
+
+/* Class = "UILabel"; text = "Subscription"; ObjectID = "X3f-DX-01C"; */
+"X3f-DX-01C.text" = "Abonnement";
+
+/* Class = "UILabel"; text = "Hidden"; ObjectID = "XgT-lZ-3Fe"; */
+"XgT-lZ-3Fe.text" = "Hidden";
+
+/* Class = "UIButton"; normalTitle = "ProLight Premium"; ObjectID = "Xvg-51-4OA"; */
+"Xvg-51-4OA.normalTitle" = "ProLight Premium";
+
+/* Class = "UIButton"; normalTitle = "S4D Website"; ObjectID = "YTI-YU-uz4"; */
+"YTI-YU-uz4.normalTitle" = "Site Web S4D";
+
+/* Class = "UIButton"; normalTitle = "Flashing"; ObjectID = "bIg-Ni-Ug1"; */
+"bIg-Ni-Ug1.normalTitle" = "Clignotant";
+
+/* Class = "UIButton"; normalTitle = "Screen Light"; ObjectID = "bZz-QL-EHA"; */
+"bZz-QL-EHA.normalTitle" = "Lumière d'écran";
+
+/* Class = "UILabel"; text = "100%"; ObjectID = "eOv-Xn-38u"; */
+"eOv-Xn-38u.text" = "100%";
+
+/* Class = "UILabel"; text = "Voice Off"; ObjectID = "hDb-sh-NWc"; */
+"hDb-sh-NWc.text" = "Voix off";
+
+/* Class = "UILabel"; text = "Studio 4 Design"; ObjectID = "hZc-Ps-6ge"; */
+"hZc-Ps-6ge.text" = "Studio 4 Conception";
+
+/* Class = "UIButton"; normalTitle = "Battery"; ObjectID = "hvc-9o-XFV"; */
+"hvc-9o-XFV.normalTitle" = "Battery";
+
+/* Class = "UIButton"; normalTitle = "Feedback"; ObjectID = "lFi-sd-k0U"; */
+"lFi-sd-k0U.normalTitle" = "Retour d'information";
+
+/* Class = "UIButton"; normalTitle = "Like us on Facebook"; ObjectID = "qNG-Mk-EIO"; */
+"qNG-Mk-EIO.normalTitle" = "Aimez-nous sur facebook";
+
+/* Class = "UIButton"; normalTitle = "About"; ObjectID = "rd4-6X-dhr"; */
+"rd4-6X-dhr.normalTitle" = "À propos de";
+
+/* Class = "UILabel"; text = "Strobe Speed: 6"; ObjectID = "svT-xa-74A"; */
+"svT-xa-74A.text" = "Vitesse stroboscopique: 6";
+
+/* Class = "UIButton"; normalTitle = "More Apps"; ObjectID = "xBx-ZH-5yv"; */
+"xBx-ZH-5yv.normalTitle" = "Plus d'applications";

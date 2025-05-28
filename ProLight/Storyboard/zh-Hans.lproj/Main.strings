@@ -1,0 +1,105 @@
+
+/* Class = "UIButton"; normalTitle = "Strobing"; ObjectID = "42I-us-8Vr"; */
+"42I-us-8Vr.normalTitle" = "频闪";
+
+/* Class = "UILabel"; text = "Haptics On"; ObjectID = "6iw-hX-6k8"; */
+"6iw-hX-6k8.text" = "触觉开启";
+
+/* Class = "UILabel"; text = "ProLight"; ObjectID = "82w-IG-4GI"; */
+"82w-IG-4GI.text" = "专业灯";
+
+/* Class = "UILabel"; text = "LED: High"; ObjectID = "9B9-vZ-S0P"; */
+"9B9-vZ-S0P.text" = "引领: High";
+
+/* Class = "UILabel"; text = "--- --, ----"; ObjectID = "AWF-13-n4W"; */
+"AWF-13-n4W.text" = "--- --, ----";
+
+/* Class = "UILabel"; text = "Settings"; ObjectID = "CaT-V1-qMo"; */
+"CaT-V1-qMo.text" = "设置";
+
+/* Class = "UIButton"; normalTitle = "Tip Jar"; ObjectID = "FoK-fz-iIh"; */
+"FoK-fz-iIh.normalTitle" = "小费罐";
+
+/* Class = "UISegmentedControl"; GEu-u6-9g7.segmentTitles[0] = "Slow"; ObjectID = "GEu-u6-9g7"; */
+"GEu-u6-9g7.segmentTitles[0]" = "减缓";
+
+/* Class = "UISegmentedControl"; GEu-u6-9g7.segmentTitles[1] = "Normal"; ObjectID = "GEu-u6-9g7"; */
+"GEu-u6-9g7.segmentTitles[1]" = "普通的";
+
+/* Class = "UISegmentedControl"; GEu-u6-9g7.segmentTitles[2] = "Fast"; ObjectID = "GEu-u6-9g7"; */
+"GEu-u6-9g7.segmentTitles[2]" = "快速地";
+
+/* Class = "UISegmentedControl"; GEu-u6-9g7.segmentTitles[3] = "Faster"; ObjectID = "GEu-u6-9g7"; */
+"GEu-u6-9g7.segmentTitles[3]" = "快点";
+
+/* Class = "UISegmentedControl"; GEu-u6-9g7.segmentTitles[4] = "Double"; ObjectID = "GEu-u6-9g7"; */
+"GEu-u6-9g7.segmentTitles[4]" = "双倍的";
+
+/* Class = "UILabel"; text = "Hide Clock"; ObjectID = "NM6-zh-UFS"; */
+"NM6-zh-UFS.text" = "隐藏时钟";
+
+/* Class = "UIBarButtonItem"; title = "---%"; ObjectID = "QhI-l1-u5u"; */
+"QhI-l1-u5u.title" = "---%";
+
+/* Class = "UILabel"; text = "Celsius"; ObjectID = "S1o-GD-92K"; */
+"S1o-GD-92K.text" = "Celsius";
+
+/* Class = "UIButton"; normalTitle = "Share With Friends"; ObjectID = "SIz-9Q-ede"; */
+"SIz-9Q-ede.normalTitle" = "和朋友分享";
+
+/* Class = "UILabel"; text = "-- : --"; ObjectID = "TMb-dC-ibC"; */
+"TMb-dC-ibC.text" = "-- : --";
+
+/* Class = "UIButton"; normalTitle = "Manage Subscriptions"; ObjectID = "Tda-xC-Dlc"; */
+"Tda-xC-Dlc.normalTitle" = "Manage Subscriptions";
+
+/* Class = "UIButton"; normalTitle = "Manage Subscriptions"; ObjectID = "VFp-f2-yJt"; */
+"VFp-f2-yJt.normalTitle" = "Manage Subscriptions";
+
+/* Class = "UILabel"; text = "Mute Sounds"; ObjectID = "VUF-Im-dnI"; */
+"VUF-Im-dnI.text" = "静音";
+
+/* Class = "UILabel"; text = "Subscription"; ObjectID = "X3f-DX-01C"; */
+"X3f-DX-01C.text" = "订阅";
+
+/* Class = "UILabel"; text = "Hidden"; ObjectID = "XgT-lZ-3Fe"; */
+"XgT-lZ-3Fe.text" = "Hidden";
+
+/* Class = "UIButton"; normalTitle = "ProLight Premium"; ObjectID = "Xvg-51-4OA"; */
+"Xvg-51-4OA.normalTitle" = "ProLight 高级版";
+
+/* Class = "UIButton"; normalTitle = "S4D Website"; ObjectID = "YTI-YU-uz4"; */
+"YTI-YU-uz4.normalTitle" = "S4D 网站";
+
+/* Class = "UIButton"; normalTitle = "Flashing"; ObjectID = "bIg-Ni-Ug1"; */
+"bIg-Ni-Ug1.normalTitle" = "闪烁";
+
+/* Class = "UIButton"; normalTitle = "Screen Light"; ObjectID = "bZz-QL-EHA"; */
+"bZz-QL-EHA.normalTitle" = "屏幕灯";
+
+/* Class = "UILabel"; text = "100%"; ObjectID = "eOv-Xn-38u"; */
+"eOv-Xn-38u.text" = "100%";
+
+/* Class = "UILabel"; text = "Voice Off"; ObjectID = "hDb-sh-NWc"; */
+"hDb-sh-NWc.text" = "语音关闭";
+
+/* Class = "UILabel"; text = "Studio 4 Design"; ObjectID = "hZc-Ps-6ge"; */
+"hZc-Ps-6ge.text" = "工作室 4 设计";
+
+/* Class = "UIButton"; normalTitle = "Battery"; ObjectID = "hvc-9o-XFV"; */
+"hvc-9o-XFV.normalTitle" = "Battery";
+
+/* Class = "UIButton"; normalTitle = "Feedback"; ObjectID = "lFi-sd-k0U"; */
+"lFi-sd-k0U.normalTitle" = "反馈";
+
+/* Class = "UIButton"; normalTitle = "Like us on Facebook"; ObjectID = "qNG-Mk-EIO"; */
+"qNG-Mk-EIO.normalTitle" = "在 Facebook 上像我们一样";
+
+/* Class = "UIButton"; normalTitle = "About"; ObjectID = "rd4-6X-dhr"; */
+"rd4-6X-dhr.normalTitle" = "关于";
+
+/* Class = "UILabel"; text = "Strobe Speed: 6"; ObjectID = "svT-xa-74A"; */
+"svT-xa-74A.text" = "频闪速度: 6";
+
+/* Class = "UIButton"; normalTitle = "More Apps"; ObjectID = "xBx-ZH-5yv"; */
+"xBx-ZH-5yv.normalTitle" = "更多的应用";

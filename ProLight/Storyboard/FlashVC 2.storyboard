@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="79x-9p-7Vz">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Flash-->
+        <scene sceneID="kXs-Z4-R7f">
+            <objects>
+                <viewController storyboardIdentifier="MCFlashView" modalTransitionStyle="crossDissolve" modalPresentationStyle="fullScreen" id="79x-9p-7Vz" customClass="MorseFlash" customModule="ProLight" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="dNM-Pd-Alz">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="background" translatesAutoresizingMaskIntoConstraints="NO" id="fdf-rW-xKn">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                            </imageView>
+                            <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Byp-aP-CDe">
+                                <rect key="frame" x="147" y="325" width="120" height="60"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="60" id="5v7-Jp-xuj"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="120" id="XPf-k2-cAy"/>
+                                    <constraint firstAttribute="height" constant="60" id="eTg-ge-qrt"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <state key="normal" title="Convert">
+                                    <color key="titleColor" red="0.0" green="0.97797602419999996" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="15"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="convertToMorse:" destination="79x-9p-7Vz" eventType="touchUpInside" id="bjI-Qy-h9U"/>
+                                </connections>
+                            </button>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="0F1-KV-7KS" customClass="KMPlaceholderTextView" customModule="KMPlaceholderTextView">
+                                <rect key="frame" x="20" y="64" width="374" height="241"/>
+                                <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="241" id="6vc-X7-88x"/>
+                                </constraints>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="placeholderColor">
+                                        <color key="value" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value=" - .- .--. / .... . .-. . / - --- / ... - .- .-. - / .-- .-. .. - .. -. --. .-.-.- /"/>
+                                </userDefinedRuntimeAttributes>
+                            </textView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Igh-Im-wps" customClass="KMPlaceholderTextView" customModule="KMPlaceholderTextView">
+                                <rect key="frame" x="20" y="405" width="374" height="437"/>
+                                <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="yes" spellCheckingType="no" returnKeyType="done" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="placeholderColor">
+                                        <color key="value" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="Tap here to start writing. "/>
+                                </userDefinedRuntimeAttributes>
+                            </textView>
+                            <navigationBar contentMode="scaleToFill" barStyle="black" translucent="NO" translatesAutoresizingMaskIntoConstraints="NO" id="z2B-aD-SSf">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                <items>
+                                    <navigationItem id="ijy-F4-45s">
+                                        <barButtonItem key="leftBarButtonItem" title="Cancel" style="done" id="60f-Se-ZZP">
+                                            <color key="tintColor" red="0.0" green="0.97797602419999996" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <connections>
+                                                <action selector="dismiss:" destination="79x-9p-7Vz" id="uVj-7O-rrk"/>
+                                            </connections>
+                                        </barButtonItem>
+                                        <barButtonItem key="rightBarButtonItem" image="repeat" catalog="system" id="Fnq-1a-Hxd">
+                                            <color key="tintColor" red="0.0" green="0.97797602419999996" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <connections>
+                                                <action selector="enableDisableRepeat:" destination="79x-9p-7Vz" id="FNh-k9-9ZB"/>
+                                            </connections>
+                                        </barButtonItem>
+                                    </navigationItem>
+                                </items>
+                            </navigationBar>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="Om9-v4-WSD"/>
+                        <color key="backgroundColor" systemColor="tertiarySystemGroupedBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="Byp-aP-CDe" firstAttribute="top" secondItem="0F1-KV-7KS" secondAttribute="bottom" constant="20" id="8RT-9Y-NGU"/>
+                            <constraint firstItem="Igh-Im-wps" firstAttribute="top" secondItem="Byp-aP-CDe" secondAttribute="bottom" constant="20" id="A0U-s7-ffO"/>
+                            <constraint firstItem="z2B-aD-SSf" firstAttribute="leading" secondItem="dNM-Pd-Alz" secondAttribute="leading" id="Aqs-h5-HEj"/>
+                            <constraint firstItem="0F1-KV-7KS" firstAttribute="trailing" secondItem="Igh-Im-wps" secondAttribute="trailing" id="FqZ-A4-cLv"/>
+                            <constraint firstItem="z2B-aD-SSf" firstAttribute="top" secondItem="dNM-Pd-Alz" secondAttribute="top" id="Ilq-wI-Nb5"/>
+                            <constraint firstAttribute="trailing" secondItem="z2B-aD-SSf" secondAttribute="trailing" id="PaM-SI-Ubd"/>
+                            <constraint firstItem="0F1-KV-7KS" firstAttribute="top" secondItem="z2B-aD-SSf" secondAttribute="bottom" constant="20" id="Uml-ZB-8hJ"/>
+                            <constraint firstItem="fdf-rW-xKn" firstAttribute="top" secondItem="dNM-Pd-Alz" secondAttribute="top" id="XeR-Nl-Hsq"/>
+                            <constraint firstItem="0F1-KV-7KS" firstAttribute="centerX" secondItem="dNM-Pd-Alz" secondAttribute="centerX" id="bdI-Mf-q4M"/>
+                            <constraint firstAttribute="bottom" secondItem="fdf-rW-xKn" secondAttribute="bottom" id="eF6-jb-ybs"/>
+                            <constraint firstItem="Igh-Im-wps" firstAttribute="bottom" secondItem="Om9-v4-WSD" secondAttribute="bottom" constant="-20" id="ezr-TL-XxA"/>
+                            <constraint firstItem="0F1-KV-7KS" firstAttribute="leading" secondItem="dNM-Pd-Alz" secondAttribute="leadingMargin" id="l6j-at-uqb"/>
+                            <constraint firstItem="0F1-KV-7KS" firstAttribute="trailing" secondItem="dNM-Pd-Alz" secondAttribute="trailingMargin" id="me7-R2-dGC"/>
+                            <constraint firstItem="fdf-rW-xKn" firstAttribute="trailing" secondItem="Om9-v4-WSD" secondAttribute="trailing" id="nNM-Ju-ltY"/>
+                            <constraint firstItem="fdf-rW-xKn" firstAttribute="leading" secondItem="Om9-v4-WSD" secondAttribute="leading" id="nOa-Ix-e6e"/>
+                            <constraint firstItem="0F1-KV-7KS" firstAttribute="leading" secondItem="Igh-Im-wps" secondAttribute="leading" id="tGp-Xl-ifX"/>
+                            <constraint firstItem="Byp-aP-CDe" firstAttribute="centerX" secondItem="dNM-Pd-Alz" secondAttribute="centerX" id="ypt-3r-2SZ"/>
+                            <constraint firstItem="Igh-Im-wps" firstAttribute="centerX" secondItem="dNM-Pd-Alz" secondAttribute="centerX" id="yr7-Xo-iOP"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Flash" id="4ny-il-jIG"/>
+                    <connections>
+                        <outlet property="cancelBtn" destination="60f-Se-ZZP" id="qSL-7i-QLx"/>
+                        <outlet property="convertFrom" destination="Igh-Im-wps" id="9Td-rG-2eP"/>
+                        <outlet property="convertToMorseButton" destination="Byp-aP-CDe" id="O3r-D7-LJT"/>
+                        <outlet property="convertedTo" destination="0F1-KV-7KS" id="NrU-XG-PcY"/>
+                        <outlet property="shouldRepeat" destination="Fnq-1a-Hxd" id="lrF-Xq-t8T"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="kem-53-bBH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1976.8115942028987" y="114.50892857142857"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="background" width="1280" height="960"/>
+        <image name="repeat" catalog="system" width="128" height="98"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray5Color">
+            <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="tertiarySystemGroupedBackgroundColor">
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

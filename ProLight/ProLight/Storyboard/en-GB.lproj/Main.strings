@@ -1,0 +1,114 @@
+
+/* Class = "UILabel"; text = "unknown"; ObjectID = "0hm-av-HYg"; */
+"0hm-av-HYg.text" = "unknown";
+
+/* Class = "UIButton"; normalTitle = "Terms/Disclaimer"; ObjectID = "1Is-Z4-Awi"; */
+"1Is-Z4-Awi.normalTitle" = "Terms/Disclaimer";
+
+/* Class = "UIButton"; normalTitle = "Strobing"; ObjectID = "42I-us-8Vr"; */
+"42I-us-8Vr.normalTitle" = "Strobing";
+
+/* Class = "UIButton"; normalTitle = "Weather"; ObjectID = "7RL-Ig-zYr"; */
+"7RL-Ig-zYr.normalTitle" = "Weather";
+
+/* Class = "UILabel"; text = "LED: High"; ObjectID = "9B9-vZ-S0P"; */
+"9B9-vZ-S0P.text" = "LED: High";
+
+/* Class = "UIButton"; normalTitle = "Mode"; ObjectID = "BJj-sK-bNm"; */
+"BJj-sK-bNm.normalTitle" = "Mode";
+
+/* Class = "UILabel"; text = "Settings"; ObjectID = "CaT-V1-qMo"; */
+"CaT-V1-qMo.text" = "Settings";
+
+/* Class = "UIButton"; normalTitle = "Privacy Policy"; ObjectID = "FhN-Ml-haH"; */
+"FhN-Ml-haH.normalTitle" = "Privacy Policy";
+
+/* Class = "UISegmentedControl"; GEu-u6-9g7.segmentTitles[0] = "Slow"; ObjectID = "GEu-u6-9g7"; */
+"GEu-u6-9g7.segmentTitles[0]" = "Slow";
+
+/* Class = "UISegmentedControl"; GEu-u6-9g7.segmentTitles[1] = "Normal"; ObjectID = "GEu-u6-9g7"; */
+"GEu-u6-9g7.segmentTitles[1]" = "Normal";
+
+/* Class = "UISegmentedControl"; GEu-u6-9g7.segmentTitles[2] = "Fast"; ObjectID = "GEu-u6-9g7"; */
+"GEu-u6-9g7.segmentTitles[2]" = "Fast";
+
+/* Class = "UISegmentedControl"; GEu-u6-9g7.segmentTitles[3] = "Faster"; ObjectID = "GEu-u6-9g7"; */
+"GEu-u6-9g7.segmentTitles[3]" = "Faster";
+
+/* Class = "UISegmentedControl"; GEu-u6-9g7.segmentTitles[4] = "Double"; ObjectID = "GEu-u6-9g7"; */
+"GEu-u6-9g7.segmentTitles[4]" = "Double";
+
+/* Class = "UITextView"; text = "Icons From: icons8.com Sounds From: freesound.org"; ObjectID = "JkP-KA-kG2"; */
+"JkP-KA-kG2.text" = "Icons From: icons8.com Sounds From: freesound.org";
+
+/* Class = "UILabel"; text = "Hide Clock"; ObjectID = "NM6-zh-UFS"; */
+"NM6-zh-UFS.text" = "Hide Clock";
+
+/* Class = "UIBarButtonItem"; title = "---%"; ObjectID = "QhI-l1-u5u"; */
+"QhI-l1-u5u.title" = "---%";
+
+/* Class = "UIButton"; normalTitle = "Share This App"; ObjectID = "SIz-9Q-ede"; */
+"SIz-9Q-ede.normalTitle" = "Share This App";
+
+/* Class = "UIButton"; normalTitle = "Need Help?"; ObjectID = "URB-mY-o1D"; */
+"URB-mY-o1D.normalTitle" = "Need Help?";
+
+/* Class = "UILabel"; text = "Sound Off"; ObjectID = "VUF-Im-dnI"; */
+"VUF-Im-dnI.text" = "Sound Off";
+
+/* Class = "UILabel"; text = "version"; ObjectID = "WLF-5W-y31"; */
+"WLF-5W-y31.text" = "version";
+
+/* Class = "UILabel"; text = "ProLight"; ObjectID = "X3f-DX-01C"; */
+"X3f-DX-01C.text" = "ProLight";
+
+/* Class = "UILabel"; text = "Hidden"; ObjectID = "XgT-lZ-3Fe"; */
+"XgT-lZ-3Fe.text" = "Hidden";
+
+/* Class = "UILabel"; text = "--:--"; ObjectID = "XnP-OZ-I3X"; */
+"XnP-OZ-I3X.text" = "--:--";
+
+/* Class = "UIButton"; normalTitle = "S4D Website"; ObjectID = "YTI-YU-uz4"; */
+"YTI-YU-uz4.normalTitle" = "S4D Website";
+
+/* Class = "UILabel"; text = "copyright"; ObjectID = "afx-Zu-gRB"; */
+"afx-Zu-gRB.text" = "copyright";
+
+/* Class = "UIButton"; normalTitle = "Flashing"; ObjectID = "bIg-Ni-Ug1"; */
+"bIg-Ni-Ug1.normalTitle" = "Flashing";
+
+/* Class = "UIButton"; normalTitle = "Screen Light"; ObjectID = "bZz-QL-EHA"; */
+"bZz-QL-EHA.normalTitle" = "Screen Light";
+
+/* Class = "UILabel"; text = "0%"; ObjectID = "eOv-Xn-38u"; */
+"eOv-Xn-38u.text" = "0%";
+
+/* Class = "UILabel"; text = "Enabled"; ObjectID = "foR-WC-fOp"; */
+"foR-WC-fOp.text" = "Enabled";
+
+/* Class = "UILabel"; text = "Voice Assist"; ObjectID = "hDb-sh-NWc"; */
+"hDb-sh-NWc.text" = "Voice Assist";
+
+/* Class = "UILabel"; text = "Studio 4 Design"; ObjectID = "hZc-Ps-6ge"; */
+"hZc-Ps-6ge.text" = "Studio 4 Design";
+
+/* Class = "UIButton"; normalTitle = "Battery"; ObjectID = "hvc-9o-XFV"; */
+"hvc-9o-XFV.normalTitle" = "Battery";
+
+/* Class = "UIButton"; normalTitle = "Send Feedback"; ObjectID = "lFi-sd-k0U"; */
+"lFi-sd-k0U.normalTitle" = "Send Feedback";
+
+/* Class = "UIButton"; normalTitle = "Like us on Facebook"; ObjectID = "qNG-Mk-EIO"; */
+"qNG-Mk-EIO.normalTitle" = "Like us on Facebook";
+
+/* Class = "UIButton"; normalTitle = "About"; ObjectID = "rd4-6X-dhr"; */
+"rd4-6X-dhr.normalTitle" = "About";
+
+/* Class = "UILabel"; text = "Strobe Speed: 6"; ObjectID = "svT-xa-74A"; */
+"svT-xa-74A.text" = "Strobe Speed: 6";
+
+/* Class = "UIButton"; normalTitle = "More Apps"; ObjectID = "xBx-ZH-5yv"; */
+"xBx-ZH-5yv.normalTitle" = "More Apps";
+
+/* Class = "UITextView"; text = "Thank you to all whome downloaded ProLight, if you want to see more of my apps please visit my website or click on \"More Apps\" in the menu."; ObjectID = "yrj-RT-fT6"; */
+"yrj-RT-fT6.text" = "Thank you to all whome downloaded ProLight, if you want to see more of my apps please visit my website or click on \"More Apps\" in the menu.";

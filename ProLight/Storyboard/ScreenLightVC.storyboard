@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="NWm-kD-cP8">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--ScreenVC-->
+        <scene sceneID="rbP-Te-DY7">
+            <objects>
+                <viewController storyboardIdentifier="screenLightVC" modalTransitionStyle="crossDissolve" modalPresentationStyle="fullScreen" id="NWm-kD-cP8" customClass="ScreenVC" customModule="ProLight" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="dZ2-cg-rcK">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bhG-Lg-1q7">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                            </imageView>
+                            <segmentedControl opaque="NO" clipsSubviews="YES" alpha="0.80000001192092896" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" segmentControlStyle="plain" selectedSegmentIndex="1" springLoaded="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gh1-5y-kiO">
+                                <rect key="frame" x="40" y="58" width="334" height="32"/>
+                                <color key="backgroundColor" systemColor="viewFlipsideBackgroundColor"/>
+                                <segments>
+                                    <segment title="OFF"/>
+                                    <segment title="ON"/>
+                                    <segment title="Flashing"/>
+                                    <segment title="Strobing"/>
+                                </segments>
+                                <connections>
+                                    <action selector="strobController:" destination="NWm-kD-cP8" eventType="valueChanged" id="xgh-HF-2Nb"/>
+                                </connections>
+                            </segmentedControl>
+                            <button opaque="NO" alpha="0.80000001192092896" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EMJ-QV-d61">
+                                <rect key="frame" x="132" y="373" width="150" height="150"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <state key="normal" image="PowerBtn"/>
+                                <connections>
+                                    <action selector="dismiss:" destination="NWm-kD-cP8" eventType="touchUpInside" id="qb2-dW-UPV"/>
+                                </connections>
+                            </button>
+                            <segmentedControl opaque="NO" clipsSubviews="YES" alpha="0.80000001192092896" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" segmentControlStyle="plain" selectedSegmentIndex="1" springLoaded="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ayT-Us-9yo">
+                                <rect key="frame" x="20" y="821" width="111" height="32"/>
+                                <color key="backgroundColor" systemColor="viewFlipsideBackgroundColor"/>
+                                <segments>
+                                    <segment title="White"/>
+                                    <segment title="Red"/>
+                                </segments>
+                                <connections>
+                                    <action selector="screenLightColor:" destination="NWm-kD-cP8" eventType="valueChanged" id="Odu-G1-BJs"/>
+                                </connections>
+                            </segmentedControl>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="u5f-yJ-P7h"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="u5f-yJ-P7h" firstAttribute="bottom" secondItem="ayT-Us-9yo" secondAttribute="bottom" constant="10" id="1YB-09-xOi"/>
+                            <constraint firstItem="bhG-Lg-1q7" firstAttribute="top" secondItem="dZ2-cg-rcK" secondAttribute="top" id="9hP-Bp-Roh"/>
+                            <constraint firstItem="bhG-Lg-1q7" firstAttribute="leading" secondItem="u5f-yJ-P7h" secondAttribute="leading" id="B8k-LM-omk"/>
+                            <constraint firstItem="bhG-Lg-1q7" firstAttribute="trailing" secondItem="u5f-yJ-P7h" secondAttribute="trailing" id="BQy-7V-d3u"/>
+                            <constraint firstAttribute="bottom" secondItem="bhG-Lg-1q7" secondAttribute="bottom" id="CFv-K6-mvA"/>
+                            <constraint firstItem="u5f-yJ-P7h" firstAttribute="trailing" secondItem="gh1-5y-kiO" secondAttribute="trailing" constant="40" id="Mme-pf-w9U"/>
+                            <constraint firstItem="gh1-5y-kiO" firstAttribute="leading" secondItem="u5f-yJ-P7h" secondAttribute="leading" constant="40" id="doj-h0-tGm"/>
+                            <constraint firstItem="gh1-5y-kiO" firstAttribute="top" secondItem="u5f-yJ-P7h" secondAttribute="top" constant="10" id="po3-J1-3LS"/>
+                            <constraint firstItem="ayT-Us-9yo" firstAttribute="leading" secondItem="u5f-yJ-P7h" secondAttribute="leading" constant="20" id="u7Y-LS-4Qv"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="StrobLight" destination="bhG-Lg-1q7" id="aVV-i3-nyc"/>
+                        <outlet property="colorSeg" destination="ayT-Us-9yo" id="wgj-Fx-5eP"/>
+                        <outlet property="dismissBtn" destination="EMJ-QV-d61" id="8zk-z1-ZoU"/>
+                        <outlet property="segmentControl" destination="gh1-5y-kiO" id="66f-AS-6hg"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Yt5-IY-6Vr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1050.7246376811595" y="227.67857142857142"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="PowerBtn" width="1024" height="1024"/>
+        <systemColor name="viewFlipsideBackgroundColor">
+            <color red="0.1215686275" green="0.12941176469999999" blue="0.14117647059999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

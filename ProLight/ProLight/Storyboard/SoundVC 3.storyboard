@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="SL1-Qf-Byu">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Morse Sound-->
+        <scene sceneID="cPH-bB-CWC">
+            <objects>
+                <viewController storyboardIdentifier="MCSoundView" modalTransitionStyle="crossDissolve" modalPresentationStyle="fullScreen" id="SL1-Qf-Byu" customClass="MorseSound" customModule="ProLight" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="64j-Bf-Cs4">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="background" translatesAutoresizingMaskIntoConstraints="NO" id="eAh-KV-yYI">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                            </imageView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="YVS-fA-n3j" customClass="KMPlaceholderTextView" customModule="KMPlaceholderTextView">
+                                <rect key="frame" x="20" y="64" width="374" height="241"/>
+                                <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="241" id="JTl-bg-mdV"/>
+                                </constraints>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value=" - .- .--. / .... . .-. . / - --- / ... - .- .-. - / .-- .-. .. - .. -. --. .-.-.- /"/>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="placeholderColor">
+                                        <color key="value" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </textView>
+                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AAl-jf-kV0">
+                                <rect key="frame" x="20" y="325" width="234" height="60"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="tintColor" red="0.0" green="0.97797602419999996" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="8Mq-qb-vBx"/>
+                                </constraints>
+                            </pickerView>
+                            <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageWhenHighlighted="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pH0-8X-MFS">
+                                <rect key="frame" x="274" y="325" width="120" height="60"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="120" id="3ws-xc-38m"/>
+                                    <constraint firstAttribute="height" constant="60" id="cfd-lB-yBW"/>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="60" id="x70-Q1-Lso"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <state key="normal" title="Convert">
+                                    <color key="titleColor" red="0.0" green="0.97797602419999996" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="15"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="convertToMorse:" destination="SL1-Qf-Byu" eventType="touchUpInside" id="fc2-ih-hSI"/>
+                                </connections>
+                            </button>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="2Dw-ej-Ib1" customClass="KMPlaceholderTextView" customModule="KMPlaceholderTextView">
+                                <rect key="frame" x="20" y="405" width="374" height="437"/>
+                                <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="yes" spellCheckingType="no" returnKeyType="done" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="Tap here to start writing. "/>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="placeholderColor">
+                                        <color key="value" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </textView>
+                            <navigationBar contentMode="scaleToFill" translucent="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MLU-4f-1i7">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                <color key="barTintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <items>
+                                    <navigationItem id="6qn-JY-VQr">
+                                        <barButtonItem key="leftBarButtonItem" title="Cancel" style="done" id="9Zb-Bb-lmB">
+                                            <color key="tintColor" red="0.0" green="0.97797602419999996" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <connections>
+                                                <action selector="dismiss:" destination="SL1-Qf-Byu" id="lEn-Y3-RwN"/>
+                                            </connections>
+                                        </barButtonItem>
+                                        <barButtonItem key="rightBarButtonItem" image="repeat" catalog="system" id="5Ha-tq-AvF">
+                                            <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <connections>
+                                                <action selector="enableDisableRepeat:" destination="SL1-Qf-Byu" id="C1z-Z7-ecK"/>
+                                            </connections>
+                                        </barButtonItem>
+                                    </navigationItem>
+                                </items>
+                            </navigationBar>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="4Dc-Gf-u1p"/>
+                        <color key="backgroundColor" systemColor="tertiarySystemGroupedBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="pH0-8X-MFS" firstAttribute="top" secondItem="YVS-fA-n3j" secondAttribute="bottom" constant="20" id="5Od-h7-wXp"/>
+                            <constraint firstItem="YVS-fA-n3j" firstAttribute="centerX" secondItem="64j-Bf-Cs4" secondAttribute="centerX" id="5lY-ht-sVg"/>
+                            <constraint firstAttribute="bottom" secondItem="eAh-KV-yYI" secondAttribute="bottom" id="AJz-Sh-5V2"/>
+                            <constraint firstItem="eAh-KV-yYI" firstAttribute="leading" secondItem="4Dc-Gf-u1p" secondAttribute="leading" id="Dwk-tI-cos"/>
+                            <constraint firstItem="2Dw-ej-Ib1" firstAttribute="bottom" secondItem="4Dc-Gf-u1p" secondAttribute="bottom" constant="-20" id="EB7-BA-hyA"/>
+                            <constraint firstAttribute="trailing" secondItem="MLU-4f-1i7" secondAttribute="trailing" id="L5A-Vy-zyl"/>
+                            <constraint firstItem="MLU-4f-1i7" firstAttribute="leading" secondItem="64j-Bf-Cs4" secondAttribute="leading" id="N9z-Uo-Jq7"/>
+                            <constraint firstItem="4Dc-Gf-u1p" firstAttribute="trailing" secondItem="2Dw-ej-Ib1" secondAttribute="trailing" constant="20" id="S3x-gk-mUb"/>
+                            <constraint firstAttribute="trailing" secondItem="eAh-KV-yYI" secondAttribute="trailing" id="V7j-mi-d5b"/>
+                            <constraint firstItem="pH0-8X-MFS" firstAttribute="leading" secondItem="AAl-jf-kV0" secondAttribute="trailing" constant="20" id="bh4-dv-4Xo"/>
+                            <constraint firstItem="YVS-fA-n3j" firstAttribute="leading" secondItem="2Dw-ej-Ib1" secondAttribute="leading" id="g9T-cN-uhc"/>
+                            <constraint firstItem="AAl-jf-kV0" firstAttribute="top" secondItem="pH0-8X-MFS" secondAttribute="top" id="jyF-Lf-Ruk"/>
+                            <constraint firstItem="2Dw-ej-Ib1" firstAttribute="leading" secondItem="4Dc-Gf-u1p" secondAttribute="leading" constant="20" id="oNd-f9-4Kp"/>
+                            <constraint firstItem="YVS-fA-n3j" firstAttribute="trailing" secondItem="2Dw-ej-Ib1" secondAttribute="trailing" id="pow-fr-ksF"/>
+                            <constraint firstItem="2Dw-ej-Ib1" firstAttribute="centerX" secondItem="64j-Bf-Cs4" secondAttribute="centerX" id="qBD-zb-LQp"/>
+                            <constraint firstItem="2Dw-ej-Ib1" firstAttribute="top" secondItem="pH0-8X-MFS" secondAttribute="bottom" constant="20" id="qrX-4O-27Y"/>
+                            <constraint firstItem="AAl-jf-kV0" firstAttribute="leading" secondItem="64j-Bf-Cs4" secondAttribute="leadingMargin" id="uis-R5-Xd2"/>
+                            <constraint firstItem="YVS-fA-n3j" firstAttribute="top" secondItem="MLU-4f-1i7" secondAttribute="bottom" constant="20" id="wNe-VN-dq8"/>
+                            <constraint firstItem="eAh-KV-yYI" firstAttribute="top" secondItem="64j-Bf-Cs4" secondAttribute="top" id="x34-2B-Uss"/>
+                            <constraint firstItem="MLU-4f-1i7" firstAttribute="top" secondItem="64j-Bf-Cs4" secondAttribute="top" id="yfi-3F-ed1"/>
+                            <constraint firstItem="4Dc-Gf-u1p" firstAttribute="trailing" secondItem="pH0-8X-MFS" secondAttribute="trailing" constant="20" id="yoR-dG-fXi"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="wgw-b4-fy3">
+                        <barButtonItem key="leftBarButtonItem" title="Cancel" id="HJa-kN-b4C"/>
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="xCg-JJ-3bc"/>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="cancelBtn" destination="9Zb-Bb-lmB" id="q92-rL-RGz"/>
+                        <outlet property="convertFrom" destination="2Dw-ej-Ib1" id="xc3-Qo-Fgj"/>
+                        <outlet property="convertToMorseButton" destination="pH0-8X-MFS" id="9Xo-38-Oeq"/>
+                        <outlet property="convertedTo" destination="YVS-fA-n3j" id="ipI-x0-p0c"/>
+                        <outlet property="shouldRepeat" destination="5Ha-tq-AvF" id="arf-l5-m9c"/>
+                        <outlet property="wpmPicker" destination="AAl-jf-kV0" id="FNQ-CV-bMQ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="UUr-q4-far" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="86.956521739130437" y="49.553571428571423"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="background" width="1280" height="960"/>
+        <image name="repeat" catalog="system" width="128" height="98"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray5Color">
+            <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="tertiarySystemGroupedBackgroundColor">
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

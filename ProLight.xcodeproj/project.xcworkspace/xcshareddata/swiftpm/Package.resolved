@@ -1,0 +1,51 @@
+{
+  "originHash" : "52022d533883041d98d474e1a5416d1411859e1ad2c85cefe18bfc173a98a698",
+  "pins" : [
+    {
+      "identity" : "ctfeedbackswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/rizumita/CTFeedbackSwift",
+      "state" : {
+        "branch" : "main",
+        "revision" : "0f6f64c674555a47b65a4e87c078651dac7ea0b6"
+      }
+    },
+    {
+      "identity" : "lottie-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/airbnb/lottie-ios",
+      "state" : {
+        "revision" : "047aa81b77adcbf583a966dfef620d17650cc656",
+        "version" : "4.5.1"
+      }
+    },
+    {
+      "identity" : "purchases-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/RevenueCat/purchases-ios.git",
+      "state" : {
+        "revision" : "e919c0b6066d60e19663211d66edaf9a01336940",
+        "version" : "4.24.1"
+      }
+    },
+    {
+      "identity" : "swiftalertview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dinhquan/SwiftAlertView",
+      "state" : {
+        "revision" : "601c049861691ea3578e3812d1e9cd548cf46f48",
+        "version" : "2.2.1"
+      }
+    },
+    {
+      "identity" : "whatsnewkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SvenTiigi/WhatsNewKit.git",
+      "state" : {
+        "revision" : "238dadc14dd58885f51037e63d08baf4275c480e",
+        "version" : "2.1.0"
+      }
+    }
+  ],
+  "version" : 3
+}

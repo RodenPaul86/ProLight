@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="CJr-Wr-N3a">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Vibration-->
+        <scene sceneID="6SJ-1p-T6a">
+            <objects>
+                <viewController storyboardIdentifier="MCVibrationView" modalTransitionStyle="crossDissolve" modalPresentationStyle="fullScreen" id="CJr-Wr-N3a" customClass="MorseVibration" customModule="ProLight" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="7Kc-x2-e3u">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="background" translatesAutoresizingMaskIntoConstraints="NO" id="GVQ-fA-PZc">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                            </imageView>
+                            <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OHZ-yH-vSL">
+                                <rect key="frame" x="147" y="325" width="120" height="60"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="60" id="VEE-O3-8eH"/>
+                                    <constraint firstAttribute="height" constant="60" id="qYx-Xx-acl"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="120" id="z70-B1-MM0"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <state key="normal" title="Convert">
+                                    <color key="titleColor" red="0.0" green="0.97797602419999996" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="15"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="convertToMorse:" destination="CJr-Wr-N3a" eventType="touchUpInside" id="Cm2-5b-WX7"/>
+                                </connections>
+                            </button>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="YEg-Yi-7xw" customClass="KMPlaceholderTextView" customModule="KMPlaceholderTextView">
+                                <rect key="frame" x="20" y="64" width="374" height="241"/>
+                                <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="241" id="ou5-nh-srE"/>
+                                </constraints>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="placeholderColor">
+                                        <color key="value" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value=" - .- .--. / .... . .-. . / - --- / ... - .- .-. - / .-- .-. .. - .. -. --. .-.-.- /"/>
+                                </userDefinedRuntimeAttributes>
+                            </textView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Kd6-6h-hpp" customClass="KMPlaceholderTextView" customModule="KMPlaceholderTextView">
+                                <rect key="frame" x="20" y="405" width="374" height="437"/>
+                                <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="yes" spellCheckingType="no" returnKeyType="done" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="placeholderColor">
+                                        <color key="value" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="Tap here to start writing. "/>
+                                </userDefinedRuntimeAttributes>
+                            </textView>
+                            <navigationBar contentMode="scaleToFill" barStyle="black" translucent="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Y6r-Tq-2md">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                <items>
+                                    <navigationItem id="5Ig-tM-V2z">
+                                        <barButtonItem key="leftBarButtonItem" title="Cancel" style="done" id="9rq-FZ-f33">
+                                            <color key="tintColor" red="0.0" green="0.97797602419999996" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <connections>
+                                                <action selector="dismiss:" destination="CJr-Wr-N3a" id="8pH-B4-nhT"/>
+                                            </connections>
+                                        </barButtonItem>
+                                        <barButtonItem key="rightBarButtonItem" image="repeat" catalog="system" id="whT-cA-J8S">
+                                            <color key="tintColor" red="0.0" green="0.97797602419999996" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <connections>
+                                                <action selector="enableDisableRepeat:" destination="CJr-Wr-N3a" id="KYj-M7-vsU"/>
+                                            </connections>
+                                        </barButtonItem>
+                                    </navigationItem>
+                                </items>
+                            </navigationBar>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="3bi-AR-svj"/>
+                        <color key="backgroundColor" systemColor="tertiarySystemGroupedBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="OHZ-yH-vSL" firstAttribute="top" secondItem="YEg-Yi-7xw" secondAttribute="bottom" constant="20" id="1aH-a0-KzL"/>
+                            <constraint firstItem="GVQ-fA-PZc" firstAttribute="top" secondItem="7Kc-x2-e3u" secondAttribute="top" id="6tX-IS-KkW"/>
+                            <constraint firstItem="GVQ-fA-PZc" firstAttribute="leading" secondItem="3bi-AR-svj" secondAttribute="leading" id="Amr-ew-XHU"/>
+                            <constraint firstItem="Y6r-Tq-2md" firstAttribute="leading" secondItem="7Kc-x2-e3u" secondAttribute="leading" id="Bxc-et-PNP"/>
+                            <constraint firstAttribute="trailing" secondItem="Y6r-Tq-2md" secondAttribute="trailing" id="CTY-6I-1wc"/>
+                            <constraint firstItem="YEg-Yi-7xw" firstAttribute="leading" secondItem="Kd6-6h-hpp" secondAttribute="leading" id="E9F-xe-HoN"/>
+                            <constraint firstItem="YEg-Yi-7xw" firstAttribute="leading" secondItem="7Kc-x2-e3u" secondAttribute="leadingMargin" id="RLH-XD-zKz"/>
+                            <constraint firstItem="YEg-Yi-7xw" firstAttribute="centerX" secondItem="7Kc-x2-e3u" secondAttribute="centerX" id="TQe-DU-xXc"/>
+                            <constraint firstItem="OHZ-yH-vSL" firstAttribute="centerX" secondItem="7Kc-x2-e3u" secondAttribute="centerX" id="YMB-48-l7N"/>
+                            <constraint firstItem="YEg-Yi-7xw" firstAttribute="trailing" secondItem="Kd6-6h-hpp" secondAttribute="trailing" id="c3N-zS-hrj"/>
+                            <constraint firstItem="Kd6-6h-hpp" firstAttribute="top" secondItem="OHZ-yH-vSL" secondAttribute="bottom" constant="20" id="e35-yZ-IUG"/>
+                            <constraint firstItem="YEg-Yi-7xw" firstAttribute="trailing" secondItem="7Kc-x2-e3u" secondAttribute="trailingMargin" id="e62-iF-Qyk"/>
+                            <constraint firstItem="GVQ-fA-PZc" firstAttribute="trailing" secondItem="3bi-AR-svj" secondAttribute="trailing" id="kFN-1Z-4Mn"/>
+                            <constraint firstItem="Kd6-6h-hpp" firstAttribute="centerX" secondItem="7Kc-x2-e3u" secondAttribute="centerX" id="nb7-QO-G6H"/>
+                            <constraint firstAttribute="bottom" secondItem="GVQ-fA-PZc" secondAttribute="bottom" id="oCt-zV-wsa"/>
+                            <constraint firstItem="Kd6-6h-hpp" firstAttribute="bottom" secondItem="3bi-AR-svj" secondAttribute="bottom" constant="-20" id="oQ0-XK-Kdr"/>
+                            <constraint firstItem="YEg-Yi-7xw" firstAttribute="top" secondItem="Y6r-Tq-2md" secondAttribute="bottom" constant="20" id="qea-Rd-9mZ"/>
+                            <constraint firstItem="Y6r-Tq-2md" firstAttribute="top" secondItem="7Kc-x2-e3u" secondAttribute="top" id="tax-bm-HqH"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Vibration" id="Fol-RG-4HJ"/>
+                    <connections>
+                        <outlet property="cancelBtn" destination="9rq-FZ-f33" id="W29-bT-lWQ"/>
+                        <outlet property="convertFrom" destination="Kd6-6h-hpp" id="YEN-ax-XBs"/>
+                        <outlet property="convertToMorseButton" destination="OHZ-yH-vSL" id="ekF-HJ-AAT"/>
+                        <outlet property="convertedTo" destination="YEg-Yi-7xw" id="SsU-WY-WVN"/>
+                        <outlet property="shouldRepeat" destination="whT-cA-J8S" id="U3F-Bi-d7M"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="TXU-YX-Iwk" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="486.95652173913049" y="5.3571428571428568"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="background" width="1280" height="960"/>
+        <image name="repeat" catalog="system" width="128" height="98"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray5Color">
+            <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="tertiarySystemGroupedBackgroundColor">
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>
