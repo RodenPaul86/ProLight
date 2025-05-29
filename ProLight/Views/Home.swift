@@ -9,13 +9,13 @@ import SwiftUI
 import AVFoundation
 
 struct Home: View {
-    @State private var brightnessLevel = 3
+    @State private var brightnessLevel = 4
     @State private var flashlightOn = true
     @State private var showLockIcon = false
     
     @State private var dragOffset: CGFloat = 0
     
-    let maxLevel = 3
+    let maxLevel = 4
     
     var body: some View {
         ZStack(alignment: .center) {
@@ -23,44 +23,49 @@ struct Home: View {
                 .ignoresSafeArea(edges: .all)
             
             VStack(spacing: 40) {
-                // Flashlight icon with beam
+                // Flashlight icon indicator
                 VStack(spacing: 8) {
                     if flashlightOn {
+                        let scaledOpacity = Double(brightnessLevel) / Double(maxLevel)
+                        let shadowRadius = 5 + (15 * scaledOpacity) // radius grows with brightness
+                        
                         Image(systemName: "flashlight.on.fill")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 32, height: 60)
-                            .foregroundColor(Color.white.opacity(Double(brightnessLevel)))
-                            .shadow(color: .white.opacity(Double(brightnessLevel)), radius: 10)
-                        
+                            .foregroundColor(Color.white.opacity(scaledOpacity))
+                            .shadow(color: .white.opacity(scaledOpacity), radius: shadowRadius)
                     } else {
                         Image(systemName: "flashlight.off.fill")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 32, height: 60)
                             .foregroundColor(.white.opacity(0.4))
+                            .shadow(color: .clear, radius: 0)
                     }
                 }
                 
                 // Brightness slider
                 VStack(spacing: 10) {
                     VStack(spacing: 5) {
-                        TopCurvedRectangle()
+                        curvedRectangle(topRadius: 40, bottomRadius: 10)
                             .fill(!flashlightOn ? Color.gray.opacity(0.3) : (brightnessLevel == maxLevel ? Color.white : Color.gray.opacity(0.3)))
                             .frame(width: 120, height: 60)
                             .onTapGesture {
                                 flashlightOn = true
                                 brightnessLevel = maxLevel
+                                print("Tapped level: \(maxLevel)")
                                 updateTorch()
                             }
 
-                        ForEach((1...maxLevel).reversed(), id: \.self) { level in
+                        ForEach((1..<(maxLevel)).reversed(), id: \.self) { level in
                             RoundedRectangle(cornerRadius: 8)
                                 .fill(!flashlightOn ? Color.gray.opacity(0.3) : (level <= brightnessLevel ? Color.white : Color.gray.opacity(0.3)))
                                 .frame(width: 120, height: 60)
                                 .onTapGesture {
                                     flashlightOn = true
                                     brightnessLevel = level
+                                    print("Tapped level: \(level)")
                                     updateTorch()
                                 }
                         }
@@ -68,8 +73,8 @@ struct Home: View {
                     
                     // Power button with lock text
                     ZStack {
-                        FlatTopRoundedRectangle()
-                            .fill(flashlightOn ? Color.green.opacity(0.8) : Color.gray.opacity(0.3))
+                        curvedRectangle(topRadius: 10, bottomRadius: 40)
+                            .fill(flashlightOn ? Color.green.opacity(0.6) : Color.gray.opacity(0.3))
                             .frame(width: 120, height: 90)
                         Image(systemName: "power")
                             .font(.largeTitle.bold())
@@ -109,21 +114,7 @@ struct Home: View {
                     
                 }
                 .padding(.horizontal)
-                
-                
-                
             }
-            
-            
-            
-            
-            
-            /*
-            // Brightness slider (hidden)
-            Slider(value: $brightness, in: 0...1)
-                .padding()
-                .offset(y: 250)
-            */
         }
     }
     
@@ -158,8 +149,6 @@ struct Home: View {
         
         device.unlockForConfiguration()
     }
-    
-    
 }
 
 #Preview {
@@ -191,79 +180,44 @@ struct RoundedTriangle: Shape {
     }
 }
 
-struct ArcShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        let startAngle: Angle = .degrees(180)
-        let endAngle: Angle = .degrees(0)
-        return Path { path in
-            path.addArc(center: CGPoint(x: rect.midX, y: rect.maxY),
-                        radius: rect.width / 2,
-                        startAngle: startAngle,
-                        endAngle: endAngle,
-                        clockwise: true)
-        }
-    }
-}
-
-struct BeamMaskShape: Shape {
+struct curvedRectangle: Shape {
+    var topRadius: CGFloat
+    var bottomRadius: CGFloat
+    
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let width = rect.width
-        let height = rect.height
-
-        path.move(to: CGPoint(x: width / 2 - 20, y: 0))
-        path.addLine(to: CGPoint(x: width / 2 + 20, y: 0))
-        path.addLine(to: CGPoint(x: width, y: height))
-        path.addLine(to: CGPoint(x: 0, y: height))
-        path.closeSubpath()
         
-        return path
-    }
-}
-
-struct TopCurvedRectangle: Shape {
-    func path(in rect: CGRect) -> Path {
-            var path = Path()
-            let radius: CGFloat = 40
-
-            path.move(to: CGPoint(x: rect.minX, y: rect.maxY)) // Start at bottom-left
-            path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY)) // Line to bottom-right
-            path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + radius)) // Line up
-            path.addArc(center: CGPoint(x: rect.maxX - radius, y: rect.minY + radius),
-                        radius: radius,
-                        startAngle: .degrees(0),
-                        endAngle: .degrees(-90),
-                        clockwise: true)
-            path.addLine(to: CGPoint(x: rect.minX + radius, y: rect.minY)) // Line to top-left arc start
-            path.addArc(center: CGPoint(x: rect.minX + radius, y: rect.minY + radius),
-                        radius: radius,
-                        startAngle: .degrees(-90),
-                        endAngle: .degrees(-180),
-                        clockwise: true)
-            path.closeSubpath()
-            return path
-        }
-}
-
-struct FlatTopRoundedRectangle: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let radius: CGFloat = 40
-
-        path.move(to: CGPoint(x: rect.minX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - radius))
-        path.addArc(center: CGPoint(x: rect.maxX - radius, y: rect.maxY - radius),
-                    radius: radius,
-                    startAngle: .zero,
+        let topR = min(topRadius, rect.width / 2, rect.height / 2)
+        let bottomR = min(bottomRadius, rect.width / 2, rect.height / 2)
+        
+        path.move(to: CGPoint(x: rect.minX + topR, y: rect.minY))
+        
+        // Top edge with rounded corners
+        path.addLine(to: CGPoint(x: rect.maxX - topR, y: rect.minY))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.minY + topR),
+                          control: CGPoint(x: rect.maxX, y: rect.minY))
+        
+        // Right side down to bottom corner
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - bottomR))
+        path.addArc(center: CGPoint(x: rect.maxX - bottomR, y: rect.maxY - bottomR),
+                    radius: bottomR,
+                    startAngle: .degrees(0),
                     endAngle: .degrees(90),
                     clockwise: false)
-        path.addLine(to: CGPoint(x: rect.minX + radius, y: rect.maxY))
-        path.addArc(center: CGPoint(x: rect.minX + radius, y: rect.maxY - radius),
-                    radius: radius,
+        
+        // Bottom edge
+        path.addLine(to: CGPoint(x: rect.minX + bottomR, y: rect.maxY))
+        path.addArc(center: CGPoint(x: rect.minX + bottomR, y: rect.maxY - bottomR),
+                    radius: bottomR,
                     startAngle: .degrees(90),
                     endAngle: .degrees(180),
                     clockwise: false)
+        
+        // Left side up to top corner
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + topR))
+        path.addQuadCurve(to: CGPoint(x: rect.minX + topR, y: rect.minY),
+                          control: CGPoint(x: rect.minX, y: rect.minY))
+        
         path.closeSubpath()
         return path
     }
