@@ -11,8 +11,7 @@ import AVFoundation
 struct Home: View {
     @State private var brightnessLevel = 4
     @State private var flashlightOn: Bool = true
-    @State private var showLockIcon: Bool = false
-    
+    @State private var isLockedPower: Bool = false
     @State private var dragOffset: CGFloat = 0
     
     let maxLevel = 4
@@ -52,9 +51,9 @@ struct Home: View {
                 // Brightness slider
                 VStack(spacing: 10) {
                     VStack(spacing: 5) {
-                        curvedRectangle(topRadius: 40, bottomRadius: 10)
+                        curvedRectangle(topRadius: 40, bottomRadius: 5)
                             .fill(!flashlightOn ? Color.gray.opacity(0.3) : (brightnessLevel == maxLevel ? Color.white : Color.gray.opacity(0.3)))
-                            .frame(width: 120, height: 70)
+                            .frame(width: 125, height: 80)
                             .onTapGesture {
                                 flashlightOn = true
                                 brightnessLevel = maxLevel
@@ -63,9 +62,9 @@ struct Home: View {
                             }
                         
                         ForEach((1..<(maxLevel)).reversed(), id: \.self) { level in
-                            RoundedRectangle(cornerRadius: 8)
+                            RoundedRectangle(cornerRadius: 5)
                                 .fill(!flashlightOn ? Color.gray.opacity(0.3) : (level <= brightnessLevel ? Color.white : Color.gray.opacity(0.3)))
-                                .frame(width: 120, height: 70)
+                                .frame(width: 125, height: 80)
                                 .onTapGesture {
                                     flashlightOn = true
                                     brightnessLevel = level
@@ -77,17 +76,34 @@ struct Home: View {
                     
                     // Power button with lock text
                     ZStack {
-                        curvedRectangle(topRadius: 10, bottomRadius: 40)
-                            .fill(Color(.darkGray).opacity(0.3))
-                            .frame(width: 120, height: 90)
+                        curvedRectangle(topRadius: 0, bottomRadius: 40)
+                            .fill(Color("darkColor"))
+                            .frame(width: 125, height: 90)
                             .offset(y: 35)
                         
-                        curvedRectangle(topRadius: 10, bottomRadius: 40)
-                            .fill(flashlightOn ? Color.green : Color.gray)
-                            .frame(width: 120, height: 90)
-                        Image(systemName: "power")
-                            .font(.largeTitle)
-                            .foregroundColor(.white)
+                        curvedRectangle(topRadius: 5, bottomRadius: 40)
+                            .fill(Color("powerBtn"))
+                            .frame(width: 125, height: 90)
+                        
+                        VStack {
+                            if isLockedPower == true {
+                                Image(systemName: "power")
+                                    .font(.title3)
+                                    .foregroundStyle(Color("textColor"))
+                                    .padding(5)
+                                
+                                Text("Double Tap")
+                                    .font(.caption.bold())
+                                    .foregroundStyle(Color("textColor"))
+                                Text("to turn off")
+                                    .font(.caption)
+                                    .foregroundStyle(Color("textColor"))
+                            } else {
+                                Image(systemName: "power")
+                                    .font(.system(size: 40))
+                                    .foregroundStyle(Color("textColor"))
+                            }
+                        }
                     }
                     .onTapGesture {
                         flashlightOn.toggle()
@@ -95,15 +111,25 @@ struct Home: View {
                         updateTorch()
                     }
                     .onLongPressGesture(minimumDuration: 1) {
-                        
+                        isLockedPower.toggle()
                     }
                     
-                    HStack {
-                        Text("Hold to")
-                        Image(systemName: "lock.fill")
+                    if isLockedPower == true {
+                        HStack {
+                            Text("Hold to")
+                            Image(systemName: "lock.open.fill")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(Color("textColor"))
+                        
+                    } else {
+                        HStack {
+                            Text("Hold to")
+                            Image(systemName: "lock.fill")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(Color("textColor"))
                     }
-                    .font(.caption)
-                    .foregroundStyle(.gray)
                 }
                 
                 // Mode Buttons
@@ -111,7 +137,7 @@ struct Home: View {
                     // Wider SOS button with subtitle
                     modeButton(title: "SOS", subtitle: "Emergency\nLight Pattern", width: 140, height: 70)
                     
-                    // Smaller RED and STROBE buttons
+                    // Smaller SCREEN and STROBE buttons
                     modeButton(title: "Screen", width: 100, height: 70)
                     modeButton(title: "Strobe", width: 100, height: 70)
                 }
@@ -134,7 +160,7 @@ struct Home: View {
             }
         }
         .frame(width: width, height: height)
-        .background(Color.gray.opacity(0.2))
+        .background(Color("darkColor"))
         .cornerRadius(20)
     }
     
