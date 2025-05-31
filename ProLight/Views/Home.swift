@@ -10,15 +10,19 @@ import AVFoundation
 
 struct Home: View {
     @State private var brightnessLevel = 4
-    @State private var flashlightOn = true
-    @State private var showLockIcon = false
+    @State private var flashlightOn: Bool = true
+    @State private var showLockIcon: Bool = false
     
     @State private var dragOffset: CGFloat = 0
     
     let maxLevel = 4
     
+    init() {
+        updateTorch()
+    }
+    
     var body: some View {
-        ZStack(alignment: .center) {
+        ZStack(alignment: .bottom) {
             Color(.black)
                 .ignoresSafeArea(edges: .all)
             
@@ -50,18 +54,18 @@ struct Home: View {
                     VStack(spacing: 5) {
                         curvedRectangle(topRadius: 40, bottomRadius: 10)
                             .fill(!flashlightOn ? Color.gray.opacity(0.3) : (brightnessLevel == maxLevel ? Color.white : Color.gray.opacity(0.3)))
-                            .frame(width: 120, height: 60)
+                            .frame(width: 120, height: 70)
                             .onTapGesture {
                                 flashlightOn = true
                                 brightnessLevel = maxLevel
                                 print("Tapped level: \(maxLevel)")
                                 updateTorch()
                             }
-
+                        
                         ForEach((1..<(maxLevel)).reversed(), id: \.self) { level in
                             RoundedRectangle(cornerRadius: 8)
                                 .fill(!flashlightOn ? Color.gray.opacity(0.3) : (level <= brightnessLevel ? Color.white : Color.gray.opacity(0.3)))
-                                .frame(width: 120, height: 60)
+                                .frame(width: 120, height: 70)
                                 .onTapGesture {
                                     flashlightOn = true
                                     brightnessLevel = level
@@ -74,12 +78,16 @@ struct Home: View {
                     // Power button with lock text
                     ZStack {
                         curvedRectangle(topRadius: 10, bottomRadius: 40)
-                            .fill(flashlightOn ? Color.green.opacity(0.6) : Color.gray.opacity(0.3))
+                            .fill(Color(.darkGray).opacity(0.3))
+                            .frame(width: 120, height: 90)
+                            .offset(y: 35)
+                        
+                        curvedRectangle(topRadius: 10, bottomRadius: 40)
+                            .fill(flashlightOn ? Color.green : Color.gray)
                             .frame(width: 120, height: 90)
                         Image(systemName: "power")
-                            .font(.largeTitle.bold())
+                            .font(.largeTitle)
                             .foregroundColor(.white)
-                        
                     }
                     .onTapGesture {
                         flashlightOn.toggle()
@@ -101,20 +109,14 @@ struct Home: View {
                 // Mode Buttons
                 HStack(spacing: 13) {
                     // Wider SOS button with subtitle
-                    modeButton(
-                        title: "SOS",
-                        subtitle: "Emergency\nlight pattern",
-                        width: 140,
-                        height: 70
-                    )
+                    modeButton(title: "SOS", subtitle: "Emergency\nLight Pattern", width: 140, height: 70)
                     
                     // Smaller RED and STROBE buttons
-                    modeButton(title: "RED", width: 80, height: 70)
-                    modeButton(title: "Strobe", width: 80, height: 70)
-                    
+                    modeButton(title: "Screen", width: 100, height: 70)
+                    modeButton(title: "Strobe", width: 100, height: 70)
                 }
-                .padding(.horizontal)
             }
+            .padding(.bottom)
         }
     }
     
