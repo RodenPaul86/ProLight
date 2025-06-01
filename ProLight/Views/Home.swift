@@ -134,29 +134,18 @@ struct Home: View {
                 // Mode Buttons
                 HStack(spacing: 13) {
                     // Wider SOS button with subtitle
-                    Button(action: {
-                        sosPressed.toggle()
-                    }) {
-                        if sosPressed == true {
-                            modeButton(title: "SOS", subtitle: "Emergency\nLight Pattern", BGColor: .red, width: 140, height: 70)
-                        } else {
-                            modeButton(title: "SOS", subtitle: "Emergency\nLight Pattern", BGColor: Color("darkColor"), width: 140, height: 70)
+                    modeButton(title: "SOS", subtitle: "Emergency\nLight Pattern", BGColor: sosPressed ? .red : Color("darkColor"), width: 140, height: 70)
+                        .onTapGesture {
+                            sosPressed.toggle()
                         }
-                    }
                     
                     // Smaller SCREEN and STROBE buttons
                     modeButton(title: "Screen", width: 100, height: 70)
                     
-                    
-                    Button(action: {
-                        strobePressed.toggle()
-                    }) {
-                        if strobePressed == true {
-                            modeButton(title: "Strobe", BGColor: .blue, width: 100, height: 70)
-                        } else {
-                            modeButton(title: "Strobe", BGColor: Color("darkColor"), width: 100, height: 70)
+                    modeButton(title: "Strobe", BGColor: strobePressed ? .blue : Color("darkColor"), width: 100, height: 70)
+                        .onTapGesture {
+                            strobePressed.toggle()
                         }
-                    }
                 }
             }
             .onAppear {
