@@ -13,15 +13,14 @@ struct Home: View {
     @State private var flashlightOn: Bool = true
     @State private var isLockedPower: Bool = false
     @State private var dragOffset: CGFloat = 0
+    @State private var strobePressed: Bool = false
+    @State private var sosPressed: Bool = false
     
     let maxLevel = 4
-    
-    init() {
-        updateTorch()
-    }
+    var tabBarHeight: CGFloat
     
     var body: some View {
-        ZStack(alignment: .bottom) {
+        ZStack(alignment: .center) {
             Color(.black)
                 .ignoresSafeArea(edges: .all)
             
@@ -135,18 +134,40 @@ struct Home: View {
                 // Mode Buttons
                 HStack(spacing: 13) {
                     // Wider SOS button with subtitle
-                    modeButton(title: "SOS", subtitle: "Emergency\nLight Pattern", width: 140, height: 70)
+                    Button(action: {
+                        sosPressed.toggle()
+                    }) {
+                        if sosPressed == true {
+                            modeButton(title: "SOS", subtitle: "Emergency\nLight Pattern", BGColor: .red, width: 140, height: 70)
+                        } else {
+                            modeButton(title: "SOS", subtitle: "Emergency\nLight Pattern", BGColor: Color("darkColor"), width: 140, height: 70)
+                        }
+                    }
                     
                     // Smaller SCREEN and STROBE buttons
                     modeButton(title: "Screen", width: 100, height: 70)
-                    modeButton(title: "Strobe", width: 100, height: 70)
+                    
+                    
+                    Button(action: {
+                        strobePressed.toggle()
+                    }) {
+                        if strobePressed == true {
+                            modeButton(title: "Strobe", BGColor: .blue, width: 100, height: 70)
+                        } else {
+                            modeButton(title: "Strobe", BGColor: Color("darkColor"), width: 100, height: 70)
+                        }
+                    }
                 }
             }
-            .padding(.bottom)
+            .onAppear {
+                updateTorch()
+            }
+            .padding()
+            .safeAreaPadding(.bottom, tabBarHeight)
         }
     }
     
-    func modeButton(title: String, subtitle: String? = nil, width: CGFloat = 80, height: CGFloat = 60) -> some View {
+    func modeButton(title: String, subtitle: String? = nil, BGColor: Color = Color("darkColor"), width: CGFloat = 80, height: CGFloat = 60) -> some View {
         HStack(spacing: 4) {
             Text(title)
                 .font(.headline)
@@ -160,7 +181,7 @@ struct Home: View {
             }
         }
         .frame(width: width, height: height)
-        .background(Color("darkColor"))
+        .background(BGColor)
         .cornerRadius(20)
     }
     
