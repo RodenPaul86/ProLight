@@ -9,213 +9,336 @@ import SwiftUI
 import AVFoundation
 
 struct Home: View {
-    @State private var brightnessLevel = 4
+    @StateObject private var flashControllerInstance = FlashController()
+    @State private var brightnessLevel: Int = 4
+    @State private var intensityLevel: Int = 1
     @State private var flashlightOn: Bool = true
     @State private var isLockedPower: Bool = false
-    @State private var dragOffset: CGFloat = 0
     @State private var strobePressed: Bool = false
     @State private var sosPressed: Bool = false
+    @State private var showSecondSlider: Bool = false
     
-    let maxLevel = 4
+    @State private var selectedLevel: Int? = nil
+    @State private var selectedFrequency: Double? = nil
+    
+    let maxLevel: Int = 4
+    let frequencies: [Int: Double] = [1: 2.0, 2: 3.0, 3: 6.0, 4: 10.0]
     var tabBarHeight: CGFloat
     
     var body: some View {
-        ZStack(alignment: .center) {
-            Color(.black)
-                .ignoresSafeArea(edges: .all)
+        ZStack {
+            Color.black.ignoresSafeArea()
             
             VStack(spacing: 40) {
-                // Flashlight icon indicator
-                VStack(spacing: 8) {
-                    if flashlightOn {
-                        let scaledOpacity = Double(brightnessLevel) / Double(maxLevel)
-                        let shadowRadius = 5 + (15 * scaledOpacity) // radius grows with brightness
-                        
-                        Image(systemName: "flashlight.on.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 32, height: 60)
-                            .foregroundColor(Color.white.opacity(scaledOpacity))
-                            .shadow(color: .white.opacity(scaledOpacity), radius: shadowRadius)
-                    } else {
-                        Image(systemName: "flashlight.off.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 32, height: 60)
-                            .foregroundColor(.white.opacity(0.4))
-                            .shadow(color: .clear, radius: 0)
-                    }
-                }
-                
-                // Brightness slider
-                VStack(spacing: 10) {
-                    VStack(spacing: 5) {
-                        curvedRectangle(topRadius: 40, bottomRadius: 5)
-                            .fill(!flashlightOn ? Color.gray.opacity(0.3) : (brightnessLevel == maxLevel ? Color.white : Color.gray.opacity(0.3)))
-                            .frame(width: 125, height: 80)
-                            .onTapGesture {
-                                flashlightOn = true
-                                brightnessLevel = maxLevel
-                                print("Tapped level: \(maxLevel)")
-                                updateTorch()
-                            }
-                        
-                        ForEach((1..<(maxLevel)).reversed(), id: \.self) { level in
-                            RoundedRectangle(cornerRadius: 5)
-                                .fill(!flashlightOn ? Color.gray.opacity(0.3) : (level <= brightnessLevel ? Color.white : Color.gray.opacity(0.3)))
-                                .frame(width: 125, height: 80)
-                                .onTapGesture {
-                                    flashlightOn = true
-                                    brightnessLevel = level
-                                    print("Tapped level: \(level)")
-                                    updateTorch()
-                                }
-                        }
-                    }
-                    
-                    // Power button with lock text
-                    ZStack {
-                        curvedRectangle(topRadius: 0, bottomRadius: 40)
-                            .fill(Color("darkColor"))
-                            .frame(width: 125, height: 90)
-                            .offset(y: 35)
-                        
-                        curvedRectangle(topRadius: 5, bottomRadius: 40)
-                            .fill(Color("powerBtn"))
-                            .frame(width: 125, height: 90)
-                        
-                        VStack {
-                            if isLockedPower == true {
-                                Image(systemName: "power")
-                                    .font(.title3)
-                                    .foregroundStyle(Color("textColor"))
-                                    .padding(5)
-                                
-                                Text("Double Tap")
-                                    .font(.caption.bold())
-                                    .foregroundStyle(Color("textColor"))
-                                Text("to turn off")
-                                    .font(.caption)
-                                    .foregroundStyle(Color("textColor"))
-                            } else {
-                                Image(systemName: "power")
-                                    .font(.system(size: 40))
-                                    .foregroundStyle(Color("textColor"))
-                            }
-                        }
-                    }
-                    .onTapGesture {
-                        flashlightOn.toggle()
-                        brightnessLevel = maxLevel
-                        updateTorch()
-                    }
-                    .onLongPressGesture(minimumDuration: 1) {
-                        isLockedPower.toggle()
-                    }
-                    
-                    if isLockedPower == true {
-                        HStack {
-                            Text("Hold to")
-                            Image(systemName: "lock.open.fill")
-                        }
-                        .font(.caption)
-                        .foregroundStyle(Color("textColor"))
-                        
-                    } else {
-                        HStack {
-                            Text("Hold to")
-                            Image(systemName: "lock.fill")
-                        }
-                        .font(.caption)
-                        .foregroundStyle(Color("textColor"))
-                    }
-                }
-                
-                // Mode Buttons
-                HStack(spacing: 13) {
-                    // Wider SOS button with subtitle
-                    modeButton(title: "SOS", subtitle: "Emergency\nLight Pattern", BGColor: sosPressed ? .red : Color("darkColor"), width: 140, height: 70)
-                        .onTapGesture {
-                            sosPressed.toggle()
-                        }
-                    
-                    // Smaller SCREEN and STROBE buttons
-                    modeButton(title: "Screen", width: 100, height: 70)
-                    
-                    modeButton(title: "Strobe", BGColor: strobePressed ? .blue : Color("darkColor"), width: 100, height: 70)
-                        .onTapGesture {
-                            strobePressed.toggle()
-                        }
-                }
+                flashlightIndicator
+                brightnessSlider
+                modeButtons
             }
             .onAppear {
                 updateTorch()
+            }
+            .onDisappear {
+                flashControllerInstance.stopFlashing()
             }
             .padding()
             .safeAreaPadding(.bottom, tabBarHeight)
         }
     }
     
-    func modeButton(title: String, subtitle: String? = nil, BGColor: Color = Color("darkColor"), width: CGFloat = 80, height: CGFloat = 60) -> some View {
+    private var flashlightIndicator: some View {
+        VStack(spacing: 8) {
+            if flashlightOn {
+                let scaledOpacity = Double(brightnessLevel) / Double(maxLevel)
+                let shadowRadius = 5 + (15 * scaledOpacity)
+                
+                Image(systemName: "flashlight.on.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 32, height: 60)
+                    .foregroundColor(Color.white.opacity(scaledOpacity))
+                    .shadow(color: .white.opacity(scaledOpacity), radius: shadowRadius)
+            } else {
+                Image(systemName: "flashlight.off.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 32, height: 60)
+                    .foregroundColor(.white.opacity(0.4))
+            }
+        }
+    }
+    
+    private var brightnessSlider: some View {
+        HStack(alignment: .top, spacing: 50) {
+            // Brightness Slider
+            VStack(spacing: 10) {
+                VStack(spacing: 5) {
+                    curvedRectangle(topRadius: 40, bottomRadius: 5)
+                        .fill(!flashlightOn ? Color.gray.opacity(0.3) : (brightnessLevel == maxLevel ? Color.white : Color.gray.opacity(0.3)))
+                        .frame(width: 125, height: 80)
+                        .onTapGesture {
+                            flashlightOn = true
+                            brightnessLevel = maxLevel
+                            updateTorch()
+                        }
+                    
+                    ForEach((1..<(maxLevel)).reversed(), id: \.self) { level in
+                        RoundedRectangle(cornerRadius: 5)
+                            .fill(!flashlightOn ? Color.gray.opacity(0.3) : (level <= brightnessLevel ? Color.white : Color.gray.opacity(0.3)))
+                            .frame(width: 125, height: 80)
+                            .onTapGesture {
+                                flashlightOn = true
+                                brightnessLevel = level
+                                updateTorch()
+                            }
+                    }
+                }
+                
+                powerButton
+                lockHint
+            }
+            .animation(.easeInOut(duration: 0.3), value: showSecondSlider)
+            .offset(x: showSecondSlider ? 0 : 100)
+            
+            // Second Slider
+            VStack(spacing: 5) {
+                HStack {
+                    HStack(spacing: 0) {
+                        Text("15 hz")
+                            .foregroundColor(.white)
+                            .font(.caption2)
+                    }
+                    
+                    curvedRectangle(topRadius: 40, bottomRadius: 5)
+                        .fill(selectedFrequency == 15.0 ? Color.white : Color.gray.opacity(0.3))
+                        .frame(width: 80, height: 80)
+                        .onTapGesture {
+                            flashlightOn = true
+                            intensityLevel = maxLevel
+                            flashControllerInstance.startFlashing(
+                                frequencyHz: frequencies[intensityLevel] ?? 2.0,
+                                intensity: Float(brightnessLevel) / Float(maxLevel)
+                            )
+                        }
+                    
+                    VStack {
+                        Text("900")
+                            .foregroundColor(.white)
+                            .font(.caption)
+                        
+                        Text("ppm")
+                            .foregroundColor(.white)
+                            .font(.caption)
+                    }
+                }
+                
+                let data = [
+                    ("10 Hz", "600"),
+                    ("06 Hz", "360"),
+                    ("03 Hz", "180")
+                ]
+                
+                ForEach(0..<data.count, id: \.self) { level in
+                    let label = data[level].0
+                    let ppm = data[level].1
+                    
+                    HStack {
+                        Text(label)
+                            .foregroundColor(.white)
+                            .font(.caption2)
+                        
+                        RoundedRectangle(cornerRadius: 5)
+                            .fill(selectedLevel == level ? Color.white : Color.gray.opacity(0.3))
+                            .frame(width: 80, height: 80)
+                            .onTapGesture {
+                                flashlightOn = true
+                                brightnessLevel = level
+                                flashControllerInstance.startFlashing(
+                                    frequencyHz: frequencies[intensityLevel] ?? 2.0,
+                                    intensity: Float(brightnessLevel) / Float(maxLevel)
+                                )
+                            }
+                        
+                        VStack {
+                            Text(ppm)
+                                .foregroundColor(.white)
+                                .font(.caption)
+                            Text("ppm")
+                                .foregroundColor(.white)
+                                .font(.caption)
+                                .italic()
+                        }
+                    }
+                }
+                
+                HStack {
+                    Text("02 Hz")
+                        .foregroundColor(.white)
+                        .font(.caption2)
+                    
+                    curvedRectangle(topRadius: 5, bottomRadius: 40)
+                        .fill(selectedFrequency == 2.0 ? Color.white : Color.gray.opacity(0.3))
+                        .frame(width: 80, height: 80)
+                        .onTapGesture {
+                            flashlightOn = true
+                            intensityLevel = maxLevel
+                            flashControllerInstance.startFlashing(
+                                frequencyHz: frequencies[intensityLevel] ?? 2.0,
+                                intensity: Float(brightnessLevel) / Float(maxLevel)
+                            )
+                        }
+                    
+                    VStack {
+                        Text("120")
+                            .foregroundColor(.white)
+                            .font(.caption)
+                        Text("ppm")
+                            .foregroundColor(.white)
+                            .font(.caption)
+                            .italic()
+                    }
+                }
+            }
+            .animation(.easeInOut(duration: 0.3), value: showSecondSlider)
+            .offset(x: showSecondSlider ? 0 : 200)
+        }
+    }
+    
+    private func sliderSegment(level: Int, fillColor: Color) -> some View {
+        let shape: AnyShape = level == maxLevel ? AnyShape(curvedRectangle(topRadius: 40, bottomRadius: 5)) : AnyShape(RoundedRectangle(cornerRadius: 5))
+        
+        return shape
+            .fill(fillColor)
+            .frame(width: 125, height: 80)
+            .onTapGesture {
+                flashlightOn = true
+                brightnessLevel = level
+                updateTorch()
+            }
+    }
+    
+    private var powerButton: some View {
+        ZStack {
+            curvedRectangle(topRadius: 0, bottomRadius: 40)
+                .fill(Color("darkColor"))
+                .frame(width: 125, height: 90)
+                .offset(y: 35)
+            
+            curvedRectangle(topRadius: 5, bottomRadius: 40)
+                .fill(Color("powerBtn"))
+                .frame(width: 125, height: 90)
+            
+            VStack {
+                Image(systemName: "power")
+                    .font(.system(size: isLockedPower ? 20 : 40))
+                    .foregroundStyle(Color("textColor"))
+                    .padding(.bottom, isLockedPower ? 5 : 0)
+                
+                if isLockedPower {
+                    Text("Double Tap")
+                        .font(.caption.bold())
+                        .foregroundStyle(Color("textColor"))
+                    Text("to turn off")
+                        .font(.caption)
+                        .foregroundStyle(Color("textColor"))
+                }
+            }
+        }
+        .onTapGesture {
+            flashlightOn.toggle()
+            brightnessLevel = maxLevel
+            updateTorch()
+            
+            if !flashlightOn {
+                flashControllerInstance.stopFlashing()
+            }
+        }
+        .onLongPressGesture(minimumDuration: 1) {
+            isLockedPower.toggle()
+        }
+    }
+    
+    private var lockHint: some View {
+        HStack {
+            Text("Hold to")
+            Image(systemName: isLockedPower ? "lock.open.fill" : "lock.fill")
+        }
+        .font(.caption)
+        .foregroundStyle(Color("textColor"))
+    }
+    
+    private var modeButtons: some View {
+        HStack(spacing: 13) {
+            modeButton(title: "SOS", subtitle: "Emergency\nLight Pattern", BGColor: sosPressed ? .red : Color("darkColor"), width: 140, height: 70)
+                .onTapGesture { sosPressed.toggle() }
+            
+            modeButton(title: "Screen", width: 100, height: 70)
+            
+            modeButton(title: "Strobe", BGColor: strobePressed ? .blue : Color("darkColor"), width: 100, height: 70)
+                .onTapGesture {
+                    strobePressed.toggle()
+                    showSecondSlider.toggle()
+                    
+                    if strobePressed {
+                        flashlightOn = true
+                        brightnessLevel = maxLevel
+                        flashControllerInstance.startFlashing(
+                            frequencyHz: frequencies[intensityLevel] ?? 2.0,
+                            intensity: Float(brightnessLevel) / Float(maxLevel)
+                        )
+                    } else {
+                        flashlightOn = false
+                        flashControllerInstance.stopFlashing()
+                    }
+                }
+        }
+    }
+    
+    private func modeButton(title: String, subtitle: String? = nil, BGColor: Color = Color("darkColor"), width: CGFloat = 80, height: CGFloat = 60) -> some View {
         HStack(spacing: 4) {
             Text(title)
                 .font(.headline)
                 .foregroundColor(.white)
+            
             if let subtitle = subtitle {
                 Text(subtitle)
-                    .padding(.horizontal, 5)
                     .font(.caption2)
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.leading)
             }
         }
-        .frame(width: width, height: height)
+        .padding(.horizontal, 5)
+        .frame(width: width, height: height, alignment: .center)
         .background(BGColor)
         .cornerRadius(20)
     }
     
-    func updateTorch() {
+    private func updateTorch() {
         guard let device = AVCaptureDevice.default(for: .video), device.hasTorch else { return }
-        try? device.lockForConfiguration()
         
-        if flashlightOn {
-            let level = Float(brightnessLevel) / Float(maxLevel)
-            try? device.setTorchModeOn(level: level)
-        } else {
-            device.torchMode = .off
+        do {
+            try device.lockForConfiguration()
+            if flashlightOn {
+                let level = Float(brightnessLevel) / Float(maxLevel)
+                
+                if showSecondSlider {
+                    // Update strobe brightness
+                    flashControllerInstance.updateBrightness(level: level)
+                } else {
+                    // Regular flashlight brightness
+                    try device.setTorchModeOn(level: level)
+                }
+            } else {
+                device.torchMode = .off
+            }
+            device.unlockForConfiguration()
+        } catch {
+            print("Torch update error: \(error)")
         }
-        
-        device.unlockForConfiguration()
     }
 }
 
 #Preview {
     ContentView()
-}
-
-struct RoundedTriangle: Shape {
-    var cornerRadius: CGFloat = 10.0
-    
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        
-        let top = CGPoint(x: rect.midX, y: rect.minY)
-        let bottomLeft = CGPoint(x: rect.minX, y: rect.maxY)
-        let bottomRight = CGPoint(x: rect.maxX, y: rect.maxY)
-        
-        path.move(to: CGPoint(x: top.x, y: top.y + cornerRadius))
-        
-        path.addQuadCurve(to: CGPoint(x: bottomLeft.x + cornerRadius, y: bottomLeft.y - cornerRadius),
-                          control: CGPoint(x: rect.minX, y: rect.midY))
-        
-        path.addQuadCurve(to: CGPoint(x: bottomRight.x - cornerRadius, y: bottomRight.y - cornerRadius),
-                          control: CGPoint(x: rect.midX, y: rect.maxY))
-        
-        path.addQuadCurve(to: CGPoint(x: top.x, y: top.y + cornerRadius),
-                          control: CGPoint(x: rect.maxX, y: rect.midY))
-        
-        return path
-    }
 }
 
 struct curvedRectangle: Shape {
@@ -229,34 +352,31 @@ struct curvedRectangle: Shape {
         let bottomR = min(bottomRadius, rect.width / 2, rect.height / 2)
         
         path.move(to: CGPoint(x: rect.minX + topR, y: rect.minY))
-        
-        // Top edge with rounded corners
         path.addLine(to: CGPoint(x: rect.maxX - topR, y: rect.minY))
-        path.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.minY + topR),
-                          control: CGPoint(x: rect.maxX, y: rect.minY))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.minY + topR), control: CGPoint(x: rect.maxX, y: rect.minY))
         
-        // Right side down to bottom corner
         path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - bottomR))
-        path.addArc(center: CGPoint(x: rect.maxX - bottomR, y: rect.maxY - bottomR),
-                    radius: bottomR,
-                    startAngle: .degrees(0),
-                    endAngle: .degrees(90),
-                    clockwise: false)
+        path.addArc(center: CGPoint(x: rect.maxX - bottomR, y: rect.maxY - bottomR), radius: bottomR, startAngle: .degrees(0), endAngle: .degrees(90), clockwise: false)
         
-        // Bottom edge
         path.addLine(to: CGPoint(x: rect.minX + bottomR, y: rect.maxY))
-        path.addArc(center: CGPoint(x: rect.minX + bottomR, y: rect.maxY - bottomR),
-                    radius: bottomR,
-                    startAngle: .degrees(90),
-                    endAngle: .degrees(180),
-                    clockwise: false)
+        path.addArc(center: CGPoint(x: rect.minX + bottomR, y: rect.maxY - bottomR), radius: bottomR, startAngle: .degrees(90), endAngle: .degrees(180), clockwise: false)
         
-        // Left side up to top corner
         path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + topR))
-        path.addQuadCurve(to: CGPoint(x: rect.minX + topR, y: rect.minY),
-                          control: CGPoint(x: rect.minX, y: rect.minY))
+        path.addQuadCurve(to: CGPoint(x: rect.minX + topR, y: rect.minY), control: CGPoint(x: rect.minX, y: rect.minY))
         
         path.closeSubpath()
         return path
+    }
+}
+
+struct AnyShape: Shape {
+    private let pathClosure: (CGRect) -> Path
+    
+    init<S: Shape>(_ wrapped: S) {
+        self.pathClosure = wrapped.path(in:)
+    }
+    
+    func path(in rect: CGRect) -> Path {
+        pathClosure(rect)
     }
 }
