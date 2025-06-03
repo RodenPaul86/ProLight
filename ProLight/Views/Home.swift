@@ -11,6 +11,7 @@ import AVFoundation
 struct Home: View {
     @StateObject private var flashControllerInstance = FlashController()
     @State private var brightnessLevel: Int = 4
+    
     @State private var intensityLevel: Int = 1
     @State private var flashlightOn: Bool = true
     @State private var isLockedPower: Bool = false
@@ -18,7 +19,7 @@ struct Home: View {
     @State private var sosPressed: Bool = false
     @State private var showSecondSlider: Bool = false
     
-    @State private var selectedLevel: Int? = nil
+    @State private var selectedLevel: Int = 4
     @State private var selectedFrequency: Double? = nil
     
     let maxLevel: Int = 4
@@ -109,13 +110,13 @@ struct Home: View {
                     }
                     
                     curvedRectangle(topRadius: 40, bottomRadius: 5)
-                        .fill(selectedFrequency == 15.0 ? Color.white : Color.gray.opacity(0.3))
+                        .fill(selectedFrequency == 15.0 ? Color("strobeHzColor") : Color.gray.opacity(0.3))
                         .frame(width: 80, height: 80)
                         .onTapGesture {
                             flashlightOn = true
-                            intensityLevel = maxLevel
+                            selectedLevel = maxLevel
                             flashControllerInstance.startFlashing(
-                                frequencyHz: frequencies[intensityLevel] ?? 2.0,
+                                frequencyHz: frequencies[intensityLevel] ?? 0.0,
                                 intensity: Float(brightnessLevel) / Float(maxLevel)
                             )
                         }
@@ -147,11 +148,11 @@ struct Home: View {
                             .font(.caption2)
                         
                         RoundedRectangle(cornerRadius: 5)
-                            .fill(selectedLevel == level ? Color.white : Color.gray.opacity(0.3))
+                            .fill(!flashlightOn ? Color.gray.opacity(0.3) : (level <= selectedLevel ? Color("strobeHzColor") : Color.gray.opacity(0.3)))
                             .frame(width: 80, height: 80)
                             .onTapGesture {
                                 flashlightOn = true
-                                brightnessLevel = level
+                                selectedLevel = level
                                 flashControllerInstance.startFlashing(
                                     frequencyHz: frequencies[intensityLevel] ?? 2.0,
                                     intensity: Float(brightnessLevel) / Float(maxLevel)
@@ -176,11 +177,10 @@ struct Home: View {
                         .font(.caption2)
                     
                     curvedRectangle(topRadius: 5, bottomRadius: 40)
-                        .fill(selectedFrequency == 2.0 ? Color.white : Color.gray.opacity(0.3))
+                        .fill(selectedFrequency == 2.0 ? Color("strobeHzColor") : Color.gray.opacity(0.3))
                         .frame(width: 80, height: 80)
                         .onTapGesture {
                             flashlightOn = true
-                            intensityLevel = maxLevel
                             flashControllerInstance.startFlashing(
                                 frequencyHz: frequencies[intensityLevel] ?? 2.0,
                                 intensity: Float(brightnessLevel) / Float(maxLevel)
@@ -302,7 +302,7 @@ struct Home: View {
             if let subtitle = subtitle {
                 Text(subtitle)
                     .font(.caption2)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.white)
                     .multilineTextAlignment(.leading)
             }
         }
