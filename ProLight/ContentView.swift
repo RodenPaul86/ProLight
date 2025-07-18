@@ -30,7 +30,7 @@ struct ContentView: View {
         FloatingTabView(selection: $activeTab) { tab, tabBarHeight in
             switch tab {
             case .home: Home(tabBarHeight: tabBarHeight)
-            case .map: Text("Map")
+            case .map: WalkingMapView(tabBarHeight: tabBarHeight)
             case .fitness: Text("Fitness")
             case .settings: LibraryView(tabBarHeight: tabBarHeight)
             }
