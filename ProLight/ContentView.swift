@@ -15,7 +15,7 @@ enum AppTab: String, CaseIterable, FloatingTabProtocol {
     
     var symbolImage: String {
         switch self {
-        case .home: "house"
+        case .home: "flashlight.on.fill"
         case .map: "map"
         case .fitness: "figure.run"
         case .settings: "gear"
