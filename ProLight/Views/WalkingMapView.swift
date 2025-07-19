@@ -7,6 +7,7 @@
 
 import SwiftUI
 import MapKit
+import Contacts
 
 struct WalkingMapView: View {
     var tabBarHeight: CGFloat
@@ -34,7 +35,6 @@ struct WalkingMapView: View {
             Group {
                 if let userLocation = locationManager.currentLocation {
                     Map(position: $cameraPosition, selection: $mapSelection, scope: locationSpace) {
-                        // User Marker
                         
                         // Search Markers
                         ForEach(searchResults, id: \.self) { mapItem in
@@ -68,6 +68,7 @@ struct WalkingMapView: View {
                             MapUserLocationButton(scope: locationSpace)
                         }
                         .buttonBorderShape(.circle)
+                        .offset(y: -60)
                         .padding()
                     }
                     .mapScope(locationSpace)
@@ -89,10 +90,12 @@ struct WalkingMapView: View {
                     }
                 }
             }, content: {
-                MapDetails()
-                    .presentationDetents([.height(300)])
-                    .presentationCornerRadius(25)
-                    .interactiveDismissDisabled(true)
+                if let selectedItem = mapSelection {
+                    MapDetails(for: selectedItem)
+                        .presentationDetents([.height(380)])
+                        .presentationCornerRadius(25)
+                        .interactiveDismissDisabled(true)
+                }
             })
             .safeAreaInset(edge: .bottom) {
                 if routeDisplaying {
@@ -152,7 +155,7 @@ struct WalkingMapView: View {
     }
     
     @ViewBuilder
-    func MapDetails() -> some View {
+    func MapDetails(for item: MKMapItem) -> some View {
         VStack(spacing: 15) {
             ZStack {
                 if lookAroundScene == nil {
@@ -178,14 +181,38 @@ struct WalkingMapView: View {
                 .padding(10)
             }
             
-            Button("Get Directions") {
-                hideTabBar = true
-                fetchRoute()
+            VStack(alignment: .leading) {
+                Text(item.name ?? "Unknown")
+                    .font(.title3.bold())
+                
+                Text(item.placemark.formattedAddress)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                
+                if let phone = item.phoneNumber {
+                    Link(phone, destination: URL(string: "tel:\(phone.replacingOccurrences(of: " ", with: ""))")!)
+                        .foregroundStyle(.blue)
+                }
             }
-            .foregroundStyle(.white)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(.blue.gradient, in: .rect(cornerRadius: 15))
+            
+            HStack {
+                Button("Get Directions") {
+                    hideTabBar = true
+                    fetchRoute()
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(.blue.gradient, in: .rect(cornerRadius: 15))
+                
+                Button("Open in Maps") {
+                    item.openInMaps()
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(.green.gradient, in: .rect(cornerRadius: 15))
+            }
         }
         .padding(15)
     }
@@ -278,12 +305,8 @@ struct WalkingMapView: View {
             longitude: (minLon + maxLon) / 2
         )
         
-        var latDelta = (maxLat - minLat) * 1.1
-        var lonDelta = (maxLon - minLon) * 1.1
-        
-        let maxDelta: CLLocationDegrees = 0.05
-        latDelta = min(latDelta, maxDelta)
-        lonDelta = min(lonDelta, maxDelta)
+        let latDelta = (maxLat - minLat) * 1.1
+        let lonDelta = (maxLon - minLon) * 1.1
         
         let span = MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lonDelta)
         
@@ -300,5 +323,14 @@ struct WalkingMapView: View {
 extension MKCoordinateRegion {
     static func region(around coordinate: CLLocationCoordinate2D, radiusMeters: CLLocationDistance = 1000) -> MKCoordinateRegion {
         MKCoordinateRegion(center: coordinate, latitudinalMeters: radiusMeters, longitudinalMeters: radiusMeters)
+    }
+}
+
+extension MKPlacemark {
+    var formattedAddress: String {
+        guard let postalAddress = self.postalAddress else { return "" }
+        let formatter = CNPostalAddressFormatter()
+        formatter.style = .mailingAddress
+        return formatter.string(from: postalAddress).replacingOccurrences(of: "\n", with: ", ")
     }
 }
