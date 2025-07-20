@@ -15,7 +15,7 @@ enum HapticType {
 }
 
 class HapticManager {
-    static let shared = hapticManager()
+    static let shared = HapticManager()
     
     private init() {}
     
