@@ -3,6 +3,7 @@
 //  ProLight
 //
 //  Created by Paul  on 7/19/25.
+//  Copyright © 2016 Studio4Designsoftware. All rights reserved.
 //
 
 import CoreLocation

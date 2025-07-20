@@ -1,14 +1,15 @@
 //
-//  Home2.swift
+//  HomeView.swift
 //  ProLight
 //
-//  Created by Paul  on 5/29/25.
+//  Created by Paul on 9/19/16.
+//  Copyright © 2016 Studio4Designsoftware. All rights reserved.
 //
 
 import SwiftUI
 import AVFoundation
 
-struct Home: View {
+struct HomeView: View {
     @StateObject private var flashControllerInstance = FlashController()
     @State private var brightnessLevel: Int = 4
     
@@ -55,15 +56,15 @@ struct Home: View {
                 Image(systemName: "flashlight.on.fill")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 32, height: 60)
+                    .frame(width: 22, height: 50)
                     .foregroundColor(Color.white.opacity(scaledOpacity))
                     .shadow(color: .white.opacity(scaledOpacity), radius: shadowRadius)
             } else {
                 Image(systemName: "flashlight.off.fill")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 32, height: 60)
-                    .foregroundColor(.white.opacity(0.4))
+                    .frame(width: 22, height: 50)
+                    .foregroundColor(.white.opacity(0.1))
             }
         }
     }
