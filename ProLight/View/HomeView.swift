@@ -22,11 +22,7 @@ struct HomeView: View {
     @State private var showSecondSlider: Bool = false
     
     @State private var selectedLevel: Int = 4
-    @State private var selectedStrobeLevel: Int = 4
     @State private var selectedFrequency: Double? = nil
-    
-    @State private var selectedFrequencies: Set<Double> = []
-    
     @State private var selectedMaxFrequency: Double? = nil
     
     let maxLevel: Int = 4
@@ -124,8 +120,8 @@ struct HomeView: View {
                     HStack {
                         // Frequency Label
                         Text(item.label)
-                            .foregroundColor(.white)
-                            .font(.caption2)
+                            .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.3))
+                            .font(.caption)
                             .frame(width: 40, alignment: .leading)
                         
                         // Strobe Bar
@@ -145,10 +141,10 @@ struct HomeView: View {
                         // PPM Label
                         VStack(alignment: .leading, spacing: 0) {
                             Text("\(item.ppm)")
-                                .foregroundColor(.white)
+                                .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.3))
                                 .font(.caption)
                             Text("ppm")
-                                .foregroundColor(.white)
+                                .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.3))
                                 .font(.caption)
                                 .italic()
                         }
