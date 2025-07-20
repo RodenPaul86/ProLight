@@ -6,14 +6,65 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3AA77BAA2E2D31BA00F018BB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AA77BA92E2D31BA00F018BB /* WidgetKit.framework */; };
+		3AA77BAC2E2D31BA00F018BB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AA77BAB2E2D31BA00F018BB /* SwiftUI.framework */; };
+		3AA77BB72E2D31BD00F018BB /* ProLight WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3AA77BA72E2D31BA00F018BB /* ProLight WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3AA77BB52E2D31BD00F018BB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3A0D29A92DE7819100F1F704 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3AA77BA62E2D31BA00F018BB;
+			remoteInfo = "ProLight WidgetExtension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		3AA77BBC2E2D31BD00F018BB /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				3AA77BB72E2D31BD00F018BB /* ProLight WidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		3A0D29B12DE7819100F1F704 /* ProLight.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProLight.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3AA77BA72E2D31BA00F018BB /* ProLight WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "ProLight WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3AA77BA92E2D31BA00F018BB /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		3AA77BAB2E2D31BA00F018BB /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3AA77BB82E2D31BD00F018BB /* Exceptions for "ProLight Widget" folder in "ProLight WidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 3AA77BA62E2D31BA00F018BB /* ProLight WidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3A0D29B32DE7819100F1F704 /* ProLight */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ProLight;
+			sourceTree = "<group>";
+		};
+		3AA77BAD2E2D31BA00F018BB /* ProLight Widget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3AA77BB82E2D31BD00F018BB /* Exceptions for "ProLight Widget" folder in "ProLight WidgetExtension" target */,
+			);
+			path = "ProLight Widget";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -26,6 +77,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3AA77BA42E2D31BA00F018BB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3AA77BAC2E2D31BA00F018BB /* SwiftUI.framework in Frameworks */,
+				3AA77BAA2E2D31BA00F018BB /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -33,6 +93,8 @@
 			isa = PBXGroup;
 			children = (
 				3A0D29B32DE7819100F1F704 /* ProLight */,
+				3AA77BAD2E2D31BA00F018BB /* ProLight Widget */,
+				3AA77BA82E2D31BA00F018BB /* Frameworks */,
 				3A0D29B22DE7819100F1F704 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,8 +103,18 @@
 			isa = PBXGroup;
 			children = (
 				3A0D29B12DE7819100F1F704 /* ProLight.app */,
+				3AA77BA72E2D31BA00F018BB /* ProLight WidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		3AA77BA82E2D31BA00F018BB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3AA77BA92E2D31BA00F018BB /* WidgetKit.framework */,
+				3AA77BAB2E2D31BA00F018BB /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -55,10 +127,12 @@
 				3A0D29AD2DE7819100F1F704 /* Sources */,
 				3A0D29AE2DE7819100F1F704 /* Frameworks */,
 				3A0D29AF2DE7819100F1F704 /* Resources */,
+				3AA77BBC2E2D31BD00F018BB /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				3AA77BB62E2D31BD00F018BB /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				3A0D29B32DE7819100F1F704 /* ProLight */,
@@ -70,6 +144,28 @@
 			productReference = 3A0D29B12DE7819100F1F704 /* ProLight.app */;
 			productType = "com.apple.product-type.application";
 		};
+		3AA77BA62E2D31BA00F018BB /* ProLight WidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3AA77BB92E2D31BD00F018BB /* Build configuration list for PBXNativeTarget "ProLight WidgetExtension" */;
+			buildPhases = (
+				3AA77BA32E2D31BA00F018BB /* Sources */,
+				3AA77BA42E2D31BA00F018BB /* Frameworks */,
+				3AA77BA52E2D31BA00F018BB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				3AA77BAD2E2D31BA00F018BB /* ProLight Widget */,
+			);
+			name = "ProLight WidgetExtension";
+			packageProductDependencies = (
+			);
+			productName = "ProLight WidgetExtension";
+			productReference = 3AA77BA72E2D31BA00F018BB /* ProLight WidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -77,11 +173,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1630;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1630;
 				TargetAttributes = {
 					3A0D29B02DE7819100F1F704 = {
 						CreatedOnToolsVersion = 16.3;
+					};
+					3AA77BA62E2D31BA00F018BB = {
+						CreatedOnToolsVersion = 16.4;
 					};
 				};
 			};
@@ -100,12 +199,20 @@
 			projectRoot = "";
 			targets = (
 				3A0D29B02DE7819100F1F704 /* ProLight */,
+				3AA77BA62E2D31BA00F018BB /* ProLight WidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		3A0D29AF2DE7819100F1F704 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3AA77BA52E2D31BA00F018BB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +229,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3AA77BA32E2D31BA00F018BB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3AA77BB62E2D31BD00F018BB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3AA77BA62E2D31BA00F018BB /* ProLight WidgetExtension */;
+			targetProxy = 3AA77BB52E2D31BD00F018BB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		3A0D29BB2DE7819300F1F704 /* Debug */ = {
@@ -323,6 +445,65 @@
 			};
 			name = Release;
 		};
+		3AA77BBA2E2D31BD00F018BB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WM7RG95JZ8;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "ProLight Widget/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "ProLight Widget";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Studio4Designsoftware.ProLight.ProLight-Widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		3AA77BBB2E2D31BD00F018BB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WM7RG95JZ8;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "ProLight Widget/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "ProLight Widget";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Studio4Designsoftware.ProLight.ProLight-Widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -340,6 +521,15 @@
 			buildConfigurations = (
 				3A0D29BE2DE7819300F1F704 /* Debug */,
 				3A0D29BF2DE7819300F1F704 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3AA77BB92E2D31BD00F018BB /* Build configuration list for PBXNativeTarget "ProLight WidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3AA77BBA2E2D31BD00F018BB /* Debug */,
+				3AA77BBB2E2D31BD00F018BB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
