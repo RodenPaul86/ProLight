@@ -88,6 +88,7 @@ struct HomeView: View {
                         .fill(!flashlightOn ? Color.gray.opacity(0.3) : (brightnessLevel == maxLevel ? Color.white : Color.gray.opacity(0.3)))
                         .frame(width: 125, height: 80)
                         .onTapGesture {
+                            HapticManager.shared.notify(.impact(.light))
                             flashlightOn = true
                             brightnessLevel = maxLevel
                             updateTorch()
@@ -98,6 +99,7 @@ struct HomeView: View {
                             .fill(!flashlightOn ? Color.gray.opacity(0.3) : (level <= brightnessLevel ? Color.white : Color.gray.opacity(0.3)))
                             .frame(width: 125, height: 80)
                             .onTapGesture {
+                                HapticManager.shared.notify(.impact(.light))
                                 flashlightOn = true
                                 brightnessLevel = level
                                 updateTorch()
@@ -129,6 +131,7 @@ struct HomeView: View {
                             .fill(item.frequency <= (selectedMaxFrequency ?? 0) ? Color("strobeHzColor") : Color.gray.opacity(0.3))
                             .frame(width: 80, height: 80)
                             .onTapGesture {
+                                HapticManager.shared.notify(.impact(.light))
                                 flashlightOn = true
                                 selectedMaxFrequency = item.frequency // Light up all ≤ this frequency
 
@@ -164,6 +167,7 @@ struct HomeView: View {
             .fill(fillColor)
             .frame(width: 125, height: 80)
             .onTapGesture {
+                HapticManager.shared.notify(.impact(.light))
                 flashlightOn = true
                 brightnessLevel = level
                 updateTorch()
@@ -198,6 +202,7 @@ struct HomeView: View {
             }
         }
         .onTapGesture {
+            HapticManager.shared.notify(.impact(.light))
             flashlightOn.toggle()
             brightnessLevel = maxLevel
             
@@ -234,12 +239,16 @@ struct HomeView: View {
     private var modeButtons: some View {
         HStack(spacing: 13) {
             modeButton(title: "SOS", subtitle: "Emergency\nLight Pattern", BGColor: sosPressed ? .red : Color("darkColor"), width: 140, height: 70)
-                .onTapGesture { sosPressed.toggle() }
+                .onTapGesture {
+                    HapticManager.shared.notify(.impact(.light))
+                    sosPressed.toggle()
+                }
             
             modeButton(title: "Screen", width: 100, height: 70)
             
             modeButton(title: "Strobe", BGColor: strobePressed ? .blue : Color("darkColor"), width: 100, height: 70)
                 .onTapGesture {
+                    HapticManager.shared.notify(.impact(.light))
                     strobePressed.toggle()
                     showSecondSlider.toggle()
                     
