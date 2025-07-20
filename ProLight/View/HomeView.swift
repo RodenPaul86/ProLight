@@ -15,17 +15,31 @@ struct HomeView: View {
     
     @State private var intensityLevel: Int = 1
     @State private var flashlightOn: Bool = true
+    @State private var isStrobeModeOn: Bool = false
     @State private var isLockedPower: Bool = false
     @State private var strobePressed: Bool = false
     @State private var sosPressed: Bool = false
     @State private var showSecondSlider: Bool = false
     
     @State private var selectedLevel: Int = 4
+    @State private var selectedStrobeLevel: Int = 4
     @State private var selectedFrequency: Double? = nil
+    
+    @State private var selectedFrequencies: Set<Double> = []
+    
+    @State private var selectedMaxFrequency: Double? = nil
     
     let maxLevel: Int = 4
     let frequencies: [Int: Double] = [1: 2.0, 2: 3.0, 3: 6.0, 4: 10.0]
     var tabBarHeight: CGFloat
+    
+    let strobeData: [(label: String, frequency: Double, ppm: Int)] = [
+        ("15 Hz", 15.0, 900),
+        ("10 Hz", 10.0, 600),
+        ("6 Hz", 6.0, 360),
+        ("3 Hz", 3.0, 180),
+        ("2 Hz", 2.0, 120)
+    ]
     
     var body: some View {
         ZStack {
@@ -33,7 +47,7 @@ struct HomeView: View {
             
             VStack(spacing: 40) {
                 flashlightIndicator
-                brightnessSlider
+                brightnessSliders
                 modeButtons
             }
             .onAppear {
@@ -69,9 +83,9 @@ struct HomeView: View {
         }
     }
     
-    private var brightnessSlider: some View {
+    private var brightnessSliders: some View {
         HStack(alignment: .top, spacing: 50) {
-            // Brightness Slider
+            // MARK: Flashlight Slider
             VStack(spacing: 10) {
                 VStack(spacing: 5) {
                     curvedRectangle(topRadius: 40, bottomRadius: 5)
@@ -94,74 +108,43 @@ struct HomeView: View {
                             }
                     }
                 }
-                
                 powerButton
                 lockHint
             }
             .animation(.easeInOut(duration: 0.3), value: showSecondSlider)
-            .offset(x: showSecondSlider ? 0 : 100)
+            .offset(x: showSecondSlider ? 0 : 111)
             
-            // Second Slider
-            VStack(spacing: 5) {
-                HStack {
-                    HStack(spacing: 0) {
-                        Text("15 hz")
-                            .foregroundColor(.white)
-                            .font(.caption2)
-                    }
-                    
-                    curvedRectangle(topRadius: 40, bottomRadius: 5)
-                        .fill(selectedFrequency == 15.0 ? Color("strobeHzColor") : Color.gray.opacity(0.3))
-                        .frame(width: 80, height: 80)
-                        .onTapGesture {
-                            flashlightOn = true
-                            selectedLevel = maxLevel
-                            flashControllerInstance.startFlashing(
-                                frequencyHz: frequencies[intensityLevel] ?? 0.0,
-                                intensity: Float(brightnessLevel) / Float(maxLevel)
-                            )
-                        }
-                    
-                    VStack {
-                        Text("900")
-                            .foregroundColor(.white)
-                            .font(.caption)
-                        
-                        Text("ppm")
-                            .foregroundColor(.white)
-                            .font(.caption)
-                    }
-                }
-                
-                let data = [
-                    ("10 Hz", "600"),
-                    ("06 Hz", "360"),
-                    ("03 Hz", "180")
-                ]
-                
-                ForEach(0..<data.count, id: \.self) { level in
-                    let label = data[level].0
-                    let ppm = data[level].1
+            // MARK: Strobe Slider
+            VStack(spacing: 6) {
+                ForEach(0..<strobeData.count, id: \.self) { index in
+                    let item = strobeData[index]
+                    let isTop = index == 0
+                    let isBottom = index == strobeData.count - 1
                     
                     HStack {
-                        Text(label)
+                        // Frequency Label
+                        Text(item.label)
                             .foregroundColor(.white)
                             .font(.caption2)
+                            .frame(width: 40, alignment: .leading)
                         
-                        RoundedRectangle(cornerRadius: 5)
-                            .fill(!flashlightOn ? Color.gray.opacity(0.3) : (level <= selectedLevel ? Color("strobeHzColor") : Color.gray.opacity(0.3)))
+                        // Strobe Bar
+                        curvedRectangle(topRadius: isTop ? 40 : 5, bottomRadius: isBottom ? 40 : 5)
+                            .fill(item.frequency <= (selectedMaxFrequency ?? 0) ? Color("strobeHzColor") : Color.gray.opacity(0.3))
                             .frame(width: 80, height: 80)
                             .onTapGesture {
                                 flashlightOn = true
-                                selectedLevel = level
+                                selectedMaxFrequency = item.frequency // Light up all ≤ this frequency
+
                                 flashControllerInstance.startFlashing(
-                                    frequencyHz: frequencies[intensityLevel] ?? 2.0,
+                                    frequencyHz: item.frequency,
                                     intensity: Float(brightnessLevel) / Float(maxLevel)
                                 )
                             }
                         
-                        VStack {
-                            Text(ppm)
+                        // PPM Label
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text("\(item.ppm)")
                                 .foregroundColor(.white)
                                 .font(.caption)
                             Text("ppm")
@@ -169,33 +152,7 @@ struct HomeView: View {
                                 .font(.caption)
                                 .italic()
                         }
-                    }
-                }
-                
-                HStack {
-                    Text("02 Hz")
-                        .foregroundColor(.white)
-                        .font(.caption2)
-                    
-                    curvedRectangle(topRadius: 5, bottomRadius: 40)
-                        .fill(selectedFrequency == 2.0 ? Color("strobeHzColor") : Color.gray.opacity(0.3))
-                        .frame(width: 80, height: 80)
-                        .onTapGesture {
-                            flashlightOn = true
-                            flashControllerInstance.startFlashing(
-                                frequencyHz: frequencies[intensityLevel] ?? 2.0,
-                                intensity: Float(brightnessLevel) / Float(maxLevel)
-                            )
-                        }
-                    
-                    VStack {
-                        Text("120")
-                            .foregroundColor(.white)
-                            .font(.caption)
-                        Text("ppm")
-                            .foregroundColor(.white)
-                            .font(.caption)
-                            .italic()
+                        .frame(width: 40, alignment: .leading)
                     }
                 }
             }
@@ -247,9 +204,20 @@ struct HomeView: View {
         .onTapGesture {
             flashlightOn.toggle()
             brightnessLevel = maxLevel
-            updateTorch()
             
-            if !flashlightOn {
+            if flashlightOn {
+                if showSecondSlider {
+                    // Restore strobe flashing at last selected frequency
+                    let frequency = selectedMaxFrequency ?? 2.0 // fallback to 2Hz
+                    selectedMaxFrequency = frequency // ensure UI stays lit
+                    flashControllerInstance.startFlashing(
+                        frequencyHz: frequency,
+                        intensity: Float(brightnessLevel) / Float(maxLevel)
+                    )
+                } else {
+                    updateTorch() // fallback to regular flashlight
+                }
+            } else {
                 flashControllerInstance.stopFlashing()
             }
         }
@@ -282,6 +250,11 @@ struct HomeView: View {
                     if strobePressed {
                         flashlightOn = true
                         brightnessLevel = maxLevel
+                        
+                        // Set 2Hz as the default selected frequency
+                        selectedFrequency = 2.0
+                        selectedMaxFrequency = 2.0
+                        
                         flashControllerInstance.startFlashing(
                             frequencyHz: frequencies[intensityLevel] ?? 2.0,
                             intensity: Float(brightnessLevel) / Float(maxLevel)
