@@ -15,7 +15,6 @@ struct HomeView: View {
     
     @State private var intensityLevel: Int = 1
     @State private var flashlightOn: Bool = true
-    @State private var isStrobeModeOn: Bool = false
     @State private var isLockedPower: Bool = false
     @State private var strobePressed: Bool = false
     @State private var sosPressed: Bool = false
@@ -104,6 +103,7 @@ struct HomeView: View {
                                 brightnessLevel = level
                                 updateTorch()
                             }
+                            .disabled(showSecondSlider == true)
                     }
                 }
                 powerButton
