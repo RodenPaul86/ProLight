@@ -10,6 +10,9 @@
 		3AA77BAA2E2D31BA00F018BB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AA77BA92E2D31BA00F018BB /* WidgetKit.framework */; };
 		3AA77BAC2E2D31BA00F018BB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AA77BAB2E2D31BA00F018BB /* SwiftUI.framework */; };
 		3AA77BB72E2D31BD00F018BB /* ProLight WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3AA77BA72E2D31BA00F018BB /* ProLight WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3ADC62F62E2E72DE00B66E31 /* ConfidentialKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3ADC62F52E2E72DE00B66E31 /* ConfidentialKit */; };
+		3ADC63B42E2E789700B66E31 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 3ADC63B32E2E789700B66E31 /* RevenueCat */; };
+		3ADC63B62E2E789700B66E31 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3ADC63B52E2E789700B66E31 /* RevenueCatUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +77,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3ADC63B42E2E789700B66E31 /* RevenueCat in Frameworks */,
+				3ADC62F62E2E72DE00B66E31 /* ConfidentialKit in Frameworks */,
+				3ADC63B62E2E789700B66E31 /* RevenueCatUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,6 +138,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				3ADC62F92E2E739F00B66E31 /* PBXTargetDependency */,
 				3AA77BB62E2D31BD00F018BB /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
@@ -139,6 +146,9 @@
 			);
 			name = ProLight;
 			packageProductDependencies = (
+				3ADC62F52E2E72DE00B66E31 /* ConfidentialKit */,
+				3ADC63B32E2E789700B66E31 /* RevenueCat */,
+				3ADC63B52E2E789700B66E31 /* RevenueCatUI */,
 			);
 			productName = ProLight;
 			productReference = 3A0D29B12DE7819100F1F704 /* ProLight.app */;
@@ -193,6 +203,11 @@
 			);
 			mainGroup = 3A0D29A82DE7819100F1F704;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3ADC62F42E2E72DE00B66E31 /* XCRemoteSwiftPackageReference "swift-confidential" */,
+				3ADC62F72E2E735100B66E31 /* XCRemoteSwiftPackageReference "swift-confidential-plugin" */,
+				3ADC63B22E2E789700B66E31 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3A0D29B22DE7819100F1F704 /* Products */;
 			projectDirPath = "";
@@ -243,6 +258,10 @@
 			isa = PBXTargetDependency;
 			target = 3AA77BA62E2D31BA00F018BB /* ProLight WidgetExtension */;
 			targetProxy = 3AA77BB52E2D31BD00F018BB /* PBXContainerItemProxy */;
+		};
+		3ADC62F92E2E739F00B66E31 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 3ADC62F82E2E739F00B66E31 /* Confidential */;
 		};
 /* End PBXTargetDependency section */
 
@@ -468,9 +487,13 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -497,9 +520,13 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -535,6 +562,56 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3ADC62F42E2E72DE00B66E31 /* XCRemoteSwiftPackageReference "swift-confidential" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/securevale/swift-confidential";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.1;
+			};
+		};
+		3ADC62F72E2E735100B66E31 /* XCRemoteSwiftPackageReference "swift-confidential-plugin" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/securevale/swift-confidential-plugin";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.1;
+			};
+		};
+		3ADC63B22E2E789700B66E31 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.33.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3ADC62F52E2E72DE00B66E31 /* ConfidentialKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3ADC62F42E2E72DE00B66E31 /* XCRemoteSwiftPackageReference "swift-confidential" */;
+			productName = ConfidentialKit;
+		};
+		3ADC62F82E2E739F00B66E31 /* Confidential */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3ADC62F72E2E735100B66E31 /* XCRemoteSwiftPackageReference "swift-confidential-plugin" */;
+			productName = "plugin:Confidential";
+		};
+		3ADC63B32E2E789700B66E31 /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3ADC63B22E2E789700B66E31 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
+		};
+		3ADC63B52E2E789700B66E31 /* RevenueCatUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3ADC63B22E2E789700B66E31 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCatUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3A0D29A92DE7819100F1F704 /* Project object */;
 }
