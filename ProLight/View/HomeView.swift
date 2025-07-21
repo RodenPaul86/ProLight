@@ -41,7 +41,7 @@ struct HomeView: View {
             Color.black.ignoresSafeArea()
             
             VStack(spacing: 40) {
-                flashlightIndicator
+                Spacer()
                 brightnessSliders
                 modeButtons
             }
@@ -80,6 +80,9 @@ struct HomeView: View {
     
     private var brightnessSliders: some View {
         HStack(alignment: .top, spacing: 50) {
+            let scaledOpacity = Double(brightnessLevel) / Double(maxLevel)
+            let shadowRadius = 5 + (15 * scaledOpacity)
+            
             // MARK: Flashlight Slider
             VStack(spacing: 10) {
                 VStack(spacing: 5) {
@@ -87,25 +90,29 @@ struct HomeView: View {
                         .fill(!flashlightOn ? Color.gray.opacity(0.3) : (brightnessLevel == maxLevel ? Color.white : Color.gray.opacity(0.3)))
                         .frame(width: 125, height: 80)
                         .onTapGesture {
+                            guard !isLockedPower else { return }
                             HapticManager.shared.notify(.impact(.light))
                             flashlightOn = true
                             brightnessLevel = maxLevel
                             updateTorch()
                         }
+                        .disabled(isLockedPower)
                     
                     ForEach((1..<(maxLevel)).reversed(), id: \.self) { level in
                         RoundedRectangle(cornerRadius: 5)
                             .fill(!flashlightOn ? Color.gray.opacity(0.3) : (level <= brightnessLevel ? Color.white : Color.gray.opacity(0.3)))
                             .frame(width: 125, height: 80)
                             .onTapGesture {
+                                guard !isLockedPower else { return }
                                 HapticManager.shared.notify(.impact(.light))
                                 flashlightOn = true
                                 brightnessLevel = level
                                 updateTorch()
                             }
-                            .disabled(showSecondSlider == true)
+                            .disabled(showSecondSlider == true || isLockedPower)
                     }
                 }
+                .shadow(color: .white.opacity(flashlightOn ? scaledOpacity : 0.1), radius: shadowRadius)
                 powerButton
                 lockHint
             }
@@ -187,22 +194,12 @@ struct HomeView: View {
             
             VStack {
                 Image(systemName: "power")
-                    .font(.system(size: isLockedPower ? 20 : 40))
+                    .font(.system(size: 40))
                     .foregroundStyle(Color("textColor"))
-                    .padding(.bottom, isLockedPower ? 5 : 0)
-                
-                if isLockedPower {
-                    Text("Double Tap")
-                        .font(.caption.bold())
-                        .foregroundStyle(Color("textColor"))
-                    Text("to turn off")
-                        .font(.caption)
-                        .foregroundStyle(Color("textColor"))
-                }
             }
         }
         .onTapGesture {
-            HapticManager.shared.notify(.impact(.light))
+            HapticManager.shared.notify(.impact(.medium))
             flashlightOn.toggle()
             brightnessLevel = maxLevel
             
@@ -223,6 +220,7 @@ struct HomeView: View {
             }
         }
         .onLongPressGesture(minimumDuration: 1) {
+            HapticManager.shared.notify(.notification(.success))
             isLockedPower.toggle()
         }
     }
