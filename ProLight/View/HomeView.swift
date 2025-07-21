@@ -284,6 +284,10 @@ struct HomeView: View {
         .frame(width: width, height: height, alignment: .center)
         .background(BGColor)
         .cornerRadius(20)
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(.gray.opacity(0.2), lineWidth: 2)
+        )
     }
     
     private func updateTorch() {
