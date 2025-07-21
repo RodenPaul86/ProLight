@@ -86,11 +86,11 @@ struct FloatingTabView<Content: View, Value: CaseIterable & Hashable & FloatingT
 
 // MARK: Floating Tab Bar Configuration
 struct FloatingTabConfig {
-    var activeTint: Color = Color("textColor")
-    var activeBackgroundTint: Color = Color("powerBtn")
+    var activeTint: Color = Color("lightGreen")
+    var activeBackgroundTint: Color = Color("darkGreen")
     var inactiveTint: Color = .gray
     var tabAnimation: Animation = .smooth(duration: 0.35, extraBounce: 0)
-    var backgroundColor: Color = Color("darkColor")
+    var backgroundColor: Color = Color("darkGray")
     var insetAmount: CGFloat = 6
     var isTranslucent: Bool = true
     var hPadding: CGFloat = 15

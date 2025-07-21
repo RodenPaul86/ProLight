@@ -58,23 +58,15 @@ struct HomeView: View {
     
     private var flashlightIndicator: some View {
         VStack(spacing: 8) {
-            if flashlightOn {
-                let scaledOpacity = Double(brightnessLevel) / Double(maxLevel)
-                let shadowRadius = 5 + (15 * scaledOpacity)
-                
-                Image(systemName: "flashlight.on.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 22, height: 50)
-                    .foregroundColor(Color.white.opacity(scaledOpacity))
-                    .shadow(color: .white.opacity(scaledOpacity), radius: shadowRadius)
-            } else {
-                Image(systemName: "flashlight.off.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 22, height: 50)
-                    .foregroundColor(.white.opacity(0.1))
-            }
+            let scaledOpacity = Double(brightnessLevel) / Double(maxLevel)
+            let shadowRadius = 5 + (15 * scaledOpacity)
+            
+            Image(systemName: flashlightOn ? "flashlight.on.fill" : "flashlight.off.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 22, height: 50)
+                .foregroundColor(flashlightOn ? .white.opacity(scaledOpacity) : .white.opacity(0.1))
+                .shadow(color: flashlightOn ? .white.opacity(scaledOpacity) : .white.opacity(0.0), radius: shadowRadius)
         }
     }
     
@@ -141,7 +133,7 @@ struct HomeView: View {
                                 HapticManager.shared.notify(.impact(.light))
                                 flashlightOn = true
                                 selectedMaxFrequency = item.frequency // Light up all ≤ this frequency
-
+                                
                                 flashControllerInstance.startFlashing(
                                     frequencyHz: item.frequency,
                                     intensity: Float(brightnessLevel) / Float(maxLevel)
@@ -185,18 +177,22 @@ struct HomeView: View {
     private var powerButton: some View {
         ZStack {
             curvedRectangle(topRadius: 0, bottomRadius: 40)
-                .fill(Color("darkColor"))
+                .fill(Color("darkGray"))
                 .frame(width: 125, height: 90)
                 .offset(y: 35)
             
             curvedRectangle(topRadius: 5, bottomRadius: 40)
-                .fill(Color("powerBtn"))
+                .fill(Color("darkGreen"))
                 .frame(width: 125, height: 90)
+                .overlay(
+                    curvedRectangle(topRadius: 5, bottomRadius: 40)
+                        .stroke(Color("lightGreen").opacity(0.6), lineWidth: 2)
+                )
             
             VStack {
                 Image(systemName: "power")
-                    .font(.system(size: 40))
-                    .foregroundStyle(Color("textColor"))
+                    .font(.system(size: 45))
+                    .foregroundStyle(Color("lightGreen"))
             }
         }
         .onTapGesture {
@@ -232,12 +228,12 @@ struct HomeView: View {
             Image(systemName: isLockedPower ? "lock.open.fill" : "lock.fill")
         }
         .font(.caption)
-        .foregroundStyle(Color("textColor"))
+        .foregroundStyle(Color("lightGreen"))
     }
     
     private var modeButtons: some View {
         HStack(spacing: 13) {
-            modeButton(title: "SOS", subtitle: "Emergency\nLight Pattern", BGColor: sosPressed ? .red : Color("darkColor"), width: 140, height: 70)
+            modeButton(title: "SOS  ", subtitle: "Emergency\nlight pattern", BGColor: sosPressed ? .red : Color("darkGray"), width: 140, height: 70)
                 .onTapGesture {
                     HapticManager.shared.notify(.impact(.light))
                     sosPressed.toggle()
@@ -245,7 +241,7 @@ struct HomeView: View {
             
             modeButton(title: "Screen", width: 100, height: 70)
             
-            modeButton(title: "Strobe", BGColor: strobePressed ? .blue : Color("darkColor"), width: 100, height: 70)
+            modeButton(title: "Strobe", BGColor: strobePressed ? .blue : Color("darkGray"), width: 100, height: 70)
                 .onTapGesture {
                     HapticManager.shared.notify(.impact(.light))
                     strobePressed.toggle()
@@ -271,7 +267,7 @@ struct HomeView: View {
         }
     }
     
-    private func modeButton(title: String, subtitle: String? = nil, BGColor: Color = Color("darkColor"), width: CGFloat = 80, height: CGFloat = 60) -> some View {
+    private func modeButton(title: String, subtitle: String? = nil, BGColor: Color = Color("darkGray"), width: CGFloat = 80, height: CGFloat = 60) -> some View {
         HStack(spacing: 4) {
             Text(title)
                 .font(.headline)
