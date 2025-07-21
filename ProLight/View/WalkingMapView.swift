@@ -68,7 +68,6 @@ struct WalkingMapView: View {
                             MapUserLocationButton(scope: locationSpace)
                         }
                         .buttonBorderShape(.circle)
-                        .offset(y: -60)
                         .padding()
                     }
                     .mapScope(locationSpace)
@@ -124,6 +123,7 @@ struct WalkingMapView: View {
                     .background(.ultraThinMaterial)
                 }
             }
+            .safeAreaPadding(.bottom, routeDisplaying ? 0 : tabBarHeight)
         }
         .onSubmit(of: .search) {
             Task {
