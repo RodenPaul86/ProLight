@@ -109,7 +109,7 @@ struct HomeView: View {
                                 brightnessLevel = level
                                 updateTorch()
                             }
-                            .disabled(showSecondSlider == true || isLockedPower)
+                            .disabled(showSecondSlider || isLockedPower)
                     }
                 }
                 .shadow(color: .white.opacity(flashlightOn ? scaledOpacity : 0.1), radius: shadowRadius)
@@ -147,6 +147,7 @@ struct HomeView: View {
                                     intensity: Float(brightnessLevel) / Float(maxLevel)
                                 )
                             }
+                            .disabled(isLockedPower)
                         
                         // PPM Label
                         VStack(alignment: .leading, spacing: 0) {
