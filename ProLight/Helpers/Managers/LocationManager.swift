@@ -7,30 +7,24 @@
 //
 
 import CoreLocation
-import Combine
 
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
     
-    @Published var currentLocation: CLLocationCoordinate2D?
-    @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    @Published var lastLocation: CLLocation?
     
     override init() {
         super.init()
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyBest
-        manager.requestWhenInUseAuthorization()
     }
     
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        authorizationStatus = manager.authorizationStatus
-        
-        if authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways {
-            manager.startUpdatingLocation()
-        }
+    func requestPermission() {
+        manager.requestWhenInUseAuthorization()
+        manager.startUpdatingLocation()
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        currentLocation = locations.last?.coordinate
+        lastLocation = locations.last
     }
 }
