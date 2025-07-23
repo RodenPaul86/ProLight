@@ -46,6 +46,16 @@
 		3AA77BAB2E2D31BA00F018BB /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3AD07D802E2FC356000A6B2D /* Exceptions for "ProLight Widget" folder in "ProLight WidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 3AA77BA62E2D31BA00F018BB /* ProLight WidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3A0D29B32DE7819100F1F704 /* ProLight */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -54,6 +64,9 @@
 		};
 		3AA77BAD2E2D31BA00F018BB /* ProLight Widget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3AD07D802E2FC356000A6B2D /* Exceptions for "ProLight Widget" folder in "ProLight WidgetExtension" target */,
+			);
 			path = "ProLight Widget";
 			sourceTree = "<group>";
 		};
@@ -465,13 +478,13 @@
 				INFOPLIST_FILE = "ProLight Widget/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "ProLight Widget";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 4.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Studio4Designsoftware.ProLight.ProLight-Widget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -498,13 +511,13 @@
 				INFOPLIST_FILE = "ProLight Widget/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "ProLight Widget";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 4.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Studio4Designsoftware.ProLight.ProLight-Widget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;

@@ -18,8 +18,8 @@ enum AppTab: String, CaseIterable, FloatingTabProtocol {
         switch self {
         case .home: "flashlight.on.fill"
         case .morseCode: "dot.radiowaves.left.and.right"
-        case .map: "map"
-        case .fitness: "figure.run"
+        case .map: "figure.walk"
+        case .fitness: "chart.bar.xaxis"
         case .settings: "gear"
         }
     }
@@ -32,7 +32,7 @@ struct ContentView: View {
         FloatingTabView(selection: $activeTab) { tab, tabBarHeight in
             switch tab {
             case .home: HomeView(tabBarHeight: tabBarHeight)
-            case .map: MapView()
+            case .map: NightWalkMapView(tabBarHeight: tabBarHeight)
             case .fitness: Text("Fitness")
             case .morseCode: Text("Morse Code")
             case .settings: LibraryView(tabBarHeight: tabBarHeight)

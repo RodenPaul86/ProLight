@@ -12,6 +12,9 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
     
     @Published var lastLocation: CLLocation?
+    @Published var trackedRoute: [CLLocationCoordinate2D] = []
+    
+    var isTrackingRoute = false
     
     override init() {
         super.init()
@@ -24,7 +27,21 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         manager.startUpdatingLocation()
     }
     
+    func startTracking() {
+        isTrackingRoute = true
+        trackedRoute = []
+    }
+    
+    func stopTracking() {
+        isTrackingRoute = false
+    }
+    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        lastLocation = locations.last
+        guard let location = locations.last else { return }
+        lastLocation = location
+        
+        if isTrackingRoute {
+            trackedRoute.append(location.coordinate)
+        }
     }
 }
