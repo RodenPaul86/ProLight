@@ -8,6 +8,7 @@
 import SwiftUI
 import RevenueCat
 import ConfidentialKit
+import SwiftData
 
 @main
 struct ProLightApp: App {
@@ -21,5 +22,6 @@ struct ProLightApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: Workout.self) // <- registers Workout as a SwiftData model
     }
 }

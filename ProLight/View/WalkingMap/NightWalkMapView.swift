@@ -29,6 +29,7 @@ struct NightWalkMapView: View {
     var tabBarHeight: CGFloat
     @State private var hideTabBar: Bool = false
     
+    @Environment(\.modelContext) private var modelContext
     @StateObject private var locationManager = LocationManager()
     @State private var cameraPosition: MapCameraPosition = .automatic
     @State private var flashlightOn: Bool = false
@@ -38,11 +39,12 @@ struct NightWalkMapView: View {
     
     @State private var showSummary: Bool = false
     @State private var walkStartTime: Date?
-    @StateObject var workoutStorage = WorkoutStorage()
     
     @State private var elapsedTime: TimeInterval = 0
     @State private var timer: Timer?
     @State private var caloriesBurned: Double = 0
+    
+    @State private var finalDuration: TimeInterval = 0
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -56,12 +58,12 @@ struct NightWalkMapView: View {
                 
                 UserAnnotation()
                 if let start = startLocation {
-                    Marker("Started", coordinate: start.coordinate)
+                    Marker("Start", coordinate: start.coordinate)
                         .tint(.green)
                 }
                 
                 if let end = endLocation {
-                    Marker("Ended", coordinate: end.coordinate)
+                    Marker("End", coordinate: end.coordinate)
                         .tint(.red)
                 }
             }
@@ -109,63 +111,61 @@ struct NightWalkMapView: View {
             VStack {
                 Spacer()
                 HStack(alignment: .bottom) {
-                    // Control Buttons
-                    HStack(alignment: .center, spacing: 10) {
-                        // Hide Tab Bar Button
-                        Button(action: { hideTabBar.toggle() }) {
-                            Image(systemName: "chevron.up.chevron.down")
-                                .font(.title2)
-                                .foregroundStyle(.black)
-                                .frame(width: 50, height: 50)
-                                .background(.ultraThinMaterial, in: Circle())
-                        }
-                        
-                        // Start/Stop Button
-                        Button(action: {
-                            if isTracking {
-                                if let location = locationManager.lastLocation {
-                                    endLocation = MarkedLocation(coordinate: location.coordinate)
-                                }
-                                locationManager.stopTracking()
-                                HealthKitManager.shared.endWorkoutSession()
-                                stopTimer()
-                                isTracking.toggle()
-                                showSummary = true
-                                
-                                
-                                
-                                let allCoords = locationManager.trackedRoute
-                                if let region = regionThatFitsAllCoordinates(allCoords) {
-                                    withAnimation {
-                                        cameraPosition = .region(region)
-                                    }
-                                }
-                            } else {
-                                if let location = locationManager.lastLocation {
-                                    startLocation = MarkedLocation(coordinate: location.coordinate)
-                                    endLocation = nil
-                                    cameraPosition = .region(
-                                        MKCoordinateRegion(
-                                            center: location.coordinate,
-                                            span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
-                                        )
-                                    )
-                                }
-                                locationManager.startTracking()
-                                walkStartTime = Date()
-                                HealthKitManager.shared.startWorkoutSession()
-                                walkStartTime = Date()
-                                elapsedTime = 0
-                                startTimer()
-                                isTracking.toggle()
+                    // Hide Tab Bar Button
+                    Button(action: { hideTabBar.toggle() }) {
+                        Image(systemName: "chevron.up.chevron.down")
+                            .font(.title2)
+                            .foregroundStyle(.black)
+                            .frame(width: 50, height: 50)
+                            .background(.ultraThinMaterial, in: Circle())
+                    }
+                    
+                    // Start/Stop Button
+                    Button(action: {
+                        if isTracking {
+                            if let location = locationManager.lastLocation {
+                                endLocation = MarkedLocation(coordinate: location.coordinate)
                             }
-                        }) {
-                            Label(isTracking ? "Stop" : "Start Walking", systemImage: isTracking ? "stop.circle.fill" : "figure.walk")
-                                .foregroundStyle(.white)
-                                .frame(minWidth: 0, maxWidth: .infinity)
-                                .padding(.vertical, 12)
-                                .background(isTracking ? .red : .green, in: .rect(cornerRadius: 15))
+                            locationManager.stopTracking()
+                            HealthKitManager.shared.endWorkoutSession()
+                            stopTimer()
+                            if let start = walkStartTime {
+                                finalDuration = Date().timeIntervalSince(start)
+                            }
+                            isTracking.toggle()
+                            showSummary = true
+                            
+                            let allCoords = locationManager.trackedRoute
+                            if let region = regionThatFitsAllCoordinates(allCoords) {
+                                withAnimation {
+                                    cameraPosition = .region(region)
+                                }
+                            }
+                        } else {
+                            if let location = locationManager.lastLocation {
+                                startLocation = MarkedLocation(coordinate: location.coordinate)
+                                endLocation = nil
+                                cameraPosition = .region(
+                                    MKCoordinateRegion(
+                                        center: location.coordinate,
+                                        span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+                                    )
+                                )
+                            }
+                            locationManager.startTracking()
+                            walkStartTime = Date()
+                            HealthKitManager.shared.startWorkoutSession()
+                            walkStartTime = Date()
+                            elapsedTime = 0
+                            startTimer()
+                            isTracking.toggle()
                         }
+                    }) {
+                        Label(isTracking ? "Stop" : "Start Walking", systemImage: isTracking ? "stop.circle.fill" : "figure.walk")
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(isTracking ? .red : .green, in: .rect(cornerRadius: 15))
                     }
                     
                     // Location + Flashlight Buttons
@@ -180,11 +180,13 @@ struct NightWalkMapView: View {
                                 )
                             }
                         }) {
-                            Image(systemName: "location.fill")
-                                .font(.title2)
-                                .foregroundStyle(.black)
-                                .frame(width: 50, height: 50)
-                                .background(.ultraThinMaterial, in: Circle())
+                            if !isTracking {
+                                Image(systemName: "location.fill")
+                                    .font(.title2)
+                                    .foregroundStyle(.black)
+                                    .frame(width: 50, height: 50)
+                                    .background(.ultraThinMaterial, in: Circle())
+                            }
                         }
                         
                         Button(action: toggleFlashlight) {
@@ -200,18 +202,27 @@ struct NightWalkMapView: View {
             }
         }
         .sheet(isPresented: $showSummary) {
+            let distance = calculateDistance(from: locationManager.trackedRoute)
+            let miles = distance * 0.000621371
+            let pace = miles > 0 ? (finalDuration / 60) / miles : 0
+            let calories = miles * 100
+            
             WorkoutSummaryView(
                 route: locationManager.trackedRoute,
-                duration: Date().timeIntervalSince(walkStartTime ?? Date()),
-                distance: calculateDistance(from: locationManager.trackedRoute)
+                duration: finalDuration,
+                distance: distance,
+                pace: pace,
+                calories: calories,
+                startCoordinate: startLocation?.coordinate,
+                endCoordinate: endLocation?.coordinate
             ) {
                 let workout = Workout(
                     date: walkStartTime ?? Date(),
-                    duration: Date().timeIntervalSince(walkStartTime ?? Date()),
-                    distance: calculateDistance(from: locationManager.trackedRoute),
+                    duration: finalDuration,
+                    distance: distance,
                     route: locationManager.trackedRoute
                 )
-                workoutStorage.addWorkout(workout)
+                saveWorkout()
                 showSummary = false
             }
         }
@@ -309,6 +320,16 @@ struct NightWalkMapView: View {
         formatter.allowedUnits = [.hour, .minute, .second]
         formatter.zeroFormattingBehavior = .pad
         return formatter.string(from: interval) ?? "00:00:00"
+    }
+    
+    func saveWorkout() {
+        let workout = Workout(
+            date: walkStartTime ?? Date(),
+            duration: Date().timeIntervalSince(walkStartTime ?? Date()),
+            distance: calculateDistance(from: locationManager.trackedRoute),
+            route: locationManager.trackedRoute
+        )
+        modelContext.insert(workout)
     }
 }
 /*

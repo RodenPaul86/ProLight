@@ -10,7 +10,7 @@ import SwiftUI
 import AVFoundation
 
 struct HomeView: View {
-    @StateObject private var workoutStorage = WorkoutStorage()
+    @Environment(\.modelContext) private var modelContext
     @StateObject private var flashControllerInstance = FlashController()
     @State private var brightnessLevel: Int = 4
     
@@ -49,7 +49,7 @@ struct HomeView: View {
                 }
                 .overlay (
                     HStack {
-                        NavigationLink(destination: WorkoutHistoryView(storage: workoutStorage)) {
+                        NavigationLink(destination: WorkoutHistoryView()) {
                             Label("Workout History", systemImage: "list.bullet.rectangle.portrait")
                                 .foregroundStyle(.white)
                         }

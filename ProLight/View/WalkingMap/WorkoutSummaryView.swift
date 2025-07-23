@@ -12,16 +12,13 @@ struct WorkoutSummaryView: View {
     let route: [CLLocationCoordinate2D]
     let duration: TimeInterval
     let distance: Double
+    let pace: Double
+    let calories: Double
+    let startCoordinate: CLLocationCoordinate2D?
+    let endCoordinate: CLLocationCoordinate2D?
     let onDone: () -> Void
     
-    @State private var region: MKCoordinateRegion = .init()
-    
-    let initialPosition: MapCameraPosition = {
-        let center = CLLocationCoordinate2D(latitude: 34.011_284, longitude: -116.166_860)
-        let span = MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
-        let region = MKCoordinateRegion(center: center, span: span)
-        return .region(region)
-    }()
+    @State private var cameraPosition: MapCameraPosition = .automatic
     
     var body: some View {
         VStack(spacing: 16) {
@@ -29,15 +26,22 @@ struct WorkoutSummaryView: View {
                 .font(.title2)
                 .bold()
             
-            Map(initialPosition: initialPosition)
-                .onMapCameraChange(frequency: .continuous) { context in
-                    region = context.region
+            Map(position: $cameraPosition) {
+                if let start = startCoordinate {
+                    Marker("Start", coordinate: start)
+                        .tint(.green)
                 }
-                .overlay(
-                    MapPolylineOverlay(coordinates: route)
-                )
-                .frame(height: 250)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                if let end = endCoordinate {
+                    Marker("End", coordinate: end)
+                        .tint(.red)
+                }
+
+                MapPolyline(coordinates: route)
+                    .stroke(.blue, lineWidth: 4)
+            }
+            .frame(height: 250)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
             
             HStack {
                 Label("Duration", systemImage: "clock")
@@ -48,7 +52,19 @@ struct WorkoutSummaryView: View {
             HStack {
                 Label("Distance", systemImage: "figure.walk")
                 Spacer()
-                Text(String(format: "%.2f km", distance / 1000))
+                Text(String(format: "%.2f mi", distance * 0.000621371))
+            }
+            
+            HStack {
+                Label("Pace", systemImage: "speedometer")
+                Spacer()
+                Text(String(format: "%.1f min/mi", pace))
+            }
+            
+            HStack {
+                Label("Calories", systemImage: "flame")
+                Spacer()
+                Text(String(format: "%.0f cal", calories))
             }
             
             Spacer()
@@ -60,9 +76,9 @@ struct WorkoutSummaryView: View {
         }
         .padding()
         .onAppear {
-            if let first = route.first {
-                region.center = first
-                region.span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+            let allCoordinates = route + [startCoordinate, endCoordinate].compactMap { $0 }
+            if let region = regionThatFitsAllCoordinates(allCoordinates) {
+                cameraPosition = .region(region)
             }
         }
     }
@@ -72,5 +88,33 @@ struct WorkoutSummaryView: View {
         formatter.allowedUnits = [.minute, .second]
         formatter.unitsStyle = .abbreviated
         return formatter.string(from: duration) ?? "-"
+    }
+    
+    func regionThatFitsAllCoordinates(_ coordinates: [CLLocationCoordinate2D]) -> MKCoordinateRegion? {
+        guard !coordinates.isEmpty else { return nil }
+
+        var minLat = coordinates.first!.latitude
+        var maxLat = coordinates.first!.latitude
+        var minLon = coordinates.first!.longitude
+        var maxLon = coordinates.first!.longitude
+
+        for coord in coordinates {
+            minLat = min(minLat, coord.latitude)
+            maxLat = max(maxLat, coord.latitude)
+            minLon = min(minLon, coord.longitude)
+            maxLon = max(maxLon, coord.longitude)
+        }
+
+        let center = CLLocationCoordinate2D(
+            latitude: (minLat + maxLat) / 2,
+            longitude: (minLon + maxLon) / 2
+        )
+
+        let span = MKCoordinateSpan(
+            latitudeDelta: max(0.005, (maxLat - minLat) * 1.4),
+            longitudeDelta: max(0.005, (maxLon - minLon) * 1.4)
+        )
+
+        return MKCoordinateRegion(center: center, span: span)
     }
 }

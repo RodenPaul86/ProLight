@@ -11,62 +11,140 @@ import MapKit
 struct WorkoutDetailView: View {
     let workout: Workout
     
-    @State private var region: MKCoordinateRegion = .init()
-    
-    let initialPosition: MapCameraPosition = {
-        let center = CLLocationCoordinate2D(latitude: 34.011_284, longitude: -116.166_860)
-        let span = MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
-        let region = MKCoordinateRegion(center: center, span: span)
-        return .region(region)
-    }()
+    @State private var cameraPosition: MapCameraPosition = .automatic
     
     var body: some View {
-        VStack(spacing: 16) {
-            Text("Route Map")
-                .font(.headline)
-            
-            Map(initialPosition: initialPosition)
-                .onMapCameraChange(frequency: .continuous) { context in
-                    region = context.region
+        VStack(alignment: .leading, spacing: 16) {
+            // Metrics Header
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("Distance")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(String(format: "%.2f mi", workout.distance / 1609.34))
+                        .font(.headline)
                 }
-                .overlay(
-                    MapPolylineOverlay(coordinates: workout.route)
-                )
-                .frame(height: 250)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-            
-            
-            /*
-            Map(coordinateRegion: $region, interactionModes: [], annotationItems: workout.route) { coord in
-                MapMarker(coordinate: coord, tint: .blue)
+                
+                Spacer()
+                
+                VStack(alignment: .leading) {
+                    Text("Duration")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(formattedTime(workout.duration))
+                        .font(.headline)
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .leading) {
+                    Text("Pace")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(paceFormatted())
+                        .font(.headline)
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .leading) {
+                    Text("Calories")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(caloriesFormatted())
+                        .font(.headline)
+                }
             }
-            .overlay(
-                MapPolylineOverlay(coordinates: workout.route)
-            )
-            .frame(height: 250)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-             */
+            .padding(.bottom, 8)
             
+            // Map
+            Map(position: $cameraPosition, interactionModes: [.pitch]) {
+                // Polyline
+                MapPolyline(coordinates: workout.route)
+                    .stroke(.blue, lineWidth: 4)
+                
+                // Start & End markers
+                if let start = workout.route.first {
+                    Marker("Start", coordinate: start)
+                        .tint(.green)
+                }
+                if let end = workout.route.last {
+                    Marker("End", coordinate: end)
+                        .tint(.red)
+                }
+            }
+            .mapControls {
+                MapPitchToggle()
+            }
+            .frame(height: 250)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .onAppear {
+                zoomToFitRoute()
+            }
+            
+            // Date
             Text("Date: \(workout.date.formatted(date: .abbreviated, time: .shortened))")
-            Text("Distance: \(String(format: "%.2f km", workout.distance / 1000))")
-            Text("Duration: \(formattedTime(workout.duration))")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
             
             Spacer()
         }
         .padding()
         .navigationTitle("Workout Detail")
-        .onAppear {
-            if let first = workout.route.first {
-                region.center = first
-                region.span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-            }
-        }
     }
     
+    // MARK: - Zoom to fit route
+    private func zoomToFitRoute() {
+        guard !workout.route.isEmpty else { return }
+        
+        var minLat = workout.route.first!.latitude
+        var maxLat = workout.route.first!.latitude
+        var minLon = workout.route.first!.longitude
+        var maxLon = workout.route.first!.longitude
+        
+        for coord in workout.route {
+            minLat = min(minLat, coord.latitude)
+            maxLat = max(maxLat, coord.latitude)
+            minLon = min(minLon, coord.longitude)
+            maxLon = max(maxLon, coord.longitude)
+        }
+        
+        let center = CLLocationCoordinate2D(
+            latitude: (minLat + maxLat) / 2,
+            longitude: (minLon + maxLon) / 2
+        )
+        
+        let span = MKCoordinateSpan(
+            latitudeDelta: (maxLat - minLat) * 1.5,
+            longitudeDelta: (maxLon - minLon) * 1.5
+        )
+        
+        let region = MKCoordinateRegion(center: center, span: span)
+        cameraPosition = .region(region)
+    }
+    
+    // MARK: - Formatter Helpers
     private func formattedTime(_ time: TimeInterval) -> String {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.minute, .second]
         formatter.unitsStyle = .abbreviated
         return formatter.string(from: time) ?? "-"
+    }
+    
+    private func paceFormatted() -> String {
+        let distanceMiles = workout.distance / 1609.34
+        guard distanceMiles > 0 else { return "-" }
+        
+        let pace = workout.duration / distanceMiles
+        let minutes = Int(pace) / 60
+        let seconds = Int(pace) % 60
+        return String(format: "%d:%02d min/mi", minutes, seconds)
+    }
+    
+    private func caloriesFormatted() -> String {
+        // Simple estimate: 100 calories per mile
+        let distanceMiles = workout.distance / 1609.34
+        let calories = distanceMiles * 100
+        return String(format: "%.0f kcal", calories)
     }
 }
