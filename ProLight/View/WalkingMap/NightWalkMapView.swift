@@ -110,78 +110,97 @@ struct NightWalkMapView: View {
             
             VStack {
                 Spacer()
-                HStack(alignment: .bottom) {
-                    // Hide Tab Bar Button
-                    Button(action: { hideTabBar.toggle() }) {
-                        Image(systemName: "chevron.up.chevron.down")
-                            .font(.title2)
-                            .foregroundStyle(.black)
-                            .frame(width: 50, height: 50)
-                            .background(.ultraThinMaterial, in: Circle())
-                    }
-                    
-                    // Start/Stop Button
+                
+                VStack(alignment: .trailing) {
                     Button(action: {
-                        if isTracking {
-                            if let location = locationManager.lastLocation {
-                                endLocation = MarkedLocation(coordinate: location.coordinate)
-                            }
-                            locationManager.stopTracking()
-                            HealthKitManager.shared.endWorkoutSession()
-                            stopTimer()
-                            if let start = walkStartTime {
-                                finalDuration = Date().timeIntervalSince(start)
-                            }
-                            isTracking.toggle()
-                            showSummary = true
-                            
-                            let allCoords = locationManager.trackedRoute
-                            if let region = regionThatFitsAllCoordinates(allCoords) {
-                                withAnimation {
-                                    cameraPosition = .region(region)
-                                }
-                            }
-                        } else {
-                            if let location = locationManager.lastLocation {
-                                startLocation = MarkedLocation(coordinate: location.coordinate)
-                                endLocation = nil
-                                cameraPosition = .region(
-                                    MKCoordinateRegion(
-                                        center: location.coordinate,
-                                        span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
-                                    )
+                        if let location = locationManager.lastLocation {
+                            cameraPosition = .region(
+                                MKCoordinateRegion(
+                                    center: location.coordinate,
+                                    span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
                                 )
-                            }
-                            locationManager.startTracking()
-                            walkStartTime = Date()
-                            HealthKitManager.shared.startWorkoutSession()
-                            walkStartTime = Date()
-                            elapsedTime = 0
-                            startTimer()
-                            isTracking.toggle()
+                            )
                         }
                     }) {
-                        Label(isTracking ? "Stop" : "Start Walking", systemImage: isTracking ? "stop.circle.fill" : "figure.walk")
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
-                            .background(isTracking ? .red : .green, in: .rect(cornerRadius: 15))
+                        if !isTracking {
+                            Image(systemName: "location.fill")
+                                .font(.title2)
+                                .foregroundStyle(.black)
+                                .frame(width: 50, height: 50)
+                                .background(.ultraThinMaterial, in: Circle())
+                        }
                     }
                     
-                    // Location + Flashlight Buttons
-                    VStack(alignment: .leading, spacing: 10) {
+                    HStack(alignment: .bottom) {
+                        // Hide Tab Bar Button
+                        Button(action: { hideTabBar.toggle() }) {
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(.title2)
+                                .foregroundStyle(.black)
+                                .frame(width: 50, height: 50)
+                                .background(.ultraThinMaterial, in: Circle())
+                        }
+                        
+                        // Start/Stop Button
                         Button(action: {
-                            if let location = locationManager.lastLocation {
-                                cameraPosition = .region(
-                                    MKCoordinateRegion(
-                                        center: location.coordinate,
-                                        span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+                            if isTracking {
+                                if let location = locationManager.lastLocation {
+                                    endLocation = MarkedLocation(coordinate: location.coordinate)
+                                }
+                                locationManager.stopTracking()
+                                HealthKitManager.shared.endWorkoutSession()
+                                stopTimer()
+                                if let start = walkStartTime {
+                                    finalDuration = Date().timeIntervalSince(start)
+                                }
+                                isTracking.toggle()
+                                showSummary = true
+                                
+                                let allCoords = locationManager.trackedRoute
+                                if let region = regionThatFitsAllCoordinates(allCoords) {
+                                    withAnimation {
+                                        cameraPosition = .region(region)
+                                    }
+                                }
+                            } else {
+                                if let location = locationManager.lastLocation {
+                                    startLocation = MarkedLocation(coordinate: location.coordinate)
+                                    endLocation = nil
+                                    cameraPosition = .region(
+                                        MKCoordinateRegion(
+                                            center: location.coordinate,
+                                            span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+                                        )
                                     )
-                                )
+                                }
+                                locationManager.startTracking()
+                                walkStartTime = Date()
+                                HealthKitManager.shared.startWorkoutSession()
+                                walkStartTime = Date()
+                                elapsedTime = 0
+                                startTimer()
+                                isTracking.toggle()
                             }
                         }) {
-                            if !isTracking {
-                                Image(systemName: "location.fill")
+                            Label(isTracking ? "Stop" : "Start Walking", systemImage: isTracking ? "stop.circle.fill" : "figure.walk")
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(isTracking ? .red : .green, in: .rect(cornerRadius: 15))
+                        }
+                        
+                        if !isTracking && endLocation != nil {
+                            Button(action: {
+                                resetCameraPosition()
+                                locationManager.reset()
+                                startLocation = nil
+                                endLocation = nil
+                                elapsedTime = 0
+                                finalDuration = 0
+                                caloriesBurned = 0
+                                cameraPosition = .automatic
+                            }) {
+                                Image(systemName: "arrow.clockwise")
                                     .font(.title2)
                                     .foregroundStyle(.black)
                                     .frame(width: 50, height: 50)
@@ -273,14 +292,17 @@ struct NightWalkMapView: View {
             maxLon = max(maxLon, coord.longitude)
         }
         
+        let latPadding = (maxLat - minLat) * 1.4 + 0.002  // Add extra padding for header
+        let lonPadding = (maxLon - minLon) * 1.4
+        
         let center = CLLocationCoordinate2D(
             latitude: (minLat + maxLat) / 2,
             longitude: (minLon + maxLon) / 2
         )
         
         let span = MKCoordinateSpan(
-            latitudeDelta: (maxLat - minLat) * 1.4,  // Add padding
-            longitudeDelta: (maxLon - minLon) * 1.4
+            latitudeDelta: (maxLat - minLat) + latPadding,
+            longitudeDelta: (maxLon - minLon) + lonPadding
         )
         
         return MKCoordinateRegion(center: center, span: span)
@@ -330,6 +352,17 @@ struct NightWalkMapView: View {
             route: locationManager.trackedRoute
         )
         modelContext.insert(workout)
+    }
+    
+    func resetCameraPosition() {
+        if let location = locationManager.lastLocation {
+            let coordinate = location.coordinate
+            let span = MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+            let region = MKCoordinateRegion(center: coordinate, span: span)
+            withAnimation {
+                cameraPosition = .region(region)
+            }
+        }
     }
 }
 /*

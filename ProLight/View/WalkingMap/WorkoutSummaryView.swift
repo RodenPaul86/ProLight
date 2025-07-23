@@ -26,19 +26,22 @@ struct WorkoutSummaryView: View {
                 .font(.title2)
                 .bold()
             
-            Map(position: $cameraPosition) {
+            Map(position: $cameraPosition, interactionModes: [.pitch]) {
                 if let start = startCoordinate {
                     Marker("Start", coordinate: start)
                         .tint(.green)
                 }
-
+                
                 if let end = endCoordinate {
                     Marker("End", coordinate: end)
                         .tint(.red)
                 }
-
+                
                 MapPolyline(coordinates: route)
                     .stroke(.blue, lineWidth: 4)
+            }
+            .mapControls {
+                MapPitchToggle()
             }
             .frame(height: 250)
             .clipShape(RoundedRectangle(cornerRadius: 12))
