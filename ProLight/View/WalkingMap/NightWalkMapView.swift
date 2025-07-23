@@ -32,7 +32,8 @@ struct NightWalkMapView: View {
     @StateObject private var locationManager = LocationManager()
     @State private var cameraPosition: MapCameraPosition = .automatic
     @State private var flashlightOn: Bool = false
-    @State private var markedLocations: [MarkedLocation] = []
+    @State private var startLocation: MarkedLocation?
+    @State private var endLocation: MarkedLocation?
     @State private var isTracking: Bool = false
     
     @State private var showSummary: Bool = false
@@ -50,18 +51,37 @@ struct NightWalkMapView: View {
                     .stroke(.blue, lineWidth: 4)
                 
                 UserAnnotation()
-                ForEach(markedLocations, id: \.self) { coord in
-                    Marker("Started", coordinate: coord.coordinate)
+                if let start = startLocation {
+                    Marker("Started", coordinate: start.coordinate)
                         .tint(.green)
+                }
+                
+                if let end = endLocation {
+                    Marker("Ended", coordinate: end.coordinate)
+                        .tint(.red)
                 }
             }
             .mapStyle(.standard(elevation: .realistic))
             .ignoresSafeArea()
             .onAppear {
                 locationManager.requestPermission()
+                
+                // Wait a moment to get location and then zoom
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    if let location = locationManager.lastLocation {
+                        cameraPosition = .region(
+                            MKCoordinateRegion(
+                                center: location.coordinate,
+                                span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+                            )
+                        )
+                    }
+                }
             }
             .onReceive(locationManager.$lastLocation.compactMap { $0 }) { location in
-                updateCamera(to: location)
+                if isTracking {
+                    updateCamera(to: location)
+                }
             }
             
             // Expandable Sheet (Bottom Panel)
@@ -76,33 +96,50 @@ struct NightWalkMapView: View {
                 }
                 
                 /*
-                Button {
-                    if let location = locationManager.lastLocation {
-                        markedLocations.append(MarkedLocation(coordinate: location.coordinate))
-                    }
-                } label: {
-                    Label("Add", systemImage: "mappin")
-                        .foregroundStyle(Color("lightGreen"))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(Color("darkGreen"), in: .rect(cornerRadius: 15))
-                }
+                 Button {
+                 if let location = locationManager.lastLocation {
+                 markedLocations.append(MarkedLocation(coordinate: location.coordinate))
+                 }
+                 } label: {
+                 Label("Add", systemImage: "mappin")
+                 .foregroundStyle(Color("lightGreen"))
+                 .frame(maxWidth: .infinity)
+                 .padding(.vertical, 12)
+                 .background(Color("darkGreen"), in: .rect(cornerRadius: 15))
+                 }
                  */
                 
                 Button(action: {
                     if isTracking {
                         // Stop
-                        if !markedLocations.isEmpty {
-                            markedLocations.removeLast()
+                        if let location = locationManager.lastLocation {
+                            endLocation = MarkedLocation(coordinate: location.coordinate)
                         }
                         locationManager.stopTracking()
                         HealthKitManager.shared.endWorkoutSession()
                         isTracking.toggle()
                         showSummary = true
+                        
+                        // Center the map on the route
+                        let allCoords = locationManager.trackedRoute
+                        if let region = regionThatFitsAllCoordinates(allCoords) {
+                            withAnimation {
+                                cameraPosition = .region(region)
+                            }
+                        }
                     } else {
                         // Start
                         if let location = locationManager.lastLocation {
-                            markedLocations.append(MarkedLocation(coordinate: location.coordinate))
+                            startLocation = MarkedLocation(coordinate: location.coordinate)
+                            endLocation = nil // reset end location in case user restarts
+                            
+                            // Lock the camera to user's location
+                            cameraPosition = .region(
+                                MKCoordinateRegion(
+                                    center: location.coordinate,
+                                    span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+                                )
+                            )
                         }
                         locationManager.startTracking()
                         walkStartTime = Date()
@@ -178,18 +215,46 @@ struct NightWalkMapView: View {
         }
         return distance
     }
+    
+    func regionThatFitsAllCoordinates(_ coordinates: [CLLocationCoordinate2D]) -> MKCoordinateRegion? {
+        guard !coordinates.isEmpty else { return nil }
+        
+        var minLat = coordinates.first!.latitude
+        var maxLat = coordinates.first!.latitude
+        var minLon = coordinates.first!.longitude
+        var maxLon = coordinates.first!.longitude
+        
+        for coord in coordinates {
+            minLat = min(minLat, coord.latitude)
+            maxLat = max(maxLat, coord.latitude)
+            minLon = min(minLon, coord.longitude)
+            maxLon = max(maxLon, coord.longitude)
+        }
+        
+        let center = CLLocationCoordinate2D(
+            latitude: (minLat + maxLat) / 2,
+            longitude: (minLon + maxLon) / 2
+        )
+        
+        let span = MKCoordinateSpan(
+            latitudeDelta: (maxLat - minLat) * 1.4,  // Add padding
+            longitudeDelta: (maxLon - minLon) * 1.4
+        )
+        
+        return MKCoordinateRegion(center: center, span: span)
+    }
 }
 /*
-#Preview {
-    NightWalkMapView(tabBarHeight: 0)
-}
-*/
- 
+ #Preview {
+ NightWalkMapView(tabBarHeight: 0)
+ }
+ */
+
 struct FlashlightHelper {
     static func setFlashlight(on: Bool) {
         guard let device = AVCaptureDevice.default(for: .video),
               device.hasTorch else { return }
-
+        
         do {
             try device.lockForConfiguration()
             device.torchMode = on ? .on : .off
