@@ -7,8 +7,11 @@
 
 import SwiftUI
 import MapKit
+import SwiftData
 
 struct WorkoutDetailView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
     let workout: Workout
     
     @State private var cameraPosition: MapCameraPosition = .automatic
@@ -91,6 +94,15 @@ struct WorkoutDetailView: View {
         }
         .padding()
         .navigationTitle("Workout Detail")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(role: .destructive) {
+                    deleteWorkout()
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
+        }
     }
     
     // MARK: - Zoom to fit route
@@ -146,5 +158,11 @@ struct WorkoutDetailView: View {
         let distanceMiles = workout.distance / 1609.34
         let calories = distanceMiles * 100
         return String(format: "%.0f kcal", calories)
+    }
+    
+    private func deleteWorkout() {
+        modelContext.delete(workout)
+        try? modelContext.save()
+        dismiss()
     }
 }
