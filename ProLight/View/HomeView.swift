@@ -10,6 +10,7 @@ import SwiftUI
 import AVFoundation
 
 struct HomeView: View {
+    @StateObject private var workoutStorage = WorkoutStorage()
     @StateObject private var flashControllerInstance = FlashController()
     @State private var brightnessLevel: Int = 4
     
@@ -37,22 +38,36 @@ struct HomeView: View {
     ]
     
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-            
-            VStack(spacing: 40) {
-                Spacer()
-                brightnessSliders
-                modeButtons
+        NavigationStack {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                
+                VStack(spacing: 40) {
+                    Spacer()
+                    brightnessSliders
+                    modeButtons
+                }
+                .overlay (
+                    HStack {
+                        NavigationLink(destination: WorkoutHistoryView(storage: workoutStorage)) {
+                            Label("Workout History", systemImage: "list.bullet.rectangle.portrait")
+                                .foregroundStyle(.white)
+                        }
+                        Spacer()
+                    }
+                        .padding(.leading)
+                        .padding(.top, 10),
+                    alignment: .topLeading
+                )
+                .onAppear {
+                    updateTorch()
+                }
+                .onDisappear {
+                    flashControllerInstance.stopFlashing()
+                }
+                .padding()
+                .safeAreaPadding(.bottom, tabBarHeight)
             }
-            .onAppear {
-                updateTorch()
-            }
-            .onDisappear {
-                flashControllerInstance.stopFlashing()
-            }
-            .padding()
-            .safeAreaPadding(.bottom, tabBarHeight)
         }
     }
     
@@ -310,7 +325,7 @@ struct HomeView: View {
             }
             device.unlockForConfiguration()
         } catch {
-            print("Torch update error: \(error)")
+            print("Flashlight update error: \(error)")
         }
     }
 }
