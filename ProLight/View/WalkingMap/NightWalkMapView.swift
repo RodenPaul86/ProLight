@@ -256,7 +256,8 @@ struct NightWalkMapView: View {
                     duration: finalDuration,
                     movingTime: locationManager.movingTime,
                     distance: distance,
-                    route: locationManager.trackedRoute
+                    route: locationManager.trackedRoute,
+                    notes: ""
                 )
                 saveWorkout()
                 showSummary = false
@@ -366,7 +367,8 @@ struct NightWalkMapView: View {
             duration: finalDuration,
             movingTime: locationManager.movingTime,
             distance: calculateDistance(from: locationManager.trackedRoute),
-            route: locationManager.trackedRoute
+            route: locationManager.trackedRoute,
+            notes: ""
         )
         modelContext.insert(workout)
     }
