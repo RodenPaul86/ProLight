@@ -47,6 +47,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3AADAB642E3248CB0044EE64 /* Exceptions for "ProLight" folder in "ProLight" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 3A0D29B02DE7819100F1F704 /* ProLight */;
+		};
 		3AD07D802E2FC356000A6B2D /* Exceptions for "ProLight Widget" folder in "ProLight WidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -59,6 +66,9 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3A0D29B32DE7819100F1F704 /* ProLight */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3AADAB642E3248CB0044EE64 /* Exceptions for "ProLight" folder in "ProLight" target */,
+			);
 			path = ProLight;
 			sourceTree = "<group>";
 		};
@@ -394,6 +404,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ProLight/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ProLight needs your location to help you navigate at night during your walk or run.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -436,6 +447,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ProLight/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ProLight needs your location to help you navigate at night during your walk or run.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;

@@ -114,8 +114,8 @@ struct WorkoutSummaryView: View {
         )
 
         let span = MKCoordinateSpan(
-            latitudeDelta: max(0.005, (maxLat - minLat) * 1.4),
-            longitudeDelta: max(0.005, (maxLon - minLon) * 1.4)
+            latitudeDelta: (maxLat - minLat) * 1.5,
+            longitudeDelta: (maxLon - minLon) * 1.5
         )
 
         return MKCoordinateRegion(center: center, span: span)

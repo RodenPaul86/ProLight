@@ -90,20 +90,39 @@ struct NightWalkMapView: View {
                 }
             }
             
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
+            HStack {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Duration")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                     Label("\(formatTime(elapsedTime))", systemImage: "clock")
-                    Spacer()
-                    Label(String(format: "%.2f mi", distanceInMiles), systemImage: "map")
+                        .font(.headline)
+                    
+                    Text("Pace")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Label(String(format: "%.1f min/mi", paceInMinutesPerMile), systemImage: "speedometer")
+                        .font(.headline)
                 }
                 
-                HStack {
-                    Label(String(format: "%.1f min/mi", paceInMinutesPerMile), systemImage: "speedometer")
-                    Spacer()
+                Spacer()
+                
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Distance")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    
+                    Label(String(format: "%.2f mi", distanceInMiles), systemImage: "map")
+                        .font(.headline)
+                    
+                    Text("Calories")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                     Label(String(format: "%.0f cal", caloriesBurned), systemImage: "flame")
+                        .font(.headline)
                 }
             }
-            .foregroundColor(.black)
+            .foregroundColor(.primary)
             .padding()
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
             .padding(.horizontal)
@@ -125,20 +144,31 @@ struct NightWalkMapView: View {
                         if !isTracking {
                             Image(systemName: "location.fill")
                                 .font(.title2)
-                                .foregroundStyle(.black)
+                                .foregroundStyle(.primary)
                                 .frame(width: 50, height: 50)
                                 .background(.ultraThinMaterial, in: Circle())
                         }
                     }
                     
                     HStack(alignment: .bottom) {
-                        // Hide Tab Bar Button
-                        Button(action: { hideTabBar.toggle() }) {
-                            Image(systemName: "chevron.up.chevron.down")
-                                .font(.title2)
-                                .foregroundStyle(.black)
-                                .frame(width: 50, height: 50)
-                                .background(.ultraThinMaterial, in: Circle())
+                        // Reset Map
+                        if !isTracking && endLocation != nil {
+                            Button(action: {
+                                resetCameraPosition()
+                                locationManager.reset()
+                                startLocation = nil
+                                endLocation = nil
+                                elapsedTime = 0
+                                finalDuration = 0
+                                caloriesBurned = 0
+                                cameraPosition = .automatic
+                            }) {
+                                Image(systemName: "arrow.clockwise")
+                                    .font(.title2)
+                                    .foregroundStyle(.primary)
+                                    .frame(width: 50, height: 50)
+                                    .background(.ultraThinMaterial, in: Circle())
+                            }
                         }
                         
                         // Start/Stop Button
@@ -150,6 +180,7 @@ struct NightWalkMapView: View {
                                 locationManager.stopTracking()
                                 HealthKitManager.shared.endWorkoutSession()
                                 stopTimer()
+                                hideTabBar = false
                                 if let start = walkStartTime {
                                     finalDuration = Date().timeIntervalSince(start)
                                 }
@@ -179,6 +210,7 @@ struct NightWalkMapView: View {
                                 walkStartTime = Date()
                                 elapsedTime = 0
                                 startTimer()
+                                hideTabBar = true
                                 isTracking.toggle()
                             }
                         }) {
@@ -189,29 +221,10 @@ struct NightWalkMapView: View {
                                 .background(isTracking ? .red : .green, in: .rect(cornerRadius: 15))
                         }
                         
-                        if !isTracking && endLocation != nil {
-                            Button(action: {
-                                resetCameraPosition()
-                                locationManager.reset()
-                                startLocation = nil
-                                endLocation = nil
-                                elapsedTime = 0
-                                finalDuration = 0
-                                caloriesBurned = 0
-                                cameraPosition = .automatic
-                            }) {
-                                Image(systemName: "arrow.clockwise")
-                                    .font(.title2)
-                                    .foregroundStyle(.black)
-                                    .frame(width: 50, height: 50)
-                                    .background(.ultraThinMaterial, in: Circle())
-                            }
-                        }
-                        
                         Button(action: toggleFlashlight) {
                             Image(systemName: flashlightOn ? "flashlight.on.fill" : "flashlight.off.fill")
                                 .font(.title2)
-                                .foregroundStyle(.black)
+                                .foregroundStyle(.primary)
                                 .frame(width: 50, height: 50)
                                 .background(.ultraThinMaterial, in: Circle())
                         }
@@ -365,11 +378,6 @@ struct NightWalkMapView: View {
         }
     }
 }
-/*
- #Preview {
- NightWalkMapView(tabBarHeight: 0)
- }
- */
 
 struct FlashlightHelper {
     static func setFlashlight(on: Bool) {
