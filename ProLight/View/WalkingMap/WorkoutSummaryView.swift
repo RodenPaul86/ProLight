@@ -67,7 +67,7 @@ struct WorkoutSummaryView: View {
             HStack {
                 Label("Calories", systemImage: "flame")
                 Spacer()
-                Text(String(format: "%.0f cal", calories))
+                Text(String(format: "%.0f Kcal", calories))
             }
             
             Spacer()
