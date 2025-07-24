@@ -14,6 +14,13 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var lastLocation: CLLocation?
     @Published var trackedRoute: [CLLocationCoordinate2D] = []
     
+    @Published var movingTime: TimeInterval = 0
+    @Published var totalDistanceInMeters: Double = 0
+    
+    private var previousLocation: CLLocation?
+    private var previousTimestamp: Date?
+    private let movementThreshold: CLLocationDistance = 5.0 // meters
+    
     var isTrackingRoute = false
     
     override init() {
@@ -42,11 +49,28 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
-        lastLocation = location
+        guard let newLocation = locations.last, newLocation.horizontalAccuracy >= 0 else { return }
+        
+        lastLocation = newLocation
         
         if isTrackingRoute {
-            trackedRoute.append(location.coordinate)
+            trackedRoute.append(newLocation.coordinate)
+            
+            if let previous = previousLocation,
+               let previousTime = previousTimestamp {
+                
+                let distance = newLocation.distance(from: previous)
+                let timeDelta = newLocation.timestamp.timeIntervalSince(previousTime)
+                
+                // Only count time and distance if user moved significantly
+                if distance >= movementThreshold {
+                    totalDistanceInMeters += distance
+                    movingTime += timeDelta
+                }
+            }
+            
+            previousLocation = newLocation
+            previousTimestamp = newLocation.timestamp
         }
     }
 }

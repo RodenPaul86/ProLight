@@ -337,12 +337,12 @@ struct NightWalkMapView: View {
     }
     
     var distanceInMiles: Double {
-        calculateDistance(from: locationManager.trackedRoute) * 0.000621371
+        locationManager.totalDistanceInMeters / 1609.34
     }
     
     var paceInMinutesPerMile: Double {
         guard distanceInMiles > 0 else { return 0 }
-        return (elapsedTime / 60) / distanceInMiles
+        return (locationManager.movingTime / 60) / distanceInMiles
     }
     
     func estimateCalories(from duration: TimeInterval) -> Double {
