@@ -61,7 +61,7 @@ struct WorkoutSummaryView: View {
             HStack {
                 Label("Pace", systemImage: "speedometer")
                 Spacer()
-                Text(String(format: "%.1f min/mi", pace))
+                Text(formattedPace(pace))
             }
             
             HStack {
@@ -71,13 +71,22 @@ struct WorkoutSummaryView: View {
             }
             
             Spacer()
-            
-            Button("Done") {
-                onDone()
-            }
-            .buttonStyle(.borderedProminent)
         }
         .padding()
+        .overlay (
+            HStack {
+                Button(action: { onDone() }) {
+                    Image(systemName: "xmark")
+                        .font(.title3)
+                        .padding(10)
+                        .background(.ultraThinMaterial, in: Circle())
+                }
+                Spacer()
+            }
+                .padding(.leading)
+                .padding(.top, 10),
+            alignment: .topLeading
+        )
         .onAppear {
             let allCoordinates = route + [startCoordinate, endCoordinate].compactMap { $0 }
             if let region = regionThatFitsAllCoordinates(allCoordinates) {
@@ -91,6 +100,13 @@ struct WorkoutSummaryView: View {
         formatter.allowedUnits = [.minute, .second]
         formatter.unitsStyle = .abbreviated
         return formatter.string(from: duration) ?? "-"
+    }
+    
+    func formattedPace(_ pace: Double) -> String {
+        guard pace > 0, pace.isFinite else { return "--:-- min/mi" }
+        let minutes = Int(pace)
+        let seconds = Int((pace - Double(minutes)) * 60)
+        return String(format: "%d:%02d min/mi", minutes, seconds)
     }
     
     func regionThatFitsAllCoordinates(_ coordinates: [CLLocationCoordinate2D]) -> MKCoordinateRegion? {

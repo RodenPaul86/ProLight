@@ -34,7 +34,7 @@ struct WorkoutDetailView: View {
                     Text("Duration")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text(formattedTime(workout.duration))
+                    Text(workout.duration.formattedDuration)
                         .font(.headline)
                 }
                 
@@ -54,7 +54,7 @@ struct WorkoutDetailView: View {
                     Text("Calories")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text(caloriesFormatted())
+                    Text(workout.distance.formattedCaloriesFromMeters())
                         .font(.headline)
                 }
             }
@@ -136,28 +136,12 @@ struct WorkoutDetailView: View {
     }
     
     // MARK: - Formatter Helpers
-    private func formattedTime(_ time: TimeInterval) -> String {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.minute, .second]
-        formatter.unitsStyle = .abbreviated
-        return formatter.string(from: time) ?? "-"
-    }
-    
     private func paceFormatted() -> String {
         let distanceMiles = workout.distance / 1609.34
-        guard distanceMiles > 0 else { return "-" }
+        guard distanceMiles > 0 else { return "--:-- min/mi" }
         
-        let pace = workout.duration / distanceMiles
-        let minutes = Int(pace) / 60
-        let seconds = Int(pace) % 60
-        return String(format: "%d:%02d min/mi", minutes, seconds)
-    }
-    
-    private func caloriesFormatted() -> String {
-        // Simple estimate: 100 calories per mile
-        let distanceMiles = workout.distance / 1609.34
-        let calories = distanceMiles * 100
-        return String(format: "%.0f kcal", calories)
+        let secondsPerMile = workout.movingTime / distanceMiles
+        return secondsPerMile.formattedPace
     }
     
     private func deleteWorkout() {

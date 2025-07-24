@@ -38,7 +38,7 @@ struct NightWalkMapView: View {
     @State private var isTracking: Bool = false
     
     @State private var showSummary: Bool = false
-    @State private var walkStartTime: Date?
+    @State private var walkStartTime: Date? = nil
     
     @State private var elapsedTime: TimeInterval = 0
     @State private var timer: Timer?
@@ -101,7 +101,9 @@ struct NightWalkMapView: View {
                     Text("Pace")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Label(String(format: "%.1f min/mi", paceInMinutesPerMile), systemImage: "speedometer")
+                    
+                    let secondsPerMile = paceInMinutesPerMile * 60
+                    Label(secondsPerMile.formattedPace, systemImage: "speedometer")
                         .font(.headline)
                 }
                 
@@ -118,7 +120,7 @@ struct NightWalkMapView: View {
                     Text("Calories")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Label(String(format: "%.0f cal", caloriesBurned), systemImage: "flame")
+                    Label(locationManager.totalDistanceInMeters.formattedCaloriesFromMeters(), systemImage: "flame")
                         .font(.headline)
                 }
             }
@@ -236,9 +238,10 @@ struct NightWalkMapView: View {
         .sheet(isPresented: $showSummary) {
             let distance = calculateDistance(from: locationManager.trackedRoute)
             let miles = distance * 0.000621371
-            let pace = miles > 0 ? (finalDuration / 60) / miles : 0
+            let movingMinutes = locationManager.movingTime / 60
+            let pace = miles > 0 ? movingMinutes / miles : 0
             let calories = miles * 100
-            
+
             WorkoutSummaryView(
                 route: locationManager.trackedRoute,
                 duration: finalDuration,
@@ -251,6 +254,7 @@ struct NightWalkMapView: View {
                 let workout = Workout(
                     date: walkStartTime ?? Date(),
                     duration: finalDuration,
+                    movingTime: locationManager.movingTime,
                     distance: distance,
                     route: locationManager.trackedRoute
                 )
@@ -326,7 +330,6 @@ struct NightWalkMapView: View {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
             if let start = walkStartTime {
                 elapsedTime = Date().timeIntervalSince(start)
-                caloriesBurned = estimateCalories(from: elapsedTime)
             }
         }
     }
@@ -341,13 +344,9 @@ struct NightWalkMapView: View {
     }
     
     var paceInMinutesPerMile: Double {
-        guard distanceInMiles > 0 else { return 0 }
-        return (locationManager.movingTime / 60) / distanceInMiles
-    }
-    
-    func estimateCalories(from duration: TimeInterval) -> Double {
-        // Simple estimation: ~100 calories per mile walked
-        return distanceInMiles * 100
+        let distance = calculateDistance(from: locationManager.trackedRoute) * 0.000621371
+        guard distance > 0 else { return 0 }
+        return (locationManager.movingTime / 60) / distance
     }
     
     func formatTime(_ interval: TimeInterval) -> String {
@@ -358,9 +357,14 @@ struct NightWalkMapView: View {
     }
     
     func saveWorkout() {
+        let endTime = Date()
+        let startTime = walkStartTime ?? endTime
+        let finalDuration = endTime.timeIntervalSince(startTime)
+        
         let workout = Workout(
-            date: walkStartTime ?? Date(),
-            duration: Date().timeIntervalSince(walkStartTime ?? Date()),
+            date: startTime,
+            duration: finalDuration,
+            movingTime: locationManager.movingTime,
             distance: calculateDistance(from: locationManager.trackedRoute),
             route: locationManager.trackedRoute
         )

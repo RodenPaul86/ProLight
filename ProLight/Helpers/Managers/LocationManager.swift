@@ -46,6 +46,10 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     func reset() {
         trackedRoute.removeAll()
         lastLocation = nil
+        previousLocation = nil
+        previousTimestamp = nil
+        totalDistanceInMeters = 0
+        movingTime = 0
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {

@@ -14,13 +14,15 @@ class Workout {
     @Attribute(.unique) var id: UUID
     var date: Date
     var duration: TimeInterval
+    var movingTime: TimeInterval
     var distance: Double
-    var routeData: Data // store [CLLocationCoordinate2D] as Data
+    var routeData: Data
     
-    init(date: Date, duration: TimeInterval, distance: Double, route: [CLLocationCoordinate2D]) {
+    init(date: Date, duration: TimeInterval, movingTime: TimeInterval, distance: Double, route: [CLLocationCoordinate2D]) {
         self.id = UUID()
         self.date = date
         self.duration = duration
+        self.movingTime = movingTime
         self.distance = distance
         self.routeData = try! JSONEncoder().encode(route)
     }
