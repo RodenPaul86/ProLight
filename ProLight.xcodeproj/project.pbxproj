@@ -10,6 +10,7 @@
 		3AA77BAA2E2D31BA00F018BB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AA77BA92E2D31BA00F018BB /* WidgetKit.framework */; };
 		3AA77BAC2E2D31BA00F018BB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AA77BAB2E2D31BA00F018BB /* SwiftUI.framework */; };
 		3AA77BB72E2D31BD00F018BB /* ProLight WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3AA77BA72E2D31BA00F018BB /* ProLight WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3AADAD0E2E3283BE0044EE64 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 3AADAD0D2E3283BE0044EE64 /* Lottie */; };
 		3ADC62F62E2E72DE00B66E31 /* ConfidentialKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3ADC62F52E2E72DE00B66E31 /* ConfidentialKit */; };
 		3ADC63B42E2E789700B66E31 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 3ADC63B32E2E789700B66E31 /* RevenueCat */; };
 		3ADC63B62E2E789700B66E31 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3ADC63B52E2E789700B66E31 /* RevenueCatUI */; };
@@ -90,6 +91,7 @@
 				3ADC63B42E2E789700B66E31 /* RevenueCat in Frameworks */,
 				3ADC62F62E2E72DE00B66E31 /* ConfidentialKit in Frameworks */,
 				3ADC63B62E2E789700B66E31 /* RevenueCatUI in Frameworks */,
+				3AADAD0E2E3283BE0044EE64 /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -159,6 +161,7 @@
 				3ADC62F52E2E72DE00B66E31 /* ConfidentialKit */,
 				3ADC63B32E2E789700B66E31 /* RevenueCat */,
 				3ADC63B52E2E789700B66E31 /* RevenueCatUI */,
+				3AADAD0D2E3283BE0044EE64 /* Lottie */,
 			);
 			productName = ProLight;
 			productReference = 3A0D29B12DE7819100F1F704 /* ProLight.app */;
@@ -217,6 +220,7 @@
 				3ADC62F42E2E72DE00B66E31 /* XCRemoteSwiftPackageReference "swift-confidential" */,
 				3ADC62F72E2E735100B66E31 /* XCRemoteSwiftPackageReference "swift-confidential-plugin" */,
 				3ADC63B22E2E789700B66E31 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+				3AADAD0C2E3283BE0044EE64 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3A0D29B22DE7819100F1F704 /* Products */;
@@ -578,6 +582,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		3AADAD0C2E3283BE0044EE64 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.2;
+			};
+		};
 		3ADC62F42E2E72DE00B66E31 /* XCRemoteSwiftPackageReference "swift-confidential" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/securevale/swift-confidential";
@@ -605,6 +617,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		3AADAD0D2E3283BE0044EE64 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3AADAD0C2E3283BE0044EE64 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
+		};
 		3ADC62F52E2E72DE00B66E31 /* ConfidentialKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3ADC62F42E2E72DE00B66E31 /* XCRemoteSwiftPackageReference "swift-confidential" */;

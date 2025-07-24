@@ -12,6 +12,7 @@ import SwiftData
 struct WorkoutDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @State private var textBody: String = ""
     let workout: Workout
     
     @State private var cameraPosition: MapCameraPosition = .automatic
@@ -83,12 +84,33 @@ struct WorkoutDetailView: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .onAppear {
                 zoomToFitRoute()
+                textBody = workout.notes ?? ""
             }
             
             // Date
             Text("Date: \(workout.date.formatted(date: .abbreviated, time: .shortened))")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+            
+            VStack(spacing: 0) {
+                HStack {
+                    Text("Note:")
+                        .font(.headline)
+                    Spacer()
+                }
+                
+                // MARK: Expanding TextField
+                TextField("Enter text here...", text: $textBody, axis: .vertical)
+                    .padding(.vertical, 8)
+                    .frame(minHeight: 200, alignment: .top) /// <-- Ensures expansion
+            }
+            .padding() // Padding inside the border
+            .background(.ultraThinMaterial)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+            )
+            .cornerRadius(12)
             
             Spacer()
         }
@@ -97,9 +119,13 @@ struct WorkoutDetailView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(role: .destructive) {
-                    deleteWorkout()
+                    if textBody.isEmpty {
+                        deleteWorkout()
+                    } else {
+                        saveNote()
+                    }
                 } label: {
-                    Label("Delete", systemImage: "trash")
+                    Text(textBody.isEmpty ? "Delete" : "Save")
                 }
             }
         }
@@ -146,6 +172,12 @@ struct WorkoutDetailView: View {
     
     private func deleteWorkout() {
         modelContext.delete(workout)
+        try? modelContext.save()
+        dismiss()
+    }
+    
+    private func saveNote() {
+        workout.notes = textBody
         try? modelContext.save()
         dismiss()
     }

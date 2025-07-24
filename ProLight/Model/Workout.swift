@@ -17,14 +17,16 @@ class Workout {
     var movingTime: TimeInterval
     var distance: Double
     var routeData: Data
+    var notes: String
     
-    init(date: Date, duration: TimeInterval, movingTime: TimeInterval, distance: Double, route: [CLLocationCoordinate2D]) {
+    init(date: Date, duration: TimeInterval, movingTime: TimeInterval, distance: Double, route: [CLLocationCoordinate2D], notes: String) {
         self.id = UUID()
         self.date = date
         self.duration = duration
         self.movingTime = movingTime
         self.distance = distance
         self.routeData = try! JSONEncoder().encode(route)
+        self.notes = notes
     }
     
     var route: [CLLocationCoordinate2D] {
