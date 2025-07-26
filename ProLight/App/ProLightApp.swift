@@ -12,6 +12,7 @@ import SwiftData
 
 @main
 struct ProLightApp: App {
+    @StateObject var appSubModel = appSubscriptionModel()
     
     init() {
         Purchases.logLevel = .debug
@@ -21,6 +22,7 @@ struct ProLightApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(appSubModel)
         }
         .modelContainer(for: Workout.self) // <- registers Workout as a SwiftData model
     }
