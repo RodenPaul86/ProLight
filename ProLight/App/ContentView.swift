@@ -33,8 +33,8 @@ struct ContentView: View {
             switch tab {
             case .home: HomeView(tabBarHeight: tabBarHeight)
             case .map: NightWalkMapView(tabBarHeight: tabBarHeight)
-            case .fitness: Text("Fitness")
-            case .morseCode: Text("Morse Code")
+            case .fitness: Text("TODO: Fitness")
+            case .morseCode: Text("TODO: Morse Code")
             case .settings: LibraryView(tabBarHeight: tabBarHeight)
             }
         }

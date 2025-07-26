@@ -16,11 +16,9 @@ struct WorkoutHistoryView: View {
         Group {
             if workouts.isEmpty {
                 VStack {
-                    /*
-                    lottieView(name: "")
+                    lottieView(name: "Traveler")
                         .frame(width: 120, height: 120)
                         .clipped()
-                     */
                     
                     Text("No Walks Recorded yet")
                         .font(.title3.bold())
@@ -32,7 +30,7 @@ struct WorkoutHistoryView: View {
                         .font(.body)
                         .foregroundColor(.gray)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity)
                 
             } else {
                 List {
@@ -53,7 +51,7 @@ struct WorkoutHistoryView: View {
                 }
             }
         }
-        .navigationTitle("Past Workouts")
+        .navigationTitle("Past Walks")
     }
     
     private func deleteWorkouts(at offsets: IndexSet) {
