@@ -24,6 +24,7 @@ struct SettingsView: View {
     @State private var isPaywallPresented: Bool = false
     @State private var isPresentedManageSubscription: Bool = false
     @State private var showStoreView = false
+    @State private var hideTabBar: Bool = false
     
     var tabBarHeight: CGFloat
     
@@ -41,11 +42,6 @@ struct SettingsView: View {
                 }
                 
                 Section(header: Text("Customization")) {
-                    if UIDevice.current.userInterfaceIdiom == .phone {
-                        customRow(icon: "paintbrush", firstLabel: "Appearance", action: {
-                            showPickerView.toggle()
-                        })
-                    }
                     customRow(icon: "questionmark.app.dashed", firstLabel: "Alternate Icons", destination: AnyView(AlternativeIcons()))
                     customRow(icon: "iphone.gen2.radiowaves.left.and.right", firstLabel: "In-App Haptics", showToggle: true, toggleValue: $isHapticsEnabled)
                 }
@@ -120,6 +116,9 @@ struct SettingsView: View {
                 }
 #endif
             }
+            .onAppear {
+                hideTabBar = false
+            }
             .listStyle(InsetGroupedListStyle())
             .navigationTitle("Settings")
             .toolbar {
@@ -132,11 +131,8 @@ struct SettingsView: View {
                     }
                 }
             }
-            .safeAreaInset(edge: .bottom) {
-                if UIDevice.current.userInterfaceIdiom == .phone {
-                    Color.clear.frame(height: appSubModel.isSubscriptionActive ? 50 : 100) /// <-- Space for the tab bar
-                }
-            }
+            .safeAreaPadding(.bottom, tabBarHeight)
+            .hideFloatingTabBar(hideTabBar)
             .fullScreenCover(isPresented: $isPaywallPresented) {
                 SubscriptionView(isPaywallPresented: $isPaywallPresented)
                     .preferredColorScheme(.dark)
@@ -315,7 +311,7 @@ struct customPremiumBanner: View {
         Button(action: onTap) {
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("\(Bundle.main.appName) Pro")
+                    Text("\(Bundle.main.appName) Premium")
                         .font(.title3.bold())
                         .foregroundStyle(.white)
                     
@@ -330,10 +326,9 @@ struct customPremiumBanner: View {
                 Spacer()
                 
                 ZStack {
-                    Image(systemName: "document.viewfinder")
+                    Image(systemName: "power")
                         .font(.system(size: 70)) /// <-- Originally the size was 80
-                        .foregroundStyle(.white)
-                        .opacity(0.1)
+                        .foregroundStyle(.white.opacity(0.1))
                         .rotationEffect(.degrees(-20))
                         .scaleEffect(1.8) /// <-- Make it larger without affecting layout
                         .offset(x: -10, y: 20)
@@ -352,7 +347,7 @@ struct customPremiumBanner: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(
                         LinearGradient(
-                            gradient: Gradient(colors: [Color("Default"), Color("Default").opacity(0.8)]),
+                            gradient: Gradient(colors: [Color.theme.background, Color.theme.background.opacity(0.8)]),
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )

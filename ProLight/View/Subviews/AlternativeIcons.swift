@@ -69,6 +69,7 @@ struct AlternativeIcons: View {
     @State private var currentAppIcon: AppIcon = .defaultIcon
     @EnvironmentObject var appSubModel: appSubscriptionModel
     @State private var isPaywallPresented: Bool = false
+    @State private var hideTabBar: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -118,9 +119,6 @@ struct AlternativeIcons: View {
                         }
                     }
                 }
-                .safeAreaInset(edge: .bottom, spacing: 0) {
-                    Color.clear.frame(height: 80) /// <-- Reserve space for the tab bar
-                }
             }
             .navigationTitle("Alternate Icons")
             .alert(isPresented: $isPaywallPresented) {
@@ -137,8 +135,10 @@ struct AlternativeIcons: View {
                 SubscriptionView(isPaywallPresented: $isPaywallPresented)
                     .preferredColorScheme(.dark)
             }
+            .hideFloatingTabBar(hideTabBar)
         }
         .onAppear {
+            hideTabBar = true
             // Check for the current icon on view appearance, and only reset if needed
             if let alternativeAppIcon = UIApplication.shared.alternateIconName,
                let appIcon = AppIcon.allCases.first(where: { $0.rawValue == alternativeAppIcon }) {

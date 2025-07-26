@@ -10,14 +10,18 @@ import SwiftUI
 
 extension Color {
     static let theme = ColorTheme()
-    static let launch = LaunchTheme()
+    //static let launch = LaunchTheme()
 }
 
 struct ColorTheme {
-    let accent = Color("Default").gradient
+    let accent = Color("darkGreen").gradient
+    let background = Color("darkGray")
+    let iconText = Color("lightGreen")
 }
 
+/*
 struct LaunchTheme {
     let accent = Color("LaunchAccentColor").gradient
     let background = Color("LaunchBackgroundColor")
 }
+*/
