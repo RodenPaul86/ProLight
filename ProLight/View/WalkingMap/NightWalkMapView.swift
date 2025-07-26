@@ -235,7 +235,7 @@ struct NightWalkMapView: View {
                 .padding()
             }
         }
-        .sheet(isPresented: $showSummary) {
+        .fullScreenCover(isPresented: $showSummary) {
             let distance = calculateDistance(from: locationManager.trackedRoute)
             let miles = distance * 0.000621371
             let movingMinutes = locationManager.movingTime / 60

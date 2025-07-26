@@ -115,17 +115,17 @@ struct WorkoutDetailView: View {
             Spacer()
         }
         .padding()
-        .navigationTitle("Workout Detail")
+        .navigationTitle("Walking Detail")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(role: .destructive) {
-                    if textBody.isEmpty {
-                        deleteWorkout()
-                    } else {
-                        saveNote()
+                HStack {
+                    Button(action: { deleteWorkout() }) {
+                        Label("Delete", systemImage: "trash")
                     }
-                } label: {
-                    Text(textBody.isEmpty ? "Delete" : "Save")
+                    
+                    Button(action: { saveNote() }) {
+                        Text("Save")
+                    }
                 }
             }
         }

@@ -18,7 +18,7 @@ enum AppTab: String, CaseIterable, FloatingTabProtocol {
         switch self {
         case .home: "flashlight.on.fill"
         case .morseCode: "dot.radiowaves.left.and.right"
-        case .map: "point.bottomleft.forward.to.point.topright.scurvepath"
+        case .map: "point.topleft.filled.down.to.point.bottomright.curvepath"
         case .fitness: "chart.bar.xaxis"
         case .settings: "gear"
         }

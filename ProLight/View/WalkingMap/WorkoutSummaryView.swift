@@ -22,9 +22,8 @@ struct WorkoutSummaryView: View {
     
     var body: some View {
         VStack(spacing: 16) {
-            Text("Workout Summary")
-                .font(.title2)
-                .bold()
+            Text("Walking Summary")
+                .font(.title2.bold())
             
             Map(position: $cameraPosition, interactionModes: [.pitch]) {
                 if let start = startCoordinate {
@@ -69,7 +68,6 @@ struct WorkoutSummaryView: View {
                 Spacer()
                 Text(String(format: "%.0f Kcal", calories))
             }
-            
             Spacer()
         }
         .padding()
