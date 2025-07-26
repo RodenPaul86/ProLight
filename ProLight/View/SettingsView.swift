@@ -25,20 +25,20 @@ struct SettingsView: View {
     @State private var isPresentedManageSubscription: Bool = false
     @State private var showStoreView = false
     
+    var tabBarHeight: CGFloat
+    
     var body: some View {
         NavigationStack {
             List {
-                /*
                 if !appSubModel.isSubscriptionActive {
                     customPremiumBanner {
                         isPaywallPresented = true
                         if isHapticsEnabled {
-                            hapticManager.shared.notify(.notification(.success))
+                            HapticManager.shared.notify(.notification(.success))
                         }
                     }
                     .listRowInsets(EdgeInsets())
                 }
-                 */
                 
                 Section(header: Text("Customization")) {
                     if UIDevice.current.userInterfaceIdiom == .phone {
@@ -159,7 +159,7 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView()
+    SettingsView(tabBarHeight: 0)
 }
 
 struct customRow: View {
