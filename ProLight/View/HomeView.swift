@@ -49,10 +49,7 @@ struct HomeView: View {
                 }
                 .overlay (
                     HStack {
-                        NavigationLink(destination: WorkoutHistoryView()) {
-                            Label("Workout History", systemImage: "list.bullet.rectangle.portrait")
-                                .foregroundStyle(.white)
-                        }
+                        // TODO: Add Weather (e.g., icon, temp city name)
                         Spacer()
                     }
                         .padding(.leading)

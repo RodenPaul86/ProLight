@@ -11,6 +11,7 @@ import SwiftData
 struct WorkoutHistoryView: View {
     @Query(sort: \Workout.date, order: .reverse) private var workouts: [Workout]
     @Environment(\.modelContext) private var context
+    @State private var hideTabBar: Bool = false
     
     var body: some View {
         Group {
@@ -51,7 +52,11 @@ struct WorkoutHistoryView: View {
                 }
             }
         }
+        .onAppear {
+            hideTabBar = true
+        }
         .navigationTitle("Past Walks")
+        .hideFloatingTabBar(hideTabBar)
     }
     
     private func deleteWorkouts(at offsets: IndexSet) {

@@ -62,7 +62,7 @@ struct WorkoutDetailView: View {
             .padding(.bottom, 8)
             
             // Map
-            Map(position: $cameraPosition, interactionModes: [.pitch]) {
+            Map(position: $cameraPosition, interactionModes: []) {
                 // Polyline
                 MapPolyline(coordinates: workout.route)
                     .stroke(.blue, lineWidth: 4)
@@ -77,14 +77,11 @@ struct WorkoutDetailView: View {
                         .tint(.red)
                 }
             }
-            .mapControls {
-                MapPitchToggle()
-            }
             .frame(height: 250)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .onAppear {
                 zoomToFitRoute()
-                textBody = workout.notes ?? ""
+                textBody = workout.notes
             }
             
             // Date

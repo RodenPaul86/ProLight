@@ -40,6 +40,10 @@ struct SettingsView: View {
                     .listRowInsets(EdgeInsets())
                 }
                 
+                Section(header: Text("General")) {
+                    customRow(icon: "figure.walk", firstLabel: "Walking History", destination: AnyView(WorkoutHistoryView()))
+                }
+                
                 Section(header: Text("Customization")) {
                     customRow(icon: "questionmark.app.dashed", firstLabel: "Alternate Icons", destination: AnyView(AlternativeIcons()))
                     customRow(icon: "iphone.gen2.radiowaves.left.and.right", firstLabel: "In-App Haptics", showToggle: true, toggleValue: $isHapticsEnabled)
