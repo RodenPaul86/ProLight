@@ -16,6 +16,7 @@ struct SettingsView: View {
     @AppStorage("resetDatastore") private var resetDatastore: Bool = false
     @AppStorage("showTipsForTesting") private var showTipsForTesting: Bool = false
     @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
+    @AppStorage("useFahrenheit") private var useFahrenheit: Bool = true
     @State private var resetOnboarding: Bool = false
     
     @State private var showDebug: Bool = false
@@ -41,6 +42,8 @@ struct SettingsView: View {
                 }
                 
                 Section(header: Text("General")) {
+                    customRow(icon: "", firstLabel: "Use Fahrenheit", showToggle: true, toggleValue: $useFahrenheit)
+                    
                     customRow(icon: "figure.walk", firstLabel: "Walking History", destination: AnyView(WorkoutHistoryView()))
                 }
                 

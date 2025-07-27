@@ -8,6 +8,8 @@
 
 import SwiftUI
 import AVFoundation
+import WeatherKit
+import CoreLocation
 
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
@@ -24,6 +26,13 @@ struct HomeView: View {
     @State private var selectedLevel: Int = 4
     @State private var selectedFrequency: Double? = nil
     @State private var selectedMaxFrequency: Double? = nil
+    
+    @StateObject private var locationManager = LocationManager()
+    @AppStorage("useFahrenheit") private var useFahrenheit: Bool = true
+
+    var selectedUnit: TemperatureUnit {
+        useFahrenheit ? .fahrenheit : .celsius
+    }
     
     let maxLevel: Int = 4
     let frequencies: [Int: Double] = [1: 2.0, 2: 3.0, 3: 6.0, 4: 10.0]
@@ -49,7 +58,33 @@ struct HomeView: View {
                 }
                 .overlay (
                     HStack {
-                        // TODO: Add Weather (e.g., icon, temp city name)
+                        if let weather = locationManager.currentWeather {
+                            let temp = selectedUnit == .fahrenheit
+                            ? weather.temperature.converted(to: .fahrenheit)
+                            : weather.temperature.converted(to: .celsius)
+                            
+                            HStack {
+                                Image(systemName: "\(weather.symbolName)")
+                                    .font(.title)
+                                    .foregroundStyle(.gray)
+                                
+                                VStack(alignment: .leading) {
+                                    Text("\(locationManager.cityName)")
+                                        .font(.caption)
+                                        .foregroundStyle(.gray)
+                                    
+                                    Text("\(Int(temp.value))\(selectedUnit.rawValue)")
+                                        .font(.title3.bold())
+                                        .foregroundStyle(.white)
+                                    
+                                    Text(weather.condition.description)
+                                        .font(.caption)
+                                        .foregroundStyle(.gray)
+                                }
+                            }
+                        } else {
+                            ProgressView("Loading weather...")
+                        }
                         Spacer()
                     }
                         .padding(.leading)
@@ -91,7 +126,7 @@ struct HomeView: View {
             VStack(spacing: 10) {
                 VStack(spacing: 5) {
                     curvedRectangle(topRadius: 40, bottomRadius: 5)
-                        .fill(!flashlightOn ? Color.gray.opacity(0.3) : (brightnessLevel == maxLevel ? Color.white : Color.gray.opacity(0.3)))
+                        .fill(!flashlightOn ? Color.gray.opacity(0.2) : (brightnessLevel == maxLevel ? Color.white : Color.gray.opacity(0.2)))
                         .frame(width: 125, height: 80)
                         .onTapGesture {
                             guard !isLockedPower else { return }
@@ -104,7 +139,7 @@ struct HomeView: View {
                     
                     ForEach((1..<(maxLevel)).reversed(), id: \.self) { level in
                         RoundedRectangle(cornerRadius: 5)
-                            .fill(!flashlightOn ? Color.gray.opacity(0.3) : (level <= brightnessLevel ? Color.white : Color.gray.opacity(0.3)))
+                            .fill(!flashlightOn ? Color.gray.opacity(0.2) : (level <= brightnessLevel ? Color.white : Color.gray.opacity(0.2)))
                             .frame(width: 125, height: 80)
                             .onTapGesture {
                                 guard !isLockedPower else { return }
