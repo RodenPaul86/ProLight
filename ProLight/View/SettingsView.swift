@@ -52,13 +52,13 @@ struct SettingsView: View {
                 Section(header: Text("Support Us")) {
                     customRow(icon: "app.badge", firstLabel: "Release Notes", destination: AnyView(releaseNotesView()))
                     
-                    if AppReviewRequest.showReviewButton, let url = AppReviewRequest.appURL(id: "id6740615012") {
+                    if AppReviewRequest.showReviewButton, let url = AppReviewRequest.appURL(id: "id1173567157") {
                         customRow(icon: "star.bubble", firstLabel: "Rate & Review \(Bundle.main.appName)") {
                             UIApplication.shared.open(url)
                         }
                     }
                     
-                    customRow(icon: "point.3.filled.connected.trianglepath.dotted", firstLabel: "Share this App", shareURL: URL(string: "https://apps.apple.com/app/docmatic-file-scanner/id6740615012"))
+                    customRow(icon: "point.3.filled.connected.trianglepath.dotted", firstLabel: "Share this App", shareURL: URL(string: "https://apps.apple.com/us/app/prolight/id1173567157"))
                     
                     //customRow(icon: "questionmark.bubble", firstLabel: "Frequently Asked Questions", destination: AnyView(FAQView()))
                     
@@ -77,7 +77,7 @@ struct SettingsView: View {
                         showStoreView.toggle()
                     }
                     
-                    customRow(icon: "paperplane", firstLabel: "Join TestFlight (Beta)", url: "https://testflight.apple.com/join/UzzQuFBX", showJoinInsteadOfSafari: true)
+                    customRow(icon: "paperplane", firstLabel: "Join TestFlight (Beta)", url: "https://testflight.apple.com/join/8rtJj2JX", showJoinInsteadOfSafari: true)
                 }
                 
                 Section(header: Text("Legal")) {
