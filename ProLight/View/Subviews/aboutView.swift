@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct aboutView: View {
-    //@EnvironmentObject var appSubModel: appSubscriptionModel
+    @State private var hideTabBar: Bool = false
     
     var body: some View {
         NavigationStack {
             VStack {
                 List {
-                    Section("") {
+                    Section {
                         customRow(icon: "app", firstLabel: "Application", secondLabel: Bundle.main.appName)
                         customRow(icon: "curlybraces", firstLabel: "Language", secondLabel: "Swift/SwiftUI")
                         customRow(icon: "square.on.square.dashed", firstLabel: "Version", secondLabel: Bundle.main.appVersion)
@@ -33,10 +33,11 @@ struct aboutView: View {
                     }
                 }
             }
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                //Color.clear.frame(height: appSubModel.isSubscriptionActive ? 80 : 100) /// <-- Reserve space for the tab bar
+            .onAppear {
+                hideTabBar = true
             }
             .navigationTitle("About")
+            .hideFloatingTabBar(hideTabBar)
         }
     }
 }

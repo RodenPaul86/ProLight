@@ -22,6 +22,7 @@ struct feedbackView: View {
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var imageData: Data? = nil
     @State private var isKeyboardVisible = false
+    @State private var hideTabBar: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -139,13 +140,19 @@ struct feedbackView: View {
                             Text("\(Bundle.main.appBuild)")
                                 .foregroundColor(.gray)
                         }
+                        HStack {
+                            Text("Subscriber")
+                            
+                            Spacer()
+                            
+                            Text(appSubModel.isSubscriptionActive ? "Yes" : "No")
+                                .foregroundStyle(.gray)
+                        }
                     }
-                }
-                .safeAreaInset(edge: .bottom, spacing: 0) {
-                    Color.clear.frame(height: appSubModel.isSubscriptionActive ? 80 : 100) /// <-- Reserve space for the tab bar
                 }
             }
             .onAppear {
+                hideTabBar = true
                 NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { _ in
                     isKeyboardVisible = true
                 }
@@ -177,6 +184,7 @@ struct feedbackView: View {
                     }
                 }
             }
+            .hideFloatingTabBar(hideTabBar)
         }
     }
     
@@ -217,6 +225,7 @@ struct feedbackView: View {
                       <tr><td><strong>App:</strong></td><td style="padding-left: 15px;">\(Bundle.main.appName)</td></tr>
                       <tr><td><strong>Version:</strong></td><td style="padding-left: 15px;">\(Bundle.main.appVersion)</td></tr>
                       <tr><td><strong>Build:</strong></td><td style="padding-left: 15px;">\(Bundle.main.appBuild)</td></tr>
+                      <tr><td><strong>Subscriber:</strong></td><td style="padding-left: 15px;">\(appSubModel.isSubscriptionActive ? "Yes" : "No")</td></tr>
                     </table>
                   </body>
                 </html>

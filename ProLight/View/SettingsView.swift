@@ -10,14 +10,13 @@ import RevenueCat
 import WebKit
 
 struct SettingsView: View {
-    //@AppStorage("AppScheme") private var appScheme: AppScheme = .device
-    @SceneStorage("ShowScenePickerView") private var showPickerView: Bool = false
+    @EnvironmentObject var appSubModel: appSubscriptionModel
+    @Environment(\.dismiss) private var dismiss
+    
     @AppStorage("resetDatastore") private var resetDatastore: Bool = false
     @AppStorage("showTipsForTesting") private var showTipsForTesting: Bool = false
     @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
     @State private var resetOnboarding: Bool = false
-    @EnvironmentObject var appSubModel: appSubscriptionModel
-    @Environment(\.dismiss) private var dismiss
     
     @State private var showDebug: Bool = false
     @State private var debugMessage: String = ""
@@ -174,6 +173,7 @@ struct customRow: View {
     
     @State private var isNavigating = false
     @State private var isSharing = false
+    @State private var hideTabBar: Bool = false
     
     var body: some View {
         Group {
@@ -181,15 +181,9 @@ struct customRow: View {
                 NavigationLink {
                     webView(url: urlString)
                         .onAppear {
-                            withAnimation {
-                                //tabBarVisibility.isVisible = false
-                            }
+                            hideTabBar = true
                         }
-                        .onDisappear {
-                            withAnimation {
-                                //tabBarVisibility.isVisible = true
-                            }
-                        }
+                        .hideFloatingTabBar(hideTabBar)
                         .edgesIgnoringSafeArea(.all)
                         .navigationTitle(firstLabel)
                         .navigationBarTitleDisplayMode(.inline)

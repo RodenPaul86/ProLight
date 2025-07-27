@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct releaseNotesView: View {
-    //@EnvironmentObject var appSubModel: appSubscriptionModel
+    @State private var hideTabBar: Bool = false
     
     let updates: [appUpdate] = [
         appUpdate(
@@ -72,10 +72,11 @@ DocMatic is designed to streamline your workflow and simplify document managemen
                 }
             }
             .padding()
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                //Color.clear.frame(height: appSubModel.isSubscriptionActive ? 80 : 100) /// <-- Reserve space for the tab bar
-            }
             .navigationTitle("Release Notes")
+            .onAppear {
+                hideTabBar = true
+            }
+            .hideFloatingTabBar(hideTabBar)
         }
     }
 }

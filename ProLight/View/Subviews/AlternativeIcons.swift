@@ -72,71 +72,55 @@ struct AlternativeIcons: View {
     @State private var hideTabBar: Bool = false
     
     var body: some View {
-        NavigationStack {
-            VStack {
-                List {
-                    Section("Original") {
-                        ForEach(AppIcon.mainIcons, id: \.rawValue) { icon in
-                            AppIconRow(
-                                icon: icon,
-                                currentAppIcon: $currentAppIcon,
-                                isSubscriptionActive: appSubModel.isSubscriptionActive,
-                                isPaywallPresented: $isPaywallPresented
-                            )
-                        }
+        VStack {
+            List {
+                Section("Original") {
+                    ForEach(AppIcon.mainIcons, id: \.rawValue) { icon in
+                        AppIconRow(
+                            icon: icon,
+                            currentAppIcon: $currentAppIcon,
+                            isSubscriptionActive: appSubModel.isSubscriptionActive,
+                            isPaywallPresented: $isPaywallPresented
+                        )
                     }
-                    
-                    Section("Oranges & Reds") {
-                        ForEach(AppIcon.warmIcons, id: \.rawValue) { icon in
-                            AppIconRow(
-                                icon: icon,
-                                currentAppIcon: $currentAppIcon,
-                                isSubscriptionActive: appSubModel.isSubscriptionActive,
-                                isPaywallPresented: $isPaywallPresented
-                            )
-                        }
+                }
+                
+                Section("Oranges & Reds") {
+                    ForEach(AppIcon.warmIcons, id: \.rawValue) { icon in
+                        AppIconRow(
+                            icon: icon,
+                            currentAppIcon: $currentAppIcon,
+                            isSubscriptionActive: appSubModel.isSubscriptionActive,
+                            isPaywallPresented: $isPaywallPresented
+                        )
                     }
-                    
-                    Section("Greens & Blues") {
-                        ForEach(AppIcon.greenBlueIcons, id: \.rawValue) { icon in
-                            AppIconRow(
-                                icon: icon,
-                                currentAppIcon: $currentAppIcon,
-                                isSubscriptionActive: appSubModel.isSubscriptionActive,
-                                isPaywallPresented: $isPaywallPresented
-                            )
-                        }
+                }
+                
+                Section("Greens & Blues") {
+                    ForEach(AppIcon.greenBlueIcons, id: \.rawValue) { icon in
+                        AppIconRow(
+                            icon: icon,
+                            currentAppIcon: $currentAppIcon,
+                            isSubscriptionActive: appSubModel.isSubscriptionActive,
+                            isPaywallPresented: $isPaywallPresented
+                        )
                     }
-                    
-                    Section("Blues & Neutrals") {
-                        ForEach(AppIcon.bluesNeutralIcons, id: \.rawValue) { icon in
-                            AppIconRow(
-                                icon: icon,
-                                currentAppIcon: $currentAppIcon,
-                                isSubscriptionActive: appSubModel.isSubscriptionActive,
-                                isPaywallPresented: $isPaywallPresented
-                            )
-                        }
+                }
+                
+                Section("Blues & Neutrals") {
+                    ForEach(AppIcon.bluesNeutralIcons, id: \.rawValue) { icon in
+                        AppIconRow(
+                            icon: icon,
+                            currentAppIcon: $currentAppIcon,
+                            isSubscriptionActive: appSubModel.isSubscriptionActive,
+                            isPaywallPresented: $isPaywallPresented
+                        )
                     }
                 }
             }
-            .navigationTitle("Alternate Icons")
-            .alert(isPresented: $isPaywallPresented) {
-                Alert(
-                    title: Text("Upgrade to Unlock"),
-                    message: Text("Unlock more app icons by subscribing!"),
-                    primaryButton: .default(Text("Subscribe")) {
-                        isPaywallPresented = true
-                    },
-                    secondaryButton: .cancel()
-                )
-            }
-            .fullScreenCover(isPresented: $isPaywallPresented) {
-                SubscriptionView(isPaywallPresented: $isPaywallPresented)
-                    .preferredColorScheme(.dark)
-            }
-            .hideFloatingTabBar(hideTabBar)
         }
+        .navigationTitle("Alternate Icons")
+        .hideFloatingTabBar(hideTabBar)
         .onAppear {
             hideTabBar = true
             // Check for the current icon on view appearance, and only reset if needed
@@ -146,6 +130,20 @@ struct AlternativeIcons: View {
             } else {
                 currentAppIcon = AppIcon.defaultIcon
             }
+        }
+        .alert(isPresented: $isPaywallPresented) {
+            Alert(
+                title: Text("Upgrade to Unlock"),
+                message: Text("Unlock more app icons by subscribing!"),
+                primaryButton: .default(Text("Subscribe")) {
+                    isPaywallPresented = true
+                },
+                secondaryButton: .cancel()
+            )
+        }
+        .fullScreenCover(isPresented: $isPaywallPresented) {
+            SubscriptionView(isPaywallPresented: $isPaywallPresented)
+                .preferredColorScheme(.dark)
         }
     }
 }

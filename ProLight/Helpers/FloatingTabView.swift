@@ -17,12 +17,15 @@ fileprivate class FloatingTabViewHelper: ObservableObject {
 
 fileprivate struct HideFloatingTabBarModifier: ViewModifier {
     var statue: Bool
+    var delay: TimeInterval = 0.0
     @EnvironmentObject private var helper: FloatingTabViewHelper
     
     func body(content: Content) -> some View {
         content
             .onChange(of: statue, initial: true) { oldValue, newValue in
-                helper.hideTabBar = newValue
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    helper.hideTabBar = newValue
+                }
             }
     }
 }
@@ -30,7 +33,7 @@ fileprivate struct HideFloatingTabBarModifier: ViewModifier {
 extension View {
     func hideFloatingTabBar(_ status: Bool) -> some View {
         self
-            .modifier(HideFloatingTabBarModifier(statue: status))
+            .modifier(HideFloatingTabBarModifier(statue: status, delay: 0.3))
     }
 }
 

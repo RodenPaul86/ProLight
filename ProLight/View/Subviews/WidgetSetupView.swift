@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WidgetSetupView: View {
-    @Environment(\.dismiss) var dismiss
+    @State private var hideTabBar: Bool = false
     
     var body: some View {
         ScrollView {
@@ -76,16 +76,11 @@ struct WidgetSetupView: View {
                  .padding(.bottom, 20)
                  */
             }
-            .padding()
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    /*
-                     Button(action: { dismiss() }) {
-                     Text("Done")
-                     }
-                     */
-                }
+            .onAppear {
+                hideTabBar = true
             }
+            .padding()
+            .hideFloatingTabBar(hideTabBar)
         }
     }
 }
