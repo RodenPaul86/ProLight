@@ -63,32 +63,30 @@ struct HomeView: View {
                             ? weather.temperature.converted(to: .fahrenheit)
                             : weather.temperature.converted(to: .celsius)
                             
-                            HStack {
-                                Image(systemName: "\(weather.symbolName)")
-                                    .font(.title)
+                            VStack(alignment: .leading) {
+                                Text("\(locationManager.cityName)")
+                                    .font(.caption)
                                     .foregroundStyle(.gray)
                                 
-                                VStack(alignment: .leading) {
-                                    Text("\(locationManager.cityName)")
-                                        .font(.caption)
+                                HStack {
+                                    Image(systemName: "\(weather.symbolName)")
+                                        .font(.title3)
                                         .foregroundStyle(.gray)
                                     
                                     Text("\(Int(temp.value))\(selectedUnit.rawValue)")
                                         .font(.title3.bold())
                                         .foregroundStyle(.white)
-                                    
-                                    Text(weather.condition.description)
-                                        .font(.caption)
-                                        .foregroundStyle(.gray)
                                 }
+                                
+                                Text(weather.condition.description)
+                                    .font(.caption)
+                                    .foregroundStyle(.gray)
                             }
-                        } else {
-                            ProgressView("Loading weather...")
                         }
                         Spacer()
                     }
                         .padding(.leading)
-                        .padding(.top, 10),
+                        .padding(.top, -10),
                     alignment: .topLeading
                 )
                 .onAppear {
