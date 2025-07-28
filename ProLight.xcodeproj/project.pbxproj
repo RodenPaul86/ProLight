@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3A160CA02E37E48100DEA6D6 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AA77BA92E2D31BA00F018BB /* WidgetKit.framework */; };
+		3A160CA12E37E48100DEA6D6 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AA77BAB2E2D31BA00F018BB /* SwiftUI.framework */; };
+		3A160CAE2E37E48400DEA6D6 /* ProLight WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3A160C9F2E37E48100DEA6D6 /* ProLight WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3A3C9BB42E35123F007A3007 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A3C9BB32E35123F007A3007 /* StoreKit.framework */; };
-		3AA77BAA2E2D31BA00F018BB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AA77BA92E2D31BA00F018BB /* WidgetKit.framework */; };
-		3AA77BAC2E2D31BA00F018BB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AA77BAB2E2D31BA00F018BB /* SwiftUI.framework */; };
-		3AA77BB72E2D31BD00F018BB /* ProLight WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3AA77BA72E2D31BA00F018BB /* ProLight WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3AADAD0E2E3283BE0044EE64 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 3AADAD0D2E3283BE0044EE64 /* Lottie */; };
 		3ADC62F62E2E72DE00B66E31 /* ConfidentialKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3ADC62F52E2E72DE00B66E31 /* ConfidentialKit */; };
 		3ADC63B42E2E789700B66E31 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 3ADC63B32E2E789700B66E31 /* RevenueCat */; };
@@ -18,11 +18,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3AA77BB52E2D31BD00F018BB /* PBXContainerItemProxy */ = {
+		3A160CAC2E37E48400DEA6D6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3A0D29A92DE7819100F1F704 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 3AA77BA62E2D31BA00F018BB;
+			remoteGlobalIDString = 3A160C9E2E37E48100DEA6D6;
 			remoteInfo = "ProLight WidgetExtension";
 		};
 /* End PBXContainerItemProxy section */
@@ -34,7 +34,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				3AA77BB72E2D31BD00F018BB /* ProLight WidgetExtension.appex in Embed Foundation Extensions */,
+				3A160CAE2E37E48400DEA6D6 /* ProLight WidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -43,27 +43,42 @@
 
 /* Begin PBXFileReference section */
 		3A0D29B12DE7819100F1F704 /* ProLight.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProLight.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A160C9F2E37E48100DEA6D6 /* ProLight WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "ProLight WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A3C9BB32E35123F007A3007 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		3A3C9BB52E35128A007A3007 /* ProLight WidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "ProLight WidgetExtension.entitlements"; sourceTree = "<group>"; };
-		3AA77BA72E2D31BA00F018BB /* ProLight WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "ProLight WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AA77BA92E2D31BA00F018BB /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		3AA77BAB2E2D31BA00F018BB /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		3AADAB642E3248CB0044EE64 /* Exceptions for "ProLight" folder in "ProLight" target */ = {
+		3A160CAF2E37E48400DEA6D6 /* Exceptions for "ProLight Widget" folder in "ProLight WidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 3A160C9E2E37E48100DEA6D6 /* ProLight WidgetExtension */;
+		};
+		3A160CCB2E37E85700DEA6D6 /* Exceptions for "ProLight" folder in "ProLight" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = 3A0D29B02DE7819100F1F704 /* ProLight */;
 		};
-		3AD07D802E2FC356000A6B2D /* Exceptions for "ProLight Widget" folder in "ProLight WidgetExtension" target */ = {
+		3A160CD22E37EB0700DEA6D6 /* Exceptions for "ProLight Widget" folder in "ProLight" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				FlashLightLiveActivity.swift,
+				WorkoutLiveActivityView.swift,
 			);
-			target = 3AA77BA62E2D31BA00F018BB /* ProLight WidgetExtension */;
+			target = 3A0D29B02DE7819100F1F704 /* ProLight */;
+		};
+		3A160DBE2E3806CC00DEA6D6 /* Exceptions for "ProLight" folder in "ProLight WidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Helpers/Extentions/Enums.swift,
+				Helpers/Managers/LocationManager.swift,
+			);
+			target = 3A160C9E2E37E48100DEA6D6 /* ProLight WidgetExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -71,15 +86,17 @@
 		3A0D29B32DE7819100F1F704 /* ProLight */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				3AADAB642E3248CB0044EE64 /* Exceptions for "ProLight" folder in "ProLight" target */,
+				3A160CCB2E37E85700DEA6D6 /* Exceptions for "ProLight" folder in "ProLight" target */,
+				3A160DBE2E3806CC00DEA6D6 /* Exceptions for "ProLight" folder in "ProLight WidgetExtension" target */,
 			);
 			path = ProLight;
 			sourceTree = "<group>";
 		};
-		3AA77BAD2E2D31BA00F018BB /* ProLight Widget */ = {
+		3A160CA22E37E48100DEA6D6 /* ProLight Widget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				3AD07D802E2FC356000A6B2D /* Exceptions for "ProLight Widget" folder in "ProLight WidgetExtension" target */,
+				3A160CD22E37EB0700DEA6D6 /* Exceptions for "ProLight Widget" folder in "ProLight" target */,
+				3A160CAF2E37E48400DEA6D6 /* Exceptions for "ProLight Widget" folder in "ProLight WidgetExtension" target */,
 			);
 			path = "ProLight Widget";
 			sourceTree = "<group>";
@@ -99,12 +116,12 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3AA77BA42E2D31BA00F018BB /* Frameworks */ = {
+		3A160C9C2E37E48100DEA6D6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3AA77BAC2E2D31BA00F018BB /* SwiftUI.framework in Frameworks */,
-				3AA77BAA2E2D31BA00F018BB /* WidgetKit.framework in Frameworks */,
+				3A160CA12E37E48100DEA6D6 /* SwiftUI.framework in Frameworks */,
+				3A160CA02E37E48100DEA6D6 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,9 +131,8 @@
 		3A0D29A82DE7819100F1F704 = {
 			isa = PBXGroup;
 			children = (
-				3A3C9BB52E35128A007A3007 /* ProLight WidgetExtension.entitlements */,
 				3A0D29B32DE7819100F1F704 /* ProLight */,
-				3AA77BAD2E2D31BA00F018BB /* ProLight Widget */,
+				3A160CA22E37E48100DEA6D6 /* ProLight Widget */,
 				3AA77BA82E2D31BA00F018BB /* Frameworks */,
 				3A0D29B22DE7819100F1F704 /* Products */,
 			);
@@ -126,7 +142,7 @@
 			isa = PBXGroup;
 			children = (
 				3A0D29B12DE7819100F1F704 /* ProLight.app */,
-				3AA77BA72E2D31BA00F018BB /* ProLight WidgetExtension.appex */,
+				3A160C9F2E37E48100DEA6D6 /* ProLight WidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -157,7 +173,7 @@
 			);
 			dependencies = (
 				3ADC62F92E2E739F00B66E31 /* PBXTargetDependency */,
-				3AA77BB62E2D31BD00F018BB /* PBXTargetDependency */,
+				3A160CAD2E37E48400DEA6D6 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				3A0D29B32DE7819100F1F704 /* ProLight */,
@@ -173,26 +189,26 @@
 			productReference = 3A0D29B12DE7819100F1F704 /* ProLight.app */;
 			productType = "com.apple.product-type.application";
 		};
-		3AA77BA62E2D31BA00F018BB /* ProLight WidgetExtension */ = {
+		3A160C9E2E37E48100DEA6D6 /* ProLight WidgetExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3AA77BB92E2D31BD00F018BB /* Build configuration list for PBXNativeTarget "ProLight WidgetExtension" */;
+			buildConfigurationList = 3A160CB02E37E48400DEA6D6 /* Build configuration list for PBXNativeTarget "ProLight WidgetExtension" */;
 			buildPhases = (
-				3AA77BA32E2D31BA00F018BB /* Sources */,
-				3AA77BA42E2D31BA00F018BB /* Frameworks */,
-				3AA77BA52E2D31BA00F018BB /* Resources */,
+				3A160C9B2E37E48100DEA6D6 /* Sources */,
+				3A160C9C2E37E48100DEA6D6 /* Frameworks */,
+				3A160C9D2E37E48100DEA6D6 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				3AA77BAD2E2D31BA00F018BB /* ProLight Widget */,
+				3A160CA22E37E48100DEA6D6 /* ProLight Widget */,
 			);
 			name = "ProLight WidgetExtension";
 			packageProductDependencies = (
 			);
 			productName = "ProLight WidgetExtension";
-			productReference = 3AA77BA72E2D31BA00F018BB /* ProLight WidgetExtension.appex */;
+			productReference = 3A160C9F2E37E48100DEA6D6 /* ProLight WidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -208,7 +224,7 @@
 					3A0D29B02DE7819100F1F704 = {
 						CreatedOnToolsVersion = 16.3;
 					};
-					3AA77BA62E2D31BA00F018BB = {
+					3A160C9E2E37E48100DEA6D6 = {
 						CreatedOnToolsVersion = 16.4;
 					};
 				};
@@ -234,7 +250,7 @@
 			projectRoot = "";
 			targets = (
 				3A0D29B02DE7819100F1F704 /* ProLight */,
-				3AA77BA62E2D31BA00F018BB /* ProLight WidgetExtension */,
+				3A160C9E2E37E48100DEA6D6 /* ProLight WidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -247,7 +263,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3AA77BA52E2D31BA00F018BB /* Resources */ = {
+		3A160C9D2E37E48100DEA6D6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -264,7 +280,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3AA77BA32E2D31BA00F018BB /* Sources */ = {
+		3A160C9B2E37E48100DEA6D6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -274,10 +290,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		3AA77BB62E2D31BD00F018BB /* PBXTargetDependency */ = {
+		3A160CAD2E37E48400DEA6D6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 3AA77BA62E2D31BA00F018BB /* ProLight WidgetExtension */;
-			targetProxy = 3AA77BB52E2D31BD00F018BB /* PBXContainerItemProxy */;
+			target = 3A160C9E2E37E48100DEA6D6 /* ProLight WidgetExtension */;
+			targetProxy = 3A160CAC2E37E48400DEA6D6 /* PBXContainerItemProxy */;
 		};
 		3ADC62F92E2E739F00B66E31 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -417,6 +433,7 @@
 				INFOPLIST_FILE = ProLight/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ProLight needs your location to help you navigate at night during your walk/run and to show you the current weather.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -461,6 +478,7 @@
 				INFOPLIST_FILE = ProLight/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ProLight needs your location to help you navigate at night during your walk/run and to show you the current weather.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -490,12 +508,11 @@
 			};
 			name = Release;
 		};
-		3AA77BBA2E2D31BD00F018BB /* Debug */ = {
+		3A160CB12E37E48400DEA6D6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_ENTITLEMENTS = "ProLight WidgetExtension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = WM7RG95JZ8;
@@ -524,12 +541,11 @@
 			};
 			name = Debug;
 		};
-		3AA77BBB2E2D31BD00F018BB /* Release */ = {
+		3A160CB22E37E48400DEA6D6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_ENTITLEMENTS = "ProLight WidgetExtension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = WM7RG95JZ8;
@@ -580,11 +596,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3AA77BB92E2D31BD00F018BB /* Build configuration list for PBXNativeTarget "ProLight WidgetExtension" */ = {
+		3A160CB02E37E48400DEA6D6 /* Build configuration list for PBXNativeTarget "ProLight WidgetExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3AA77BBA2E2D31BD00F018BB /* Debug */,
-				3AA77BBB2E2D31BD00F018BB /* Release */,
+				3A160CB12E37E48400DEA6D6 /* Debug */,
+				3A160CB22E37E48400DEA6D6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

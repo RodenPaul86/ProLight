@@ -9,6 +9,7 @@ import SwiftUI
 import MapKit
 import CoreLocation
 import AVFoundation
+import ActivityKit
 
 struct MarkedLocation: Identifiable, Hashable {
     let id = UUID()
@@ -28,6 +29,7 @@ struct MarkedLocation: Identifiable, Hashable {
 struct NightWalkMapView: View {
     var tabBarHeight: CGFloat
     @State private var hideTabBar: Bool = false
+    @State private var liveActivity: Activity<WorkoutAttributes>? = nil
     
     @Environment(\.modelContext) private var modelContext
     @StateObject private var locationManager = LocationManager()
@@ -189,6 +191,13 @@ struct NightWalkMapView: View {
                                 isTracking.toggle()
                                 showSummary = true
                                 
+                                Task {
+                                    if let activity = liveActivity {
+                                        await endWorkoutLiveActivity(activity: activity)
+                                        liveActivity = nil
+                                    }
+                                }
+                                
                                 let allCoords = locationManager.trackedRoute
                                 if let region = regionThatFitsAllCoordinates(allCoords) {
                                     withAnimation {
@@ -214,6 +223,10 @@ struct NightWalkMapView: View {
                                 startTimer()
                                 hideTabBar = true
                                 isTracking.toggle()
+                                
+                                Task {
+                                    await startWorkoutLiveActivity()
+                                }
                             }
                         }) {
                             Label(isTracking ? "Stop" : "Start Walking", systemImage: isTracking ? "stop.circle.fill" : "figure.walk")
@@ -241,7 +254,7 @@ struct NightWalkMapView: View {
             let movingMinutes = locationManager.movingTime / 60
             let pace = miles > 0 ? movingMinutes / miles : 0
             let calories = miles * 100
-
+            
             WorkoutSummaryView(
                 route: locationManager.trackedRoute,
                 duration: finalDuration,
@@ -331,6 +344,14 @@ struct NightWalkMapView: View {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
             if let start = walkStartTime {
                 elapsedTime = Date().timeIntervalSince(start)
+                
+                let distance = calculateDistance(from: locationManager.trackedRoute)
+                
+                Task {
+                    if let activity = liveActivity {
+                        await updateWorkoutLiveActivity(activity: activity, elapsed: elapsedTime, distance: distance)
+                    }
+                }
             }
         }
     }
@@ -382,6 +403,42 @@ struct NightWalkMapView: View {
                 cameraPosition = .region(region)
             }
         }
+    }
+    
+    func startWorkoutLiveActivity() async {
+        let attributes = WorkoutAttributes(workoutType: "Walk")
+        let initialState = WorkoutAttributes.ContentState(elapsedTime: 0, distance: 0, pace: 0)
+        
+        do {
+            let activity = try Activity<WorkoutAttributes>.request(
+                attributes: attributes,
+                contentState: initialState,
+                pushType: nil
+            )
+            liveActivity = activity
+            print("Started Live Activity: \(activity.id)")
+        } catch {
+            print("Error starting Live Activity: \(error)")
+        }
+    }
+    
+    func updateWorkoutLiveActivity(activity: Activity<WorkoutAttributes>, elapsed: TimeInterval, distance: Double) async {
+        let pace = elapsed > 0 ? elapsed / (distance / 1000) : 0
+        
+        let updatedState = WorkoutAttributes.ContentState(
+            elapsedTime: elapsed,
+            distance: distance,
+            pace: pace
+        )
+        
+        await activity.update(using: updatedState)
+    }
+    
+    func endWorkoutLiveActivity(activity: Activity<WorkoutAttributes>) async {
+        await activity.end(
+            using: activity.contentState,
+            dismissalPolicy: .immediate
+        )
     }
 }
 

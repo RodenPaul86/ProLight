@@ -10,11 +10,15 @@ import SwiftUI
 import AVFoundation
 import WeatherKit
 import CoreLocation
+import ActivityKit
 
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var flashControllerInstance = FlashController()
     @State private var brightnessLevel: Int = 4
+    
+    @State private var flashlightActivity: Activity<FlashlightAttributes>?
     
     @State private var intensityLevel: Int = 1
     @State private var flashlightOn: Bool = true
@@ -89,15 +93,29 @@ struct HomeView: View {
                         .padding(.top, -10),
                     alignment: .topLeading
                 )
-                .onAppear {
-                    updateTorch()
-                }
-                .onDisappear {
-                    flashControllerInstance.stopFlashing()
-                }
                 .padding()
                 .safeAreaPadding(.bottom, tabBarHeight)
             }
+            .onAppear {
+                updateTorch()
+                startFlashlightLiveActivity()
+            }
+            .onDisappear {
+                flashControllerInstance.stopFlashing()
+            }
+            .onChange(of: scenePhase) { newPhase in
+                    if newPhase == .background {
+                        // App is now in background
+                        print("App moved to background — leave flashlight ON")
+                    } else if newPhase == .active {
+                        // App became active again
+                        print("App is active — optionally update torch")
+                        updateTorch()
+                    } else if newPhase == .inactive {
+                        //App going inactive (home button, app switcher)
+                        print("App is inactive")
+                    }
+                }
         }
     }
     
@@ -205,6 +223,29 @@ struct HomeView: View {
         }
     }
     
+    func startFlashlightLiveActivity() {
+        let attributes = FlashlightAttributes(mode: "Steady")
+        let state = FlashlightAttributes.ContentState(isOn: true, brightness: 1.0)
+        
+        do {
+            flashlightActivity = try Activity<FlashlightAttributes>.request(
+                attributes: attributes,
+                contentState: state,
+                pushType: nil
+            )
+        } catch {
+            print("Failed to start Live Activity: \(error)")
+        }
+    }
+    
+    func stopFlashlightLiveActivity() {
+        Task {
+            await flashlightActivity?.end(
+                dismissalPolicy: .immediate
+            )
+        }
+    }
+    
     private func sliderSegment(level: Int, fillColor: Color) -> some View {
         let shape: AnyShape = level == maxLevel ? AnyShape(curvedRectangle(topRadius: 40, bottomRadius: 5)) : AnyShape(RoundedRectangle(cornerRadius: 5))
         
@@ -256,9 +297,11 @@ struct HomeView: View {
                     )
                 } else {
                     updateTorch() // fallback to regular flashlight
+                    startFlashlightLiveActivity()
                 }
             } else {
                 flashControllerInstance.stopFlashing()
+                stopFlashlightLiveActivity()
             }
         }
         .onLongPressGesture(minimumDuration: 1) {
