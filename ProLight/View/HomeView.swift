@@ -18,8 +18,6 @@ struct HomeView: View {
     @StateObject private var flashControllerInstance = FlashController()
     @State private var brightnessLevel: Int = 4
     
-    @State private var flashlightActivity: Activity<FlashlightAttributes>?
-    
     @State private var intensityLevel: Int = 1
     @State private var flashlightOn: Bool = true
     @State private var isLockedPower: Bool = false
@@ -33,14 +31,16 @@ struct HomeView: View {
     
     @StateObject private var locationManager = LocationManager()
     @AppStorage("useFahrenheit") private var useFahrenheit: Bool = true
-
+    @State private var showWeatherSheet: Bool = false
+    
     var selectedUnit: TemperatureUnit {
         useFahrenheit ? .fahrenheit : .celsius
     }
     
+    var tabBarHeight: CGFloat
+    
     let maxLevel: Int = 4
     let frequencies: [Int: Double] = [1: 2.0, 2: 3.0, 3: 6.0, 4: 10.0]
-    var tabBarHeight: CGFloat
     
     let strobeData: [(label: String, frequency: Double, ppm: Int)] = [
         ("15 Hz", 15.0, 900),
@@ -72,19 +72,21 @@ struct HomeView: View {
                                     .font(.caption)
                                     .foregroundStyle(.gray)
                                 
-                                HStack {
-                                    Image(systemName: "\(weather.symbolName)")
-                                        .font(.title3)
-                                        .foregroundStyle(.gray)
-                                    
-                                    Text("\(Int(temp.value))\(selectedUnit.rawValue)")
-                                        .font(.title3.bold())
-                                        .foregroundStyle(.white)
-                                }
+                                Text("\(Int(temp.value))°")
+                                    .font(.title3.bold())
+                                    .foregroundStyle(.white)
                                 
                                 Text(weather.condition.description)
                                     .font(.caption)
                                     .foregroundStyle(.gray)
+                            }
+                            .onTapGesture {
+                                showWeatherSheet = true
+                            }
+                            .sheet(isPresented: $showWeatherSheet) {
+                                WeatherView()
+                                    .presentationDetents([.fraction(0.26)]) // 25% of screen height
+                                    .presentationDragIndicator(.visible) // Shows the line at top
                             }
                         }
                         Spacer()
@@ -98,24 +100,23 @@ struct HomeView: View {
             }
             .onAppear {
                 updateTorch()
-                startFlashlightLiveActivity()
             }
             .onDisappear {
                 flashControllerInstance.stopFlashing()
             }
-            .onChange(of: scenePhase) { newPhase in
-                    if newPhase == .background {
-                        // App is now in background
-                        print("App moved to background — leave flashlight ON")
-                    } else if newPhase == .active {
-                        // App became active again
-                        print("App is active — optionally update torch")
-                        updateTorch()
-                    } else if newPhase == .inactive {
-                        //App going inactive (home button, app switcher)
-                        print("App is inactive")
-                    }
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .background {
+                    // App is now in background
+                    print("App moved to background — leave flashlight ON")
+                } else if newPhase == .active {
+                    // App became active again
+                    print("App is active — optionally update torch")
+                    updateTorch()
+                } else if newPhase == .inactive {
+                    //App going inactive (home button, app switcher)
+                    print("App is inactive")
                 }
+            }
         }
     }
     
@@ -223,29 +224,6 @@ struct HomeView: View {
         }
     }
     
-    func startFlashlightLiveActivity() {
-        let attributes = FlashlightAttributes(mode: "Steady")
-        let state = FlashlightAttributes.ContentState(isOn: true, brightness: 1.0)
-        
-        do {
-            flashlightActivity = try Activity<FlashlightAttributes>.request(
-                attributes: attributes,
-                contentState: state,
-                pushType: nil
-            )
-        } catch {
-            print("Failed to start Live Activity: \(error)")
-        }
-    }
-    
-    func stopFlashlightLiveActivity() {
-        Task {
-            await flashlightActivity?.end(
-                dismissalPolicy: .immediate
-            )
-        }
-    }
-    
     private func sliderSegment(level: Int, fillColor: Color) -> some View {
         let shape: AnyShape = level == maxLevel ? AnyShape(curvedRectangle(topRadius: 40, bottomRadius: 5)) : AnyShape(RoundedRectangle(cornerRadius: 5))
         
@@ -297,11 +275,9 @@ struct HomeView: View {
                     )
                 } else {
                     updateTorch() // fallback to regular flashlight
-                    startFlashlightLiveActivity()
                 }
             } else {
                 flashControllerInstance.stopFlashing()
-                stopFlashlightLiveActivity()
             }
         }
         .onLongPressGesture(minimumDuration: 1) {

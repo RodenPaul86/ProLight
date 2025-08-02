@@ -16,6 +16,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     @Published var lastLocation: CLLocation?
     @Published var currentWeather: CurrentWeather?
+    @Published var dailyForecast: Forecast<DayWeather>?
     @Published var cityName: String = "Loading..."
     
     @Published var trackedRoute: [CLLocationCoordinate2D] = []
@@ -97,6 +98,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             let weather = try await WeatherService.shared.weather(for: location)
             DispatchQueue.main.async {
                 self.currentWeather = weather.currentWeather
+                self.dailyForecast = weather.dailyForecast
             }
         } catch {
             print("WeatherKit error: \(error.localizedDescription)")
