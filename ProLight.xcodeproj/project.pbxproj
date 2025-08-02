@@ -67,7 +67,6 @@
 		3A160CD22E37EB0700DEA6D6 /* Exceptions for "ProLight Widget" folder in "ProLight" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				FlashLightLiveActivity.swift,
 				WorkoutLiveActivityView.swift,
 			);
 			target = 3A0D29B02DE7819100F1F704 /* ProLight */;

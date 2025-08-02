@@ -16,7 +16,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3AA77BA62E2D31BA00F018BB"
+               BlueprintIdentifier = "3A160C9E2E37E48100DEA6D6"
                BuildableName = "ProLight WidgetExtension.appex"
                BlueprintName = "ProLight WidgetExtension"
                ReferencedContainer = "container:ProLight.xcodeproj">
@@ -62,7 +62,7 @@
          BundleIdentifier = "com.apple.springboard">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3AA77BA62E2D31BA00F018BB"
+            BlueprintIdentifier = "3A160C9E2E37E48100DEA6D6"
             BuildableName = "ProLight WidgetExtension.appex"
             BlueprintName = "ProLight WidgetExtension"
             ReferencedContainer = "container:ProLight.xcodeproj">
