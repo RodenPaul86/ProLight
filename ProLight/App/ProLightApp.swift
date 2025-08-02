@@ -15,7 +15,7 @@ struct ProLightApp: App {
     @StateObject var appSubModel = appSubscriptionModel()
     
     init() {
-        Purchases.logLevel = .debug
+        Purchases.logLevel = .error
         Purchases.configure(withAPIKey: "\(Secrets.$apiKey)")
     }
     
