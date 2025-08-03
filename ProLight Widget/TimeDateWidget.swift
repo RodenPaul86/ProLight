@@ -76,27 +76,16 @@ struct SmallWidgetView: View {
     var body: some View {
         ZStack {
             Color.black
-            VStack(alignment: .trailing) {
-                Text(entry.date.formatted(.dateTime.hour(.defaultDigits(amPM: .omitted))))
-                    .font(.system(size: 60, design: .rounded)).bold()
-                    .foregroundColor(.green)
-                    .opacity(0.8)
-                    .shadow(color: Color(UIColor(displayP3Red: 96/255,green: 252/255, blue: 255/255, alpha: 2)), radius: 5, x: 1, y: 1)
-                    .padding(.bottom, -7)
-                
-                Text(entry.date.formatted(.dateTime.minute(.twoDigits)))
-                    .font(.system(size: 60, design: .rounded)).bold()
-                    .foregroundColor(.green)
-                    .opacity(0.8)
-                    .shadow(color: Color(UIColor(displayP3Red: 96/255,green: 252/255, blue: 255/255, alpha: 2)), radius: 5, x: 1, y: 1)
-                    .padding(.top, -15)
-                
-            }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .trailing)
-            
             VStack(alignment: .leading) {
+                Text(entry.date.hourMinute)
+                    .font(.system(size: 45, design: .rounded)).bold()
+                    .foregroundColor(.green)
+                    .opacity(0.8)
+                    .shadow(color: Color(UIColor(displayP3Red: 96/255,green: 252/255, blue: 255/255, alpha: 2)), radius: 5, x: 1, y: 1)
+                    .padding(.bottom, -10)
+                
                 Spacer()
+                
                 Text(entry.date.formatted(.dateTime.weekday(.wide)))
                     .font(.system(size: 20)).bold()
                     .foregroundColor(.white)
@@ -118,7 +107,7 @@ struct MediumWidgetView: View {
         ZStack {
             Color.black
             VStack(alignment: .trailing, spacing: 0) {
-                Text(entry.date.formatted(.dateTime.hour(.defaultDigits(amPM: .omitted)).minute()))
+                Text(entry.date.hourMinute)
                     .font(.system(size: 110, design: .rounded)).bold()
                     .foregroundColor(.green)
                     .opacity(0.8)
@@ -150,14 +139,14 @@ struct LargeWidgetView: View {
         ZStack {
             Color.black
             VStack(alignment: .trailing, spacing: 0) {
-                Text(entry.date.formatted(.dateTime.hour(.defaultDigits(amPM: .omitted))))
+                Text(entry.date.hour)
                     .font(.system(size: 140, design: .rounded)).bold()
                     .foregroundColor(.green)
                     .opacity(0.8)
                     .shadow(color: Color(UIColor(displayP3Red: 96/255,green: 252/255, blue: 255/255, alpha: 2)), radius: 5, x: 1, y: 1)
                     .padding(.bottom, -15)
                 
-                Text(entry.date.formatted(.dateTime.minute(.twoDigits)))
+                Text(entry.date.minute)
                     .font(.system(size: 140, design: .rounded)).bold()
                     .foregroundColor(.green)
                     .opacity(0.8)
@@ -190,8 +179,8 @@ struct TimeDateWidget: Widget {
             TimeWidget_WidgetEntryView(entry: entry)
                 .containerBackground(.clear, for: .widget)
         }
-        .configurationDisplayName("Date + Time")
-        .description("Simple widget displaying the current date and time.")
+        .configurationDisplayName("Current Date & Time")
+        .description("Stay updated with the current date and time — right on your Home Screen.")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
         .contentMarginsDisabled()
     }
@@ -201,30 +190,29 @@ struct TimeDateWidget_Previews: PreviewProvider {
     static var previews: some View {
         SmallWidgetView(entry: TimeDateEntry(date: Date(), location: nil))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
-        
-        MediumWidgetView(entry: TimeDateEntry(date: Date(), location: nil))
-            .previewContext(WidgetPreviewContext(family: .systemMedium))
-        
-        LargeWidgetView(entry: TimeDateEntry(date: Date(), location: nil))
-            .previewContext(WidgetPreviewContext(family: .systemLarge))
     }
 }
 
 extension Date {
     var displayDateFormat: String {
-        self.formatted(
-            .dateTime
-                .month(.wide)
-                .day()
-                .year()
-        )
+        self.formatted(.dateTime.month(.wide).day().year())
     }
     
-    var displayTimeFormat: String {
-        self.formatted(
-            .dateTime
-                .hour(.conversationalDefaultDigits(amPM: .narrow))
-                .minute()
-        )
+    var hourMinute: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "H:mm" // or "h:mm" for 12-hour
+        return formatter.string(from: self)
+    }
+    
+    var hour: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "H" // or "h" for 12-hour
+        return formatter.string(from: self)
+    }
+    
+    var minute: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "mm" // or "mm" for 12-hour
+        return formatter.string(from: self)
     }
 }
