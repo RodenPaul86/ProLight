@@ -76,7 +76,7 @@ struct SmallWidgetView: View {
     var body: some View {
         VStack(alignment: .leading) {
             Text(entry.date.hourMinute)
-                .font(.system(size: 50, design: .rounded)).bold()
+                .font(.system(size: 46, design: .rounded)).bold()
                 .foregroundColor(.green)
                 .shadow(color: Color(UIColor(displayP3Red: 96/255,green: 252/255, blue: 255/255, alpha: 2)), radius: 1, x: 1, y: 1)
                 .padding(.bottom, -10)
