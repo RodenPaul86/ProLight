@@ -10,6 +10,7 @@ import Foundation
 import CoreLocation
 import SwiftUI
 import WeatherKit
+import WidgetKit
 
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
@@ -68,7 +69,10 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         lastLocation = newLocation
         reverseGeocode(location: newLocation)
         
-        // ✅ Fetch weather once, or update when significant change occurs
+        saveForWidget(newLocation)
+        WidgetCenter.shared.reloadAllTimelines()
+        
+        // Fetch weather once, or update when significant change occurs
         Task {
             await fetchWeather(for: newLocation)
         }
@@ -103,6 +107,15 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         } catch {
             print("WeatherKit error: \(error.localizedDescription)")
         }
+    }
+    
+    // MARK: Share location with widget
+    func saveForWidget(_ location: CLLocation) {
+        let defaults = UserDefaults(suiteName: "group.app.prolight.widget")
+        defaults?.set(location.coordinate.latitude, forKey: "widget_latitude")
+        defaults?.set(location.coordinate.longitude, forKey: "widget_longitude")
+        
+        //print("Saved lat/lon:", location.coordinate)
     }
 }
 

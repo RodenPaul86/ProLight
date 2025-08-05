@@ -12,6 +12,6 @@ import SwiftUI
 struct ProLight_WidgetBundle: WidgetBundle {
     var body: some Widget {
         TimeDateWidget()
-        //WorkoutLiveActivityWidget()
+        WorkoutLiveActivityWidget()
     }
 }

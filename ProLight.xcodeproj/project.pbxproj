@@ -42,6 +42,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3A0A979A2E3FBA34006DD11D /* ProLight WidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "ProLight WidgetExtension.entitlements"; sourceTree = "<group>"; };
 		3A0D29B12DE7819100F1F704 /* ProLight.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProLight.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A160C9F2E37E48100DEA6D6 /* ProLight WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "ProLight WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A3C9BB32E35123F007A3007 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
@@ -130,6 +131,7 @@
 		3A0D29A82DE7819100F1F704 = {
 			isa = PBXGroup;
 			children = (
+				3A0A979A2E3FBA34006DD11D /* ProLight WidgetExtension.entitlements */,
 				3A0D29B32DE7819100F1F704 /* ProLight */,
 				3A160CA22E37E48100DEA6D6 /* ProLight Widget */,
 				3AA77BA82E2D31BA00F018BB /* Frameworks */,
@@ -512,6 +514,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = "ProLight WidgetExtension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = WM7RG95JZ8;
@@ -545,6 +548,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = "ProLight WidgetExtension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = WM7RG95JZ8;

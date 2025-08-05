@@ -74,28 +74,24 @@ struct SmallWidgetView: View {
     var entry: TimeProvider.Entry
     
     var body: some View {
-        ZStack {
-            Color.black
-            VStack(alignment: .leading) {
-                Text(entry.date.hourMinute)
-                    .font(.system(size: 45, design: .rounded)).bold()
-                    .foregroundColor(.green)
-                    .opacity(0.8)
-                    .shadow(color: Color(UIColor(displayP3Red: 96/255,green: 252/255, blue: 255/255, alpha: 2)), radius: 5, x: 1, y: 1)
-                    .padding(.bottom, -10)
-                
-                Spacer()
-                
-                Text(entry.date.formatted(.dateTime.weekday(.wide)))
-                    .font(.system(size: 20)).bold()
-                    .foregroundColor(.white)
-                Text(entry.date.formatted(.dateTime.month(.abbreviated).day().year()))
-                    .font(.caption).bold()
-                    .foregroundColor(.gray)
-            }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
+        VStack(alignment: .leading) {
+            Text(entry.date.hourMinute)
+                .font(.system(size: 50, design: .rounded)).bold()
+                .foregroundColor(.green)
+                .shadow(color: Color(UIColor(displayP3Red: 96/255,green: 252/255, blue: 255/255, alpha: 2)), radius: 1, x: 1, y: 1)
+                .padding(.bottom, -10)
+            
+            Spacer()
+            
+            Text(entry.date.formatted(.dateTime.weekday(.wide)))
+                .font(.system(size: 20)).bold()
+                .foregroundColor(.white)
+            Text(entry.date.formatted(.dateTime.month(.abbreviated).day().year()))
+                .font(.caption).bold()
+                .foregroundColor(.gray)
         }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -105,13 +101,11 @@ struct MediumWidgetView: View {
     
     var body: some View {
         ZStack {
-            Color.black
             VStack(alignment: .trailing, spacing: 0) {
                 Text(entry.date.hourMinute)
                     .font(.system(size: 110, design: .rounded)).bold()
                     .foregroundColor(.green)
-                    .opacity(0.8)
-                    .shadow(color: Color(UIColor(displayP3Red: 96/255,green: 252/255, blue: 255/255, alpha: 2)), radius: 5, x: 1, y: 1)
+                    .shadow(color: Color(UIColor(displayP3Red: 96/255,green: 252/255, blue: 255/255, alpha: 2)), radius: 1, x: 1, y: 1)
             }
             .padding(.trailing, 10)
             .frame(maxWidth: .infinity, alignment: .trailing)
@@ -137,20 +131,17 @@ struct LargeWidgetView: View {
     
     var body: some View {
         ZStack {
-            Color.black
             VStack(alignment: .trailing, spacing: 0) {
                 Text(entry.date.hour)
                     .font(.system(size: 140, design: .rounded)).bold()
                     .foregroundColor(.green)
-                    .opacity(0.8)
-                    .shadow(color: Color(UIColor(displayP3Red: 96/255,green: 252/255, blue: 255/255, alpha: 2)), radius: 5, x: 1, y: 1)
+                    .shadow(color: Color(UIColor(displayP3Red: 96/255,green: 252/255, blue: 255/255, alpha: 2)), radius: 1, x: 1, y: 1)
                     .padding(.bottom, -15)
                 
                 Text(entry.date.minute)
                     .font(.system(size: 140, design: .rounded)).bold()
                     .foregroundColor(.green)
-                    .opacity(0.8)
-                    .shadow(color: Color(UIColor(displayP3Red: 96/255,green: 252/255, blue: 255/255, alpha: 2)), radius: 5, x: 1, y: 1)
+                    .shadow(color: Color(UIColor(displayP3Red: 96/255,green: 252/255, blue: 255/255, alpha: 2)), radius: 1, x: 1, y: 1)
                     .padding(.top, -15)
             }
             .padding(.trailing, 10)
@@ -177,7 +168,7 @@ struct TimeDateWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: TimeProvider()) { entry in
             TimeWidget_WidgetEntryView(entry: entry)
-                .containerBackground(.clear, for: .widget)
+                .containerBackground(.black, for: .widget)
         }
         .configurationDisplayName("Current Date & Time")
         .description("Stay updated with the current date and time — right on your Home Screen.")
@@ -200,13 +191,13 @@ extension Date {
     
     var hourMinute: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "H:mm" // or "h:mm" for 12-hour
+        formatter.dateFormat = "h:mm" // or "h:mm" for 12-hour
         return formatter.string(from: self)
     }
     
     var hour: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "H" // or "h" for 12-hour
+        formatter.dateFormat = "h" // or "h" for 12-hour
         return formatter.string(from: self)
     }
     
