@@ -26,6 +26,7 @@ enum AppTab: String, CaseIterable, FloatingTabProtocol {
 }
 
 struct ContentView: View {
+    @EnvironmentObject var healthManager: HealthManager
     @State private var activeTab: AppTab = .home
     
     var body: some View {
@@ -33,7 +34,7 @@ struct ContentView: View {
             switch tab {
             case .home: HomeView(tabBarHeight: tabBarHeight)
             case .map: NightWalkMapView(tabBarHeight: tabBarHeight)
-            case .fitness: Text("TODO: Fitness")
+            case .fitness: UserActivityView()
             case .morseCode: Text("TODO: Morse Code")
             case .settings: SettingsView(tabBarHeight: tabBarHeight)
             }

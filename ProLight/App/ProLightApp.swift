@@ -13,6 +13,7 @@ import SwiftData
 @main
 struct ProLightApp: App {
     @StateObject var appSubModel = appSubscriptionModel()
+    @StateObject var healthManager = HealthManager()
     
     init() {
         Purchases.logLevel = .error
@@ -23,6 +24,7 @@ struct ProLightApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(appSubModel)
+                .environmentObject(healthManager)
         }
         .modelContainer(for: Workout.self) // <- registers Workout as a SwiftData model
     }
