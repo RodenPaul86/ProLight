@@ -18,7 +18,9 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var lastLocation: CLLocation?
     @Published var currentWeather: CurrentWeather?
     @Published var dailyForecast: Forecast<DayWeather>?
-    @Published var cityName: String = "Loading..."
+    @Published var hourlyForecast: Forecast<HourWeather>?
+    @Published var cityName: String = ""
+    @Published var stateName: String = ""
     
     @Published var trackedRoute: [CLLocationCoordinate2D] = []
     @Published var currentLocation: CLLocation?
@@ -103,6 +105,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             DispatchQueue.main.async {
                 self.currentWeather = weather.currentWeather
                 self.dailyForecast = weather.dailyForecast
+                self.hourlyForecast = weather.hourlyForecast
             }
         } catch {
             print("WeatherKit error: \(error.localizedDescription)")
@@ -127,7 +130,8 @@ extension LocationManager {
                 print("Reverse geocoding error: \(error.localizedDescription)")
             } else if let placemark = placemarks?.first {
                 DispatchQueue.main.async {
-                    self.cityName = placemark.locality ?? "Unknown"
+                    self.cityName = placemark.locality ?? ""
+                    self.stateName = placemark.administrativeArea ?? ""
                 }
             }
         }

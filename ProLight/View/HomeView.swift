@@ -30,11 +30,11 @@ struct HomeView: View {
     @State private var selectedMaxFrequency: Double? = nil
     
     @StateObject private var locationManager = LocationManager()
-    @AppStorage("useFahrenheit") private var useFahrenheit: Bool = true
+    @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
     @State private var showWeatherSheet: Bool = false
     
     var selectedUnit: TemperatureUnit {
-        useFahrenheit ? .fahrenheit : .celsius
+        TemperatureUnit(rawValue: selectedUnitRaw) ?? .fahrenheit
     }
     
     var tabBarHeight: CGFloat
@@ -68,7 +68,7 @@ struct HomeView: View {
                             : weather.temperature.converted(to: .celsius)
                             
                             VStack(alignment: .leading) {
-                                Text("\(locationManager.cityName)")
+                                Text("\(locationManager.cityName), \(locationManager.stateName)")
                                     .font(.caption)
                                     .foregroundStyle(.gray)
                                 
@@ -85,7 +85,7 @@ struct HomeView: View {
                             }
                             .sheet(isPresented: $showWeatherSheet) {
                                 WeatherView()
-                                    .presentationDetents([.fraction(0.26)]) // 25% of screen height
+                                    .presentationDetents([.fraction(0.45)]) // 25% of screen height
                                     .presentationDragIndicator(.visible) // Shows the line at top
                             }
                         }

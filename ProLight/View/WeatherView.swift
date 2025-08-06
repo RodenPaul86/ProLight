@@ -8,16 +8,22 @@
 import SwiftUI
 import WeatherKit
 
+private func formattedHour(_ date: Date) -> String {
+    let hourFormatter = DateFormatter()
+    hourFormatter.dateFormat = "ha" // e.g. "3PM"
+    return hourFormatter.string(from: date)
+}
+
 struct WeatherView: View {
     @StateObject private var locationManager = LocationManager()
-    @AppStorage("useFahrenheit") private var useFahrenheit: Bool = true
+    @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
     
     @Environment(\.colorScheme) var colorScheme
     @State private var attributionLink: URL?
     @State private var attributionLogo: URL?
     
     var selectedUnit: TemperatureUnit {
-        useFahrenheit ? .fahrenheit : .celsius
+        TemperatureUnit(rawValue: selectedUnitRaw) ?? .fahrenheit
     }
     
     var body: some View {
@@ -39,13 +45,16 @@ struct WeatherView: View {
                 ? today.highTemperature.converted(to: .fahrenheit)
                 : today.highTemperature.converted(to: .celsius)
                 
+                
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("\(locationManager.cityName)")
+                    
+                    // MARK: City name + State name
+                    Text("\(locationManager.cityName), \(locationManager.stateName)")
                         .font(.title3)
                         .foregroundColor(.white.opacity(0.8))
                     
+                    // MARK: Today + daily cards
                     HStack(spacing: 12) {
-                        // Big "Today" weather card
                         TodayWeatherCard(
                             temp: "\(Int(temp.value))°",
                             description: weather.condition.description.capitalized,
@@ -54,45 +63,61 @@ struct WeatherView: View {
                             high: "\(Int(high.value))°"
                         )
                         
-                        // Small daily cards (can be made dynamic too)
-                        if let daily = locationManager.dailyForecast?.forecast.dropFirst().prefix(2) {
-                            HStack(spacing: 8) {
-                                ForEach(Array(daily.enumerated()), id: \.offset) { index, day in
-                                    let high = selectedUnit == .fahrenheit
-                                    ? day.highTemperature.converted(to: .fahrenheit)
-                                    : day.highTemperature.converted(to: .celsius)
+                        if let daily = locationManager.dailyForecast?.forecast.dropFirst().prefix(6) {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 8) {
+                                    ForEach(Array(daily.enumerated()), id: \.offset) { index, day in
+                                        let high = selectedUnit == .fahrenheit
+                                        ? day.highTemperature.converted(to: .fahrenheit)
+                                        : day.highTemperature.converted(to: .celsius)
+                                        
+                                        let symbol = day.symbolName
+                                        let weekday = Calendar.current.shortWeekdaySymbols[
+                                            Calendar.current.component(.weekday, from: day.date) - 1
+                                        ]
+                                        
+                                        DailyWeatherCard(
+                                            day: weekday.uppercased(),
+                                            temp: "\(Int(high.value))°",
+                                            imageName: "\(symbol).fill"
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // MARK: Hourly forecast starting with Now
+                    if let hourly = locationManager.hourlyForecast?.forecast.filter({ $0.date >= Date() }).prefix(12) {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 12) {
+                                // First card = Now
+                                HourlyWeatherCard(
+                                    hour: "Now",
+                                    temp: "\(Int(temp.value))°",
+                                    imageName: "\(weather.symbolName).fill"
+                                )
+                                
+                                // Next hours from WeatherKit (no dropFirst here)
+                                ForEach(Array(hourly), id: \.date) { hourData in
+                                    let hourTemp = selectedUnit == .fahrenheit
+                                    ? hourData.temperature.converted(to: .fahrenheit)
+                                    : hourData.temperature.converted(to: .celsius)
                                     
-                                    let symbol = day.symbolName
-                                    let weekday = Calendar.current.shortWeekdaySymbols[
-                                        Calendar.current.component(.weekday, from: day.date) - 1
-                                    ]
-                                    
-                                    DailyWeatherCard(
-                                        day: weekday.uppercased(),
-                                        temp: "\(Int(high.value))°",
-                                        imageName: "\(symbol).fill"
+                                    HourlyWeatherCard(
+                                        hour: formattedHour(hourData.date),
+                                        temp: "\(Int(hourTemp.value))°",
+                                        imageName: "\(hourData.symbolName).fill"
                                     )
                                 }
                             }
                         }
                     }
                     
-                    HStack(spacing: 0) {
-                        Image(systemName: "apple.logo")
-                            .font(.system(size: 12))
-                            .foregroundStyle(.white)
-                        
-                        Text("Weather")
-                            .font(.system(size: 17))
-                            .foregroundStyle(.white)
-                        
-                        Button("Other data sources") {
-                            
-                        }
-                        .padding(.horizontal, 5)
-                    }
+                    // MARK: Attribution
+                    AppleWeatherAttributionView()
                 }
-                .padding()
+                .padding(.horizontal)
             }
         }
     }
@@ -165,21 +190,48 @@ struct DailyWeatherCard: View {
     }
 }
 
+struct HourlyWeatherCard: View {
+    var hour: String
+    var temp: String
+    var imageName: String
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(hour)
+                .font(.caption2)
+                .foregroundColor(.white.opacity(0.7))
+            Image(systemName: imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 24, height: 24)
+                .symbolRenderingMode(.multicolor)
+            Text(temp)
+                .font(.caption)
+                .foregroundColor(.white)
+        }
+        .padding(.vertical, 8)
+        .frame(width: 50, height: 100)
+        .background(Color.black.opacity(0.3))
+        .cornerRadius(20)
+    }
+}
+
 struct AppleWeatherAttributionView: View {
     var body: some View {
         HStack(spacing: 6) {
             // Apple logo
             Image(systemName: "apple.logo")
-                .font(.caption)
+                .font(.system(size: 10))
+                .foregroundStyle(.white)
             
             // Attribution text
-            Text("Weather data from ")
-                .font(.caption2)
-                .foregroundColor(.secondary)
+            Text("Weather")
+                .font(.system(size: 15))
+                .foregroundColor(.white)
             
             // Link to Apple Weather
-            Link("Apple Weather", destination: URL(string: "https://weather.apple.com")!)
-                .font(.caption2)
+            Link("Other data sources", destination: URL(string: "https://developer.apple.com/weatherkit/data-source-attribution/")!)
+                .font(.system(size: 15))
         }
         .padding(.top, 8)
     }
