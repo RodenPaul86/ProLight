@@ -16,7 +16,7 @@ struct SettingsView: View {
     @AppStorage("resetDatastore") private var resetDatastore: Bool = false
     @AppStorage("showTipsForTesting") private var showTipsForTesting: Bool = false
     @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
-    @AppStorage("useFahrenheit") private var useFahrenheit: Bool = true
+    @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
     @State private var resetOnboarding: Bool = false
     
     @State private var showDebug: Bool = false
@@ -29,6 +29,10 @@ struct SettingsView: View {
     var tabBarHeight: CGFloat
     
     var body: some View {
+        var selectedUnit: TemperatureUnit {
+            TemperatureUnit(rawValue: selectedUnitRaw) ?? .fahrenheit
+        }
+        
         NavigationStack {
             List {
                 if !appSubModel.isSubscriptionActive {
@@ -42,14 +46,13 @@ struct SettingsView: View {
                 }
                 
                 Section(header: Text("General")) {
-                    customRow(icon: "", firstLabel: "Use Fahrenheit", showToggle: true, toggleValue: $useFahrenheit)
-                    
                     customRow(icon: "figure.walk", firstLabel: "Walking History", destination: AnyView(WorkoutHistoryView()))
                 }
                 
                 Section(header: Text("Customization")) {
                     customRow(icon: "questionmark.app.dashed", firstLabel: "Alternate Icons", destination: AnyView(AlternativeIcons()))
                     customRow(icon: "iphone.gen2.radiowaves.left.and.right", firstLabel: "In-App Haptics", showToggle: true, toggleValue: $isHapticsEnabled)
+                    customRow(icon: "thermometer", firstLabel: "Primary Units", showMenu: true, selectedOptionRaw: $selectedUnitRaw)
                 }
                 
                 Section(header: Text("Support Us")) {
@@ -174,12 +177,18 @@ struct customRow: View {
     var url: String? = nil           /// <-- Optional URL
     var showToggle: Bool = false
     var toggleValue: Binding<Bool>? = nil /// <-- Optional toggle switch
+    var showMenu: Bool = false
+    var menuOptions: [String] = []
+    var selectedOption: Binding<String?>? = nil
     var shareURL: URL? = nil             /// <-- Optional share link
     var showJoinInsteadOfSafari: Bool? = nil
     //@EnvironmentObject var tabBarVisibility: TabBarVisibility
     
-    @State private var isNavigating = false
-    @State private var isSharing = false
+    var selectedOptionRaw: Binding<String>?
+    
+    
+    @State private var isNavigating: Bool = false
+    @State private var isSharing: Bool = false
     @State private var hideTabBar: Bool = false
     
     var body: some View {
@@ -221,6 +230,8 @@ struct customRow: View {
                 .buttonStyle(.plain)
             } else if showToggle {
                 rowContent(showChevron: false)
+            } else if showMenu {
+                rowContent(showChevron: false)
             } else {
                 rowContent(showChevron: action != nil || shareURL != nil)
                     .onTapGesture {
@@ -258,6 +269,11 @@ struct customRow: View {
             if showToggle, let binding = toggleValue {
                 Toggle("", isOn: binding)
                     .labelsHidden()
+            } else if showMenu, let binding = selectedOptionRaw {
+                EnumSelectionMenu<TemperatureUnit>(
+                    selection: binding,
+                    displayName: { $0.displayName }
+                )
             } else if showChevron {
                 Image(systemName: "chevron.right")
                     .font(.headline)
@@ -273,6 +289,38 @@ struct customRow: View {
     
     private func isWebsite(_ urlString: String) -> Bool {
         return urlString.hasPrefix("http")
+    }
+}
+
+struct EnumSelectionMenu<T: CaseIterable & RawRepresentable & Identifiable & Equatable>: View where T.RawValue == String {
+    var options: [T] = Array(T.allCases)
+    @Binding var selection: String
+    
+    var displayName: (T) -> String
+    
+    var body: some View {
+        Menu {
+            ForEach(options) { option in
+                Button {
+                    selection = option.rawValue
+                } label: {
+                    HStack {
+                        Text(displayName(option))
+                        if selection == option.rawValue {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        } label: {
+            if let selectedEnum = options.first(where: { $0.rawValue == selection }) {
+                HStack {
+                    Text(displayName(selectedEnum))
+                    Image(systemName: "chevron.up.chevron.down") /// <-- Chevron next to text
+                }
+                .foregroundColor(.secondary)
+            }
+        }
     }
 }
 
