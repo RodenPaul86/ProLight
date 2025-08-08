@@ -21,7 +21,7 @@ struct UserActivityView: View {
                 .padding(.horizontal)
                 .padding(.top)
             }
-            .navigationTitle("Fitness Log")
+            .navigationTitle("Fitness Stats")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
