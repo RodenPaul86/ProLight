@@ -19,7 +19,7 @@ enum AppTab: String, CaseIterable, FloatingTabProtocol {
         case .home: "flashlight.on.fill"
         case .morseCode: "dot.radiowaves.left.and.right"
         case .map: "point.topleft.filled.down.to.point.bottomright.curvepath"
-        case .fitness: "chart.bar.xaxis"
+        case .fitness: "chart.line.uptrend.xyaxis"
         case .settings: "gear"
         }
     }
