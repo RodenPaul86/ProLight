@@ -11,18 +11,6 @@ import HealthKit
 class HealthManager: ObservableObject {
     let healthStore = HKHealthStore()
     
-    var startDate: Date {
-        let option = UserDefaults.standard.string(forKey: "dateRangeOption") ?? "day"
-        let dateRangeOption = DateRangeOption(rawValue: option) ?? .day
-        
-        switch dateRangeOption {
-        case .day:
-            return .startOfDay
-        case .week:
-            return .startOfWeek
-        }
-    }
-    
     @Published var activites: [String : cardElements] = [:]
     
     @Published var mockActivites: [String : cardElements] = [
@@ -59,7 +47,7 @@ class HealthManager: ObservableObject {
     
     func fetchTodaySteps() {
         let steps = HKQuantityType(.stepCount)
-        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: Date())
+        let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
         let query = HKStatisticsQuery(quantityType: steps, quantitySamplePredicate: predicate) { _, result, error in
             guard let quantity = result?.sumQuantity(), error == nil else {
                 print("error fetching todays step count...")
@@ -81,7 +69,7 @@ class HealthManager: ObservableObject {
     
     func fetchTodayCalories() {
         let calories = HKQuantityType(.activeEnergyBurned)
-        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: Date())
+        let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
         
         let query = HKStatisticsQuery(quantityType: calories, quantitySamplePredicate: predicate) { _, result, error in
             
@@ -105,7 +93,7 @@ class HealthManager: ObservableObject {
     
     func fetchTodayStairsClimbed() {
         let flights = HKQuantityType(.flightsClimbed)
-        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: Date())
+        let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
         
         let query = HKStatisticsQuery(quantityType: flights, quantitySamplePredicate: predicate) { _, result, error in
             
@@ -129,7 +117,7 @@ class HealthManager: ObservableObject {
     
     func fetchTodayWalkingDistance() {
         let distanceType = HKQuantityType(.distanceWalkingRunning)
-        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: Date())
+        let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
         
         let query = HKStatisticsQuery(quantityType: distanceType, quantitySamplePredicate: predicate) { _, result, error in
             
@@ -153,7 +141,7 @@ class HealthManager: ObservableObject {
     
     func fetchTodayWalkingSpeed() {
         let speedType = HKQuantityType(.walkingSpeed)
-        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: Date())
+        let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
         
         let query = HKSampleQuery(sampleType: speedType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { _, samples, error in
             
@@ -189,7 +177,7 @@ class HealthManager: ObservableObject {
     
     func fetchCurrentWeekWorkoutStats() {
         let workout = HKSampleType.workoutType()
-        let timePredicate = HKQuery.predicateForSamples(withStart: startDate, end: Date())
+        let timePredicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
         
         let query = HKSampleQuery(sampleType: workout, predicate: timePredicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { _, sample, error in
             if let error = error {

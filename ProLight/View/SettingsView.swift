@@ -17,7 +17,6 @@ struct SettingsView: View {
     @AppStorage("showTipsForTesting") private var showTipsForTesting: Bool = false
     @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
     @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
-    @AppStorage("dateRangeOption") private var dateRangeOptionRaw: String = DateRangeOption.day.rawValue
     @State private var resetOnboarding: Bool = false
     
     @State private var showDebug: Bool = false
@@ -31,10 +30,6 @@ struct SettingsView: View {
     
     var selectedUnit: TemperatureUnit {
         TemperatureUnit(rawValue: selectedUnitRaw) ?? .fahrenheit
-    }
-    
-    var dateRangeOption: DateRangeOption {
-        DateRangeOption(rawValue: dateRangeOptionRaw) ?? .day
     }
     
     var body: some View {
@@ -58,7 +53,6 @@ struct SettingsView: View {
                     customRow(icon: "questionmark.app.dashed", firstLabel: "Alternate Icons", destination: AnyView(AlternativeIcons()))
                     customRow(icon: "iphone.gen2.radiowaves.left.and.right", firstLabel: "In-App Haptics", showToggle: true, toggleValue: $isHapticsEnabled)
                     customRow(icon: "thermometer", firstLabel: "Primary Units", showMenu: true, selectedOptionRaw: $selectedUnitRaw)
-                    customRow(icon: "calendar", firstLabel: "Data Range", showMenu: true, selectedOptionRaw: $dateRangeOptionRaw)
                 }
                 
                 Section(header: Text("Support Us")) {
@@ -188,10 +182,7 @@ struct customRow: View {
     var selectedOption: Binding<String?>? = nil
     var shareURL: URL? = nil             /// <-- Optional share link
     var showJoinInsteadOfSafari: Bool? = nil
-    //@EnvironmentObject var tabBarVisibility: TabBarVisibility
-    
     var selectedOptionRaw: Binding<String>?
-    
     
     @State private var isNavigating: Bool = false
     @State private var isSharing: Bool = false
@@ -279,9 +270,6 @@ struct customRow: View {
                 EnumSelectionMenu<TemperatureUnit>(
                     selection: binding,
                     displayName: { $0.displayName }
-                )
-                EnumSelectionMenu<DateRangeOption>(
-                    selection: binding, displayName: { $0.displayName }
                 )
             } else if showChevron {
                 Image(systemName: "chevron.right")
