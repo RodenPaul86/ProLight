@@ -11,17 +11,23 @@ struct UserActivityView: View {
     @EnvironmentObject var healthManager: HealthManager
     
     var body: some View {
-        VStack {
-            LazyVGrid(columns: Array(repeating: GridItem(spacing: 20), count: 2)) {
-                ForEach(healthManager.activites.sorted(by: { $0.value.id < $1.value.id }), id: \.key) { item in
-                    ActivityCard(activity: item.value)
+        NavigationStack {
+            ScrollView { // Added so content scrolls if needed
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: 2), spacing: 20) {
+                    ForEach(healthManager.activites.sorted(by: { $0.value.id < $1.value.id }), id: \.key) { item in
+                        ActivityCard(activity: item.value)
+                    }
                 }
+                .padding(.horizontal)
+                .padding(.top)
             }
-            .padding(.horizontal)
+            .navigationTitle("Fitness Log")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
 
 #Preview {
     UserActivityView()
+        .environmentObject(HealthManager())
 }

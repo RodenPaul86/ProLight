@@ -20,3 +20,17 @@ enum TemperatureUnit: String, CaseIterable, Identifiable {
         }
     }
 }
+
+enum DateRangeOption: String, CaseIterable, Identifiable {
+    case day = "Today"
+    case week = "This Week"
+    
+    var id: String { self.rawValue }
+    
+    var displayName: String {
+        switch self {
+        case .day: return "Start Of Day"
+        case .week: return "Start Of Week"
+        }
+    }
+}

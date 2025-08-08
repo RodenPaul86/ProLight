@@ -12,6 +12,7 @@ struct cardElements {
     let title: String
     let subtitle: String
     let image: String
+    let tintColor: Color
     let amount: String
 }
 
@@ -37,11 +38,14 @@ struct ActivityCard: View {
                     Spacer()
                     
                     Image(systemName: activity.image)
-                        .foregroundStyle(.green)
+                        .foregroundStyle(activity.tintColor)
                 }
                 
                 Text(activity.amount)
                     .font(.system(size: 24))
+                    .minimumScaleFactor(0.6)
+                    .bold()
+                    .padding(.bottom)
             }
             .padding()
         }
@@ -49,5 +53,5 @@ struct ActivityCard: View {
 }
 
 #Preview {
-    ActivityCard(activity: cardElements(id: 0, title: "Daily Steps", subtitle: "Goal: 10,000", image: "figure.walk", amount: "6,234"))
+    ActivityCard(activity: cardElements(id: 0, title: "Daily Steps", subtitle: "Goal: 10,000", image: "figure.walk", tintColor: .green, amount: "6,234"))
 }
