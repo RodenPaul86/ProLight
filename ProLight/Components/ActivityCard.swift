@@ -24,28 +24,32 @@ struct ActivityCard: View {
             Color(uiColor: .systemGray6)
                 .cornerRadius(15)
             
-            VStack(spacing: 20) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(activity.title)
-                            .font(.system(size: 16))
-                        
-                        Text(activity.subtitle)
-                            .font(.system(size: 12))
-                            .foregroundStyle(.gray)
-                    }
+            VStack(alignment: .leading, spacing: 20) {
+                HStack {
+                    Image(systemName: activity.image)
+                        .font(.system(size: 20))
+                        .foregroundStyle(activity.tintColor.gradient)
+                        .frame(width: 40, height: 40)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(Color("darkGray"))
+                        )
+                    
+                    Text(activity.title)
+                        .font(.system(size: 20))
                     
                     Spacer()
-                    
-                    Image(systemName: activity.image)
-                        .foregroundStyle(activity.tintColor)
                 }
                 
-                Text(activity.amount)
-                    .font(.system(size: 24))
-                    .minimumScaleFactor(0.6)
-                    .bold()
-                    .padding(.bottom)
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(activity.amount)
+                        .font(.system(size: 25).bold())
+                        .minimumScaleFactor(0.6)
+                    
+                    Text(activity.subtitle)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.gray)
+                }
             }
             .padding()
         }
@@ -53,5 +57,8 @@ struct ActivityCard: View {
 }
 
 #Preview {
-    ActivityCard(activity: cardElements(id: 0, title: "Daily Steps", subtitle: "Goal: 10,000", image: "figure.walk", tintColor: .green, amount: "6,234"))
+    UserActivityView()
+        .environmentObject(HealthManager())
+    
+    //ActivityCard(activity: cardElements(id: 0, title: "Daily Steps", subtitle: "Goal: 10,000", image: "figure.walk", tintColor: .green, amount: "6,234"))
 }

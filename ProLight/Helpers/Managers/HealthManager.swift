@@ -14,10 +14,12 @@ class HealthManager: ObservableObject {
     @Published var activites: [String : cardElements] = [:]
     
     @Published var mockActivites: [String : cardElements] = [
-        "todaySteps" : cardElements(id: 0, title: "Today Steps", subtitle: "Goal 10,000", image: "figure.walk", tintColor: .green, amount: "12,123"),
-        "todayCalories" : cardElements(id: 1, title: "Today Calories", subtitle: "Goal 900", image: "flame", tintColor: .red, amount: "900"),
-        "weekRunning" : cardElements(id: 2, title: "Running", subtitle: "Mins this week", image: "figure.walk", tintColor: .blue, amount: "90 minutes"),
-        "todayStairs" : cardElements(id: 3, title: "Stairs Climbed", subtitle: "Flights today",image: "stairs", tintColor: .orange, amount: "2")
+        "todaySteps" : cardElements(id: 0, title: "Steps", subtitle: "Steps", image: "shoeprints.fill", tintColor: .green, amount: "12,123"),
+        "todayCalories" : cardElements(id: 1, title: "Calories", subtitle: "Burned", image: "flame", tintColor: .red, amount: "900 kcal"),
+        "weekRunning" : cardElements(id: 2, title: "Running", subtitle: "Running", image: "figure.run", tintColor: .blue, amount: "90 min"),
+        "todayStairs" : cardElements(id: 3, title: "Stairs", subtitle: "Flights Climbed",image: "figure.stairs", tintColor: .orange, amount: "2"),
+        "todayWalkingDistance" : cardElements(id: 4, title: "Distance", subtitle: "Distance", image: "map", tintColor: .blue, amount: "1.05 km"),
+        "todayWalkingSpeed" : cardElements(id: 5, title: "Speed", subtitle: "Average Speed", image: "speedometer", tintColor: .purple, amount: "3 mph")
     ]
     
     init() {
@@ -56,7 +58,7 @@ class HealthManager: ObservableObject {
             
             let stepCount = quantity.doubleValue(for: .count())
             let displayAmount = stepCount.formattedString() ?? "No Data"
-            let activity = cardElements(id: 0, title: "Today Steps", subtitle: "Goal 10,000", image: "figure.walk", tintColor: .green, amount: displayAmount)
+            let activity = cardElements(id: 0, title: "Steps", subtitle: "Steps", image: "shoeprints.fill", tintColor: .green, amount: displayAmount)
             
             DispatchQueue.main.async {
                 self.activites["todaySteps"] = activity
@@ -81,7 +83,7 @@ class HealthManager: ObservableObject {
                 displayAmount = caloriesBurned.formattedString()!
             }
             
-            let activity = cardElements(id: 1, title: "Today Calories", subtitle: "Goal 900", image: "flame", tintColor: .red, amount: displayAmount)
+            let activity = cardElements(id: 1, title: "Calories", subtitle: "Burned", image: "flame", tintColor: .red, amount: "\(displayAmount) kcal")
             
             DispatchQueue.main.async {
                 self.activites["todayCalories"] = activity
@@ -105,7 +107,7 @@ class HealthManager: ObservableObject {
                 displayAmount = flightsCount.formattedString()!
             }
             
-            let activity = cardElements(id: 3, title: "Stairs Climbed", subtitle: "Floors today", image: "stairs", tintColor: .orange, amount: displayAmount)
+            let activity = cardElements(id: 3, title: "Stairs", subtitle: "Flights Climbed", image: "figure.stairs", tintColor: .orange, amount: displayAmount)
             
             DispatchQueue.main.async {
                 self.activites["todayStairs"] = activity
@@ -129,7 +131,7 @@ class HealthManager: ObservableObject {
                 displayAmount = String(format: "%.2f km", distance / 1000)
             }
             
-            let activity = cardElements(id: 4, title: "Walking Distance", subtitle: "Today", image: "map", tintColor: .blue, amount: displayAmount)
+            let activity = cardElements(id: 4, title: "Distance", subtitle: "Distance", image: "map", tintColor: .blue, amount: displayAmount)
             
             DispatchQueue.main.async {
                 self.activites["todayWalkingDistance"] = activity
@@ -158,14 +160,7 @@ class HealthManager: ObservableObject {
                 displayAmount = String(format: "%.2f mph", mph)
             }
             
-            let activity = cardElements(
-                id: 5,
-                title: "Walking Speed",
-                subtitle: "Average today",
-                image: "speedometer",
-                tintColor: .purple,
-                amount: displayAmount
-            )
+            let activity = cardElements(id: 5, title: "Speed", subtitle: "Average Speed", image: "speedometer", tintColor: .purple, amount: displayAmount)
             
             DispatchQueue.main.async {
                 self.activites["todayWalkingSpeed"] = activity
@@ -177,7 +172,7 @@ class HealthManager: ObservableObject {
     
     func fetchCurrentWeekWorkoutStats() {
         let workout = HKSampleType.workoutType()
-        let timePredicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
+        let timePredicate = HKQuery.predicateForSamples(withStart: .startOfWeek, end: Date())
         
         let query = HKSampleQuery(sampleType: workout, predicate: timePredicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { _, sample, error in
             if let error = error {
@@ -186,7 +181,7 @@ class HealthManager: ObservableObject {
             }
             
             guard let workouts = sample as? [HKWorkout], !workouts.isEmpty else {
-                let activity = cardElements(id: 2, title: "Running", subtitle: "Mins this week", image: "figure.walk", tintColor: .blue, amount: "No Data")
+                let activity = cardElements(id: 2, title: "Running", subtitle: "Data from Watch", image: "figure.run", tintColor: .blue, amount: "No Data")
                 DispatchQueue.main.async {
                     self.activites["weekRunning"] = activity
                 }
@@ -201,7 +196,7 @@ class HealthManager: ObservableObject {
                 }
             }
             
-            let activity = cardElements(id: 2, title: "Running", subtitle: "Mins this week", image: "figure.walk", tintColor: .blue, amount: "\(runningCount) minutes")
+            let activity = cardElements(id: 2, title: "Running", subtitle: "Weekly Run", image: "figure.run", tintColor: .blue, amount: "\(runningCount) min")
             
             DispatchQueue.main.async {
                 self.activites["weekRunning"] = activity
