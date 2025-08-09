@@ -26,7 +26,6 @@ enum AppTab: String, CaseIterable, FloatingTabProtocol {
 }
 
 struct ContentView: View {
-    @EnvironmentObject var healthManager: HealthManager
     @State private var activeTab: AppTab = .home
     
     var body: some View {
@@ -44,25 +43,4 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-}
-
-struct LibraryView: View {
-    var tabBarHeight: CGFloat
-    @State private var hideTabBar: Bool = false
-    
-    var body: some View {
-        NavigationStack {
-            VStack {
-                Spacer(minLength: 0)
-                
-                Button("Hide Tab Bar") {
-                    hideTabBar.toggle()
-                }
-            }
-            .padding()
-            .navigationTitle("Library")
-            .safeAreaPadding(.bottom, tabBarHeight)
-        }
-        .hideFloatingTabBar(hideTabBar)
-    }
 }
