@@ -179,7 +179,7 @@ struct HomeView: View {
                 lockHint
             }
             .animation(.easeInOut(duration: 0.3), value: showSecondSlider)
-            .offset(x: showSecondSlider ? 0 : 111)
+            .offset(x: showSecondSlider ? 10 : 115)
             
             // MARK: Strobe Slider
             VStack(spacing: 6) {
@@ -226,7 +226,7 @@ struct HomeView: View {
                 }
             }
             .animation(.easeInOut(duration: 0.3), value: showSecondSlider)
-            .offset(x: showSecondSlider ? 0 : 200)
+            .offset(x: showSecondSlider ? 10 : 200)
         }
     }
     
@@ -303,15 +303,15 @@ struct HomeView: View {
     
     private var modeButtons: some View {
         HStack(spacing: 13) {
-            modeButton(title: "SOS  ", subtitle: "Emergency\nlight pattern", BGColor: sosPressed ? .red : Color("darkGray"), width: 140, height: 70)
+            modeButton(title: "SOS", subtitle: "Emergency", BGColor: sosPressed ? .red : Color("darkGray"))
                 .onTapGesture {
                     HapticManager.shared.notify(.impact(.light))
                     sosPressed.toggle()
                 }
             
-            modeButton(title: "Screen", width: 100, height: 70)
+            modeButton(title: "Screen")
             
-            modeButton(title: "Strobe", BGColor: strobePressed ? .blue : Color("darkGray"), width: 100, height: 70)
+            modeButton(title: "Strobe", BGColor: strobePressed ? .blue : Color("darkGray"))
                 .onTapGesture {
                     HapticManager.shared.notify(.impact(.light))
                     strobePressed.toggle()
@@ -337,21 +337,21 @@ struct HomeView: View {
         }
     }
     
-    private func modeButton(title: String, subtitle: String? = nil, BGColor: Color = Color("darkGray"), width: CGFloat = 80, height: CGFloat = 60) -> some View {
-        HStack(spacing: 4) {
+    private func modeButton(title: String, subtitle: String? = nil, BGColor: Color = Color("darkGray")) -> some View {
+        VStack(spacing: 4) {
             Text(title)
                 .font(.headline)
                 .foregroundColor(.white)
             
             if let subtitle = subtitle {
                 Text(subtitle)
-                    .font(.caption2)
-                    .foregroundColor(.white)
+                    .font(.caption)
+                    .foregroundColor(.gray)
                     .multilineTextAlignment(.leading)
             }
         }
         .padding(.horizontal, 5)
-        .frame(width: width, height: height, alignment: .center)
+        .frame(maxWidth: .infinity, maxHeight: 70, alignment: .center)
         .background(BGColor)
         .cornerRadius(20)
         .overlay(
