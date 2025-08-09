@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct cardElements {
+struct cardElements: Identifiable, Equatable {
     let id: Int
     let title: String
     let subtitle: String
@@ -25,6 +25,7 @@ struct ActivityCard: View {
                 .cornerRadius(15)
             
             VStack(alignment: .leading, spacing: 20) {
+                // Top section with icon & title
                 HStack {
                     Image(systemName: activity.image)
                         .font(.system(size: 20))
@@ -36,18 +37,19 @@ struct ActivityCard: View {
                         )
                     
                     Text(activity.title)
-                        .font(.system(size: 20))
+                        .font(.headline)
                     
                     Spacer()
                 }
                 
+                // Amount & subtitle
                 VStack(alignment: .leading, spacing: 5) {
                     Text(activity.amount)
-                        .font(.system(size: 25).bold())
+                        .font(.title2.bold())
                         .minimumScaleFactor(0.6)
                     
                     Text(activity.subtitle)
-                        .font(.system(size: 12))
+                        .font(.caption)
                         .foregroundStyle(.gray)
                 }
             }
@@ -61,4 +63,30 @@ struct ActivityCard: View {
         .environmentObject(HealthManager())
     
     //ActivityCard(activity: cardElements(id: 0, title: "Daily Steps", subtitle: "Goal: 10,000", image: "figure.walk", tintColor: .green, amount: "6,234"))
+}
+
+// MARK: - Drop Delegate
+struct DropViewDelegate: DropDelegate {
+    let item: cardElements
+    @Binding var activities: [cardElements]
+    @Binding var draggingItem: cardElements?
+    var onReorder: () -> Void
+    
+    func performDrop(info: DropInfo) -> Bool {
+        draggingItem = nil
+        onReorder()
+        return true
+    }
+    
+    func dropEntered(info: DropInfo) {
+        guard let draggingItem = draggingItem,
+              draggingItem != item,
+              let fromIndex = activities.firstIndex(of: draggingItem),
+              let toIndex = activities.firstIndex(of: item) else { return }
+        
+        withAnimation {
+            activities.move(fromOffsets: IndexSet(integer: fromIndex),
+                            toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex)
+        }
+    }
 }
