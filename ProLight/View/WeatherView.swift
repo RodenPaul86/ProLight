@@ -47,7 +47,6 @@ struct WeatherView: View {
                 
                 
                 VStack(alignment: .leading, spacing: 10) {
-                    
                     // MARK: City name + State name
                     if !locationManager.cityName.isEmpty {
                         Text("\(locationManager.cityName), \(locationManager.stateName)")
