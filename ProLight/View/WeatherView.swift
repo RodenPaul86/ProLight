@@ -46,12 +46,16 @@ struct WeatherView: View {
                 : today.highTemperature.converted(to: .celsius)
                 
                 
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 10) {
                     
                     // MARK: City name + State name
                     Text("\(locationManager.cityName), \(locationManager.stateName)")
                         .font(.title3)
                         .foregroundColor(.white.opacity(0.8))
+                    
+                    Text("Today")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.7))
                     
                     // MARK: Today + daily cards
                     HStack(spacing: 12) {
@@ -91,23 +95,27 @@ struct WeatherView: View {
                     if let hourly = locationManager.hourlyForecast?.forecast.filter({ $0.date >= Date() }).prefix(12) {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 12) {
-                                // First card = Now
+                                
+                                let nowSymbol = weather.symbolName == "wind" ? "wind" : "\(weather.symbolName).fill"
+                                
                                 HourlyWeatherCard(
                                     hour: "Now",
                                     temp: "\(Int(temp.value))°",
-                                    imageName: "\(weather.symbolName).fill"
+                                    imageName: nowSymbol
                                 )
                                 
-                                // Next hours from WeatherKit (no dropFirst here)
+                                // Next hours from WeatherKit
                                 ForEach(Array(hourly), id: \.date) { hourData in
                                     let hourTemp = selectedUnit == .fahrenheit
                                     ? hourData.temperature.converted(to: .fahrenheit)
                                     : hourData.temperature.converted(to: .celsius)
                                     
+                                    let symbol = hourData.symbolName == "wind" ? "wind" : "\(hourData.symbolName).fill"
+                                    
                                     HourlyWeatherCard(
                                         hour: formattedHour(hourData.date),
                                         temp: "\(Int(hourTemp.value))°",
-                                        imageName: "\(hourData.symbolName).fill"
+                                        imageName: symbol
                                     )
                                 }
                             }
@@ -155,7 +163,8 @@ struct TodayWeatherCard: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 50, height: 50)
-                .symbolRenderingMode(.multicolor)
+                .symbolRenderingMode(imageName == "wind" ? .monochrome : .multicolor)
+                .foregroundStyle(imageName == "wind" ? .white : .primary)
         }
         .padding()
         .frame(width: 220, height: 100)
@@ -178,7 +187,8 @@ struct DailyWeatherCard: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 24, height: 24)
-                .symbolRenderingMode(.multicolor)
+                .symbolRenderingMode(imageName == "wind" ? .monochrome : .multicolor)
+                .foregroundStyle(imageName == "wind" ? .white : .primary)
             Text(temp)
                 .font(.caption)
                 .foregroundColor(.white)
@@ -204,10 +214,11 @@ struct HourlyWeatherCard: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 24, height: 24)
-                .symbolRenderingMode(.multicolor)
+                .symbolRenderingMode(imageName == "wind" ? .monochrome : .multicolor)
+                .foregroundStyle(imageName == "wind" ? .white : .primary)
             Text(temp)
                 .font(.caption)
-                .foregroundColor(.white)
+                .foregroundStyle(.white)
         }
         .padding(.vertical, 8)
         .frame(width: 50, height: 100)
