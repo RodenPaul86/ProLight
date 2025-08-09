@@ -11,7 +11,8 @@ import HealthKit
 class HealthManager: ObservableObject {
     let healthStore = HKHealthStore()
     
-    @Published var activites: [String : cardElements] = [:]
+    @Published var activities: [String : cardElements] = [:]
+    @Published var orderedActivities: [cardElements] = []
     
     @Published var mockActivites: [String : cardElements] = [
         "todaySteps" : cardElements(id: 0, title: "Steps", subtitle: "Steps", image: "shoeprints.fill", tintColor: .green, amount: "12,123"),
@@ -19,7 +20,8 @@ class HealthManager: ObservableObject {
         "weekRunning" : cardElements(id: 2, title: "Running", subtitle: "Running", image: "figure.run", tintColor: .blue, amount: "90 min"),
         "todayStairs" : cardElements(id: 3, title: "Stairs", subtitle: "Flights Climbed",image: "figure.stairs", tintColor: .orange, amount: "2"),
         "todayWalkingDistance" : cardElements(id: 4, title: "Distance", subtitle: "Distance", image: "map", tintColor: .blue, amount: "1.05 km"),
-        "todayWalkingSpeed" : cardElements(id: 5, title: "Speed", subtitle: "Average Speed", image: "speedometer", tintColor: .purple, amount: "3 mph")
+        "todayWalkingSpeed" : cardElements(id: 5, title: "Speed", subtitle: "Average Speed", image: "speedometer", tintColor: .purple, amount: "3 mph"),
+        "todayHeartRate" : cardElements(id: 6, title: "Heart Rate", subtitle: "Average Today", image: "heart.fill", tintColor: .pink, amount: "72 bpm")
     ]
     
     init() {
@@ -29,8 +31,9 @@ class HealthManager: ObservableObject {
         let walkingDistance = HKQuantityType(.distanceWalkingRunning)
         let walkingSpeed = HKQuantityType(.walkingSpeed)
         let workout = HKObjectType.workoutType()
+        let heartRate = HKQuantityType(.heartRate)
         
-        let healthTypes: Set = [steps, calories, flights, walkingDistance, walkingSpeed, workout]
+        let healthTypes: Set = [steps, calories, flights, walkingDistance, walkingSpeed, workout, heartRate]
         
         Task {
             do {
@@ -41,6 +44,7 @@ class HealthManager: ObservableObject {
                 fetchCurrentWeekWorkoutStats()
                 fetchTodayWalkingDistance()
                 fetchTodayWalkingSpeed()
+                fetchTodayHeartRate()
             } catch {
                 print("error fetching health data...")
             }
@@ -61,7 +65,7 @@ class HealthManager: ObservableObject {
             let activity = cardElements(id: 0, title: "Steps", subtitle: "Steps", image: "shoeprints.fill", tintColor: .green, amount: displayAmount)
             
             DispatchQueue.main.async {
-                self.activites["todaySteps"] = activity
+                self.activities["todaySteps"] = activity
             }
             
             print(stepCount.formattedString())
@@ -86,7 +90,7 @@ class HealthManager: ObservableObject {
             let activity = cardElements(id: 1, title: "Calories", subtitle: "Burned", image: "flame", tintColor: .red, amount: "\(displayAmount) kcal")
             
             DispatchQueue.main.async {
-                self.activites["todayCalories"] = activity
+                self.activities["todayCalories"] = activity
             }
         }
         
@@ -110,7 +114,7 @@ class HealthManager: ObservableObject {
             let activity = cardElements(id: 3, title: "Stairs", subtitle: "Flights Climbed", image: "figure.stairs", tintColor: .orange, amount: displayAmount)
             
             DispatchQueue.main.async {
-                self.activites["todayStairs"] = activity
+                self.activities["todayStairs"] = activity
             }
         }
         
@@ -134,7 +138,7 @@ class HealthManager: ObservableObject {
             let activity = cardElements(id: 4, title: "Distance", subtitle: "Distance", image: "map", tintColor: .blue, amount: displayAmount)
             
             DispatchQueue.main.async {
-                self.activites["todayWalkingDistance"] = activity
+                self.activities["todayWalkingDistance"] = activity
             }
         }
         
@@ -163,7 +167,33 @@ class HealthManager: ObservableObject {
             let activity = cardElements(id: 5, title: "Speed", subtitle: "Average Speed", image: "speedometer", tintColor: .purple, amount: displayAmount)
             
             DispatchQueue.main.async {
-                self.activites["todayWalkingSpeed"] = activity
+                self.activities["todayWalkingSpeed"] = activity
+            }
+        }
+        
+        healthStore.execute(query)
+    }
+    
+    func fetchTodayHeartRate() {
+        let heartRateType = HKQuantityType(.heartRate)
+        let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
+        
+        let query = HKSampleQuery(sampleType: heartRateType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { _, samples, error in
+            
+            var displayAmount = "No Data"
+            
+            if let error = error {
+                print("Error fetching heart rate: \(error.localizedDescription)")
+            } else if let hrSamples = samples as? [HKQuantitySample], !hrSamples.isEmpty {
+                let totalHR = hrSamples.reduce(0.0) { $0 + $1.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute())) }
+                let avgHR = totalHR / Double(hrSamples.count)
+                displayAmount = String(format: "%.0f bpm", avgHR)
+            }
+            
+            let activity = cardElements(id: 6, title: "Heart Rate", subtitle: "Average Today", image: "heart.fill", tintColor: .pink, amount: displayAmount)
+            
+            DispatchQueue.main.async {
+                self.activities["todayHeartRate"] = activity
             }
         }
         
@@ -183,7 +213,7 @@ class HealthManager: ObservableObject {
             guard let workouts = sample as? [HKWorkout], !workouts.isEmpty else {
                 let activity = cardElements(id: 2, title: "Running", subtitle: "Data from Watch", image: "figure.run", tintColor: .blue, amount: "No Data")
                 DispatchQueue.main.async {
-                    self.activites["weekRunning"] = activity
+                    self.activities["weekRunning"] = activity
                 }
                 return
             }
@@ -199,7 +229,7 @@ class HealthManager: ObservableObject {
             let activity = cardElements(id: 2, title: "Running", subtitle: "Weekly Run", image: "figure.run", tintColor: .blue, amount: "\(runningCount) min")
             
             DispatchQueue.main.async {
-                self.activites["weekRunning"] = activity
+                self.activities["weekRunning"] = activity
             }
         }
         
