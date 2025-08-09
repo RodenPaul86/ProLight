@@ -66,7 +66,7 @@ struct WeatherView: View {
                         TodayWeatherCard(
                             temp: "\(Int(temp.value))°",
                             description: weather.condition.description.capitalized,
-                            imageName: "\(weather.symbolName).fill",
+                            imageName: "\(weather.symbolName)",
                             low: "\(Int(low.value))°",
                             high: "\(Int(high.value))°"
                         )
@@ -79,7 +79,7 @@ struct WeatherView: View {
                                         ? day.highTemperature.converted(to: .fahrenheit)
                                         : day.highTemperature.converted(to: .celsius)
                                         
-                                        let symbol = day.symbolName
+                                        let symbol = day.symbolName == "wind" ? "wind" : "\(day.symbolName).fill"
                                         let weekday = Calendar.current.shortWeekdaySymbols[
                                             Calendar.current.component(.weekday, from: day.date) - 1
                                         ]
@@ -87,7 +87,7 @@ struct WeatherView: View {
                                         DailyWeatherCard(
                                             day: weekday.uppercased(),
                                             temp: "\(Int(high.value))°",
-                                            imageName: "\(symbol).fill"
+                                            imageName: symbol
                                         )
                                     }
                                 }
