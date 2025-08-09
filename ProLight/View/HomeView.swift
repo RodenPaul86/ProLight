@@ -68,9 +68,15 @@ struct HomeView: View {
                             : weather.temperature.converted(to: .celsius)
                             
                             VStack(alignment: .leading) {
-                                Text("\(locationManager.cityName), \(locationManager.stateName)")
-                                    .font(.caption)
-                                    .foregroundStyle(.gray)
+                                if !locationManager.cityName.isEmpty {
+                                    Text("\(locationManager.cityName), \(locationManager.stateName)")
+                                        .font(.caption)
+                                        .foregroundStyle(.gray)
+                                } else {
+                                    Text("Loading...")
+                                        .font(.caption)
+                                        .foregroundStyle(.gray)
+                                }
                                 
                                 Text("\(Int(temp.value))°")
                                     .font(.title3.bold())

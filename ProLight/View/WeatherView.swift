@@ -49,9 +49,15 @@ struct WeatherView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     
                     // MARK: City name + State name
-                    Text("\(locationManager.cityName), \(locationManager.stateName)")
-                        .font(.title3)
-                        .foregroundColor(.white.opacity(0.8))
+                    if !locationManager.cityName.isEmpty {
+                        Text("\(locationManager.cityName), \(locationManager.stateName)")
+                            .font(.title3)
+                            .foregroundStyle(.white)
+                    } else {
+                        Text("Loading...")
+                            .font(.title3)
+                            .foregroundStyle(.white)
+                    }
                     
                     Text("Today")
                         .font(.caption)
