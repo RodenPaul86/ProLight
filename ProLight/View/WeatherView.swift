@@ -10,7 +10,7 @@ import WeatherKit
 
 private func formattedHour(_ date: Date) -> String {
     let hourFormatter = DateFormatter()
-    hourFormatter.dateFormat = "ha" // e.g. "3PM"
+    hourFormatter.dateFormat = "ha" /// <-- e.g. "3PM"
     return hourFormatter.string(from: date)
 }
 
@@ -44,7 +44,6 @@ struct WeatherView: View {
                 let high = selectedUnit == .fahrenheit
                 ? today.highTemperature.converted(to: .fahrenheit)
                 : today.highTemperature.converted(to: .celsius)
-                
                 
                 VStack(alignment: .leading, spacing: 10) {
                     // MARK: City name + State name
