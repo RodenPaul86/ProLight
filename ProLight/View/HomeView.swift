@@ -179,7 +179,7 @@ struct HomeView: View {
                 lockHint
             }
             .animation(.easeInOut(duration: 0.3), value: showSecondSlider)
-            .offset(x: showSecondSlider ? 10 : 115)
+            .offset(x: showSecondSlider ? 10 : 112)
             
             // MARK: Strobe Slider
             VStack(spacing: 6) {
