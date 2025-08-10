@@ -45,6 +45,8 @@ struct WeatherView: View {
                 ? today.highTemperature.converted(to: .fahrenheit)
                 : today.highTemperature.converted(to: .celsius)
                 
+                let nowSymbol = weather.symbolName == "wind" ? "wind" : "\(weather.symbolName).fill"
+                
                 VStack(alignment: .leading, spacing: 10) {
                     // MARK: City name + State name
                     if !locationManager.cityName.isEmpty {
@@ -66,7 +68,7 @@ struct WeatherView: View {
                         TodayWeatherCard(
                             temp: "\(Int(temp.value))°",
                             description: weather.condition.description.capitalized,
-                            imageName: "\(weather.symbolName)",
+                            imageName: nowSymbol,
                             low: "\(Int(low.value))°",
                             high: "\(Int(high.value))°"
                         )
