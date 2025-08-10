@@ -23,6 +23,8 @@ struct HomeView: View {
     @State private var isLockedPower: Bool = false
     @State private var strobePressed: Bool = false
     @State private var sosPressed: Bool = false
+    @State private var screenPressed: Bool = false
+    @State private var aiPressed: Bool = false
     @State private var showSecondSlider: Bool = false
     
     @State private var selectedLevel: Int = 4
@@ -31,6 +33,9 @@ struct HomeView: View {
     
     @StateObject private var locationManager = LocationManager()
     @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
+    @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
+    @AppStorage("isAssistantEnabled") private var isAssistantEnabled: Bool = true
+
     @State private var showWeatherSheet: Bool = false
     
     var selectedUnit: TemperatureUnit {
@@ -301,6 +306,7 @@ struct HomeView: View {
         .foregroundStyle(Color("lightGreen"))
     }
     
+    // MARK: Action Buttons
     private var modeButtons: some View {
         HStack(spacing: 13) {
             modeButton(title: "SOS", subtitle: "Emergency", BGColor: sosPressed ? .red : Color("darkGray"))
@@ -309,7 +315,17 @@ struct HomeView: View {
                     sosPressed.toggle()
                 }
             
-            modeButton(title: "Screen")
+            modeButton(title: "Screen", BGColor: screenPressed ? .yellow : Color("darkGray"))
+                .onTapGesture {
+                    HapticManager.shared.notify(.impact(.light))
+                    screenPressed.toggle()
+                    
+                    if screenPressed {
+                        
+                    } else {
+                        
+                    }
+                }
             
             modeButton(title: "Strobe", BGColor: strobePressed ? .blue : Color("darkGray"))
                 .onTapGesture {
@@ -334,6 +350,14 @@ struct HomeView: View {
                         flashControllerInstance.stopFlashing()
                     }
                 }
+            
+            if isAssistantEnabled {
+                modeButton(title: "AI", subtitle: "Assistant", BGColor: aiPressed ? .green : Color("darkGray"))
+                    .onTapGesture {
+                        HapticManager.shared.notify(.impact(.light))
+                        aiPressed.toggle()
+                    }
+            }
         }
     }
     

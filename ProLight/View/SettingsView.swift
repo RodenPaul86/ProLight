@@ -16,6 +16,7 @@ struct SettingsView: View {
     @AppStorage("resetDatastore") private var resetDatastore: Bool = false
     @AppStorage("showTipsForTesting") private var showTipsForTesting: Bool = false
     @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
+    @AppStorage("isAssistantEnabled") private var isAssistantEnabled: Bool = true
     @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
     @State private var resetOnboarding: Bool = false
     
@@ -47,6 +48,7 @@ struct SettingsView: View {
                 
                 Section(header: Text("General")) {
                     customRow(icon: "figure.walk", firstLabel: "Walking History", destination: AnyView(WorkoutHistoryView()))
+                    customRow(icon: "", firstLabel: "AI Assistant", showToggle: true, toggleValue: $isAssistantEnabled)
                 }
                 
                 Section(header: Text("Customization")) {
