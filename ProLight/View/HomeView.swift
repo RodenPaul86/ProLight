@@ -150,7 +150,7 @@ struct HomeView: View {
                             }
                             .sheet(isPresented: $showWeatherSheet) {
                                 WeatherView()
-                                    .presentationDetents([.fraction(0.45)]) // 25% of screen height
+                                    .presentationDetents([.fraction(0.50)]) // 50% of screen height
                                     .presentationDragIndicator(.visible) // Shows the line at top
                             }
                         }

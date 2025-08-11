@@ -97,11 +97,24 @@ struct WeatherView: View {
                         }
                     }
                     
+                    Text("Hourly")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.7))
+                    
                     // MARK: Hourly forecast starting with Now
-                    if let hourly = locationManager.hourlyForecast?.forecast.filter({ $0.date >= Date() }).prefix(12) {
+                    if let hourly = locationManager.hourlyForecast?.forecast.filter({ $0.date >= Date() }).prefix(12),
+                       let daily = locationManager.dailyForecast?.forecast {
+                        
+                        let today = daily.first
+                        let tomorrow = daily.dropFirst().first
+                        
+                        // Sunrise/sunset times
+                        let todaySunrise = today?.sun.sunrise
+                        let todaySunset = today?.sun.sunset
+                        let tomorrowSunrise = tomorrow?.sun.sunrise
+                        
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 12) {
-                                
                                 let nowSymbol = weather.symbolName == "wind" ? "wind" : "\(weather.symbolName).fill"
                                 
                                 HourlyWeatherCard(
@@ -118,11 +131,35 @@ struct WeatherView: View {
                                     
                                     let symbol = hourData.symbolName == "wind" ? "wind" : "\(hourData.symbolName).fill"
                                     
-                                    HourlyWeatherCard(
-                                        hour: formattedHour(hourData.date),
-                                        temp: "\(Int(hourTemp.value))°",
-                                        imageName: symbol
-                                    )
+                                    // Special case for sunrise/sunset
+                                    if let sunrise = todaySunrise, Calendar.current.isDate(hourData.date, equalTo: sunrise, toGranularity: .hour) {
+                                        HourlyWeatherCard(
+                                            hour: formattedHour(sunrise),
+                                            temp: "Sunrise",
+                                            imageName: "sunrise.fill"
+                                        )
+                                    }
+                                    else if let sunset = todaySunset, Calendar.current.isDate(hourData.date, equalTo: sunset, toGranularity: .hour) {
+                                        HourlyWeatherCard(
+                                            hour: formattedHour(sunset),
+                                            temp: "Sunset",
+                                            imageName: "sunset.fill"
+                                        )
+                                    }
+                                    else if let tomorrowSunrise = tomorrowSunrise, Calendar.current.isDate(hourData.date, equalTo: tomorrowSunrise, toGranularity: .hour) {
+                                        HourlyWeatherCard(
+                                            hour: formattedHour(tomorrowSunrise),
+                                            temp: "Sunrise",
+                                            imageName: "sunrise.fill"
+                                        )
+                                    }
+                                    else {
+                                        HourlyWeatherCard(
+                                            hour: formattedHour(hourData.date),
+                                            temp: "\(Int(hourTemp.value))°",
+                                            imageName: symbol
+                                        )
+                                    }
                                 }
                             }
                         }
