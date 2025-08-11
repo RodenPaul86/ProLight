@@ -28,6 +28,9 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var movingTime: TimeInterval = 0
     @Published var totalDistanceInMeters: Double = 0
     
+    @Published var emergencyNumber: String?
+    @Published var countryCode: String = ""
+    
     private var previousLocation: CLLocation?
     private var previousTimestamp: Date?
     private let movementThreshold: CLLocationDistance = 5.0 // meters
@@ -44,6 +47,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     func requestPermission() {
         manager.requestWhenInUseAuthorization()
+        manager.requestLocation()
         manager.startUpdatingLocation()
     }
     
@@ -123,17 +127,56 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 }
 
 extension LocationManager {
+    private func lookupEmergencyNumber(for countryCode: String) -> String {
+        let emergencyNumbers: [String: String] = [
+            "US": "911",    // United States
+            "CA": "911",    // Canada
+            "GB": "999",    // United Kingdom
+            "AU": "000",    // Australia
+            "NZ": "111",    // New Zealand
+            "FR": "112",    // France
+            "DE": "112",    // Germany
+            "EU": "112",    // European Union
+            "MX": "911",    // Mexico
+            "BR": "190",    // Brazil (police; 192 for ambulance, 193 for fire)
+            "JP": "110",    // Japan (police; 119 for ambulance/fire)
+            "CN": "110",    // China (police; 120 for ambulance, 119 for fire)
+            "IN": "112",    // India
+            "ZA": "10111",  // South Africa (police; 10177 for ambulance)
+            "RU": "112",    // Russia
+            "SG": "999",    // Singapore
+            "MY": "999",    // Malaysia
+            "HK": "999",    // Hong Kong
+            "KR": "112",    // South Korea (police; 119 ambulance/fire)
+            "TW": "110",    // Taiwan (police; 119 ambulance/fire)
+            "SA": "999",    // Saudi Arabia
+            "AE": "999",    // United Arab Emirates
+            "IL": "100",    // Israel (police; 101 ambulance, 102 fire)
+            "EG": "122",    // Egypt (police; 123 ambulance)
+        ]
+        return emergencyNumbers[countryCode] ?? "112" // default to 112
+    }
+    
     private func reverseGeocode(location: CLLocation) {
         let geocoder = CLGeocoder()
         geocoder.reverseGeocodeLocation(location) { placemarks, error in
             if let error = error {
                 print("Reverse geocoding error: \(error.localizedDescription)")
-            } else if let placemark = placemarks?.first {
-                DispatchQueue.main.async {
-                    self.cityName = placemark.locality ?? ""
-                    self.stateName = placemark.administrativeArea ?? ""
+                return
+            }
+            
+            guard let placemark = placemarks?.first else { return }
+            
+            DispatchQueue.main.async {
+                self.cityName = placemark.locality ?? ""
+                self.stateName = placemark.administrativeArea ?? ""
+                
+                if let countryCode = placemark.isoCountryCode {
+                    self.countryCode = countryCode
+                    self.emergencyNumber = self.lookupEmergencyNumber(for: countryCode)
                 }
             }
         }
     }
 }
+

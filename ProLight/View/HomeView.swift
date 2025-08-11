@@ -12,6 +12,12 @@ import WeatherKit
 import CoreLocation
 import ActivityKit
 
+enum ControlMode {
+    case neutral
+    case sos
+    case strobe
+}
+
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
@@ -22,10 +28,10 @@ struct HomeView: View {
     @State private var flashlightOn: Bool = true
     @State private var isLockedPower: Bool = false
     @State private var strobePressed: Bool = false
+    @State private var showSecondSlider: Bool = false
     @State private var sosPressed: Bool = false
     @State private var screenPressed: Bool = false
     @State private var aiPressed: Bool = false
-    @State private var showSecondSlider: Bool = false
     
     @State private var selectedLevel: Int = 4
     @State private var selectedFrequency: Double? = nil
@@ -35,14 +41,23 @@ struct HomeView: View {
     @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
     @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
     @AppStorage("isAssistantEnabled") private var isAssistantEnabled: Bool = true
-
+    
     @State private var showWeatherSheet: Bool = false
     
     var selectedUnit: TemperatureUnit {
         TemperatureUnit(rawValue: selectedUnitRaw) ?? .fahrenheit
     }
     
+    @State private var mode: ControlMode = .neutral
+    
     var tabBarHeight: CGFloat
+    
+    var scaledOpacity: Double {
+        Double(brightnessLevel) / Double(maxLevel)
+    }
+    var shadowRadius: Double {
+        5 + (15 * scaledOpacity)
+    }
     
     let maxLevel: Int = 4
     let frequencies: [Int: Double] = [1: 2.0, 2: 3.0, 3: 6.0, 4: 10.0]
@@ -55,6 +70,35 @@ struct HomeView: View {
         ("2 Hz", 2.0, 120)
     ]
     
+    var sosOffset: CGFloat {
+        switch mode {
+        case .sos:
+            return -120 // visible position
+        default:
+            return -400 // hidden offscreen to the left
+        }
+    }
+    
+    var flashlightOffset: CGFloat {
+        switch mode {
+        case .neutral:
+            return 0 // centered
+        case .sos:
+            return 100 // shift right when SOS is shown
+        case .strobe:
+            return -100 // shift left when strobe is shown
+        }
+    }
+    
+    var strobeOffset: CGFloat {
+        switch mode {
+        case .strobe:
+            return 100 // visible position
+        default:
+            return 400 // hidden offscreen to the right
+        }
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -62,7 +106,17 @@ struct HomeView: View {
                 
                 VStack(spacing: 40) {
                     Spacer()
-                    brightnessSliders
+                    ZStack(alignment: .top) {
+                        sosView
+                            .offset(x: sosOffset)
+                        
+                        flashlightView
+                            .offset(x: flashlightOffset)
+                            
+                        strobeView
+                            .offset(x: strobeOffset)
+                    }
+                    .animation(.easeInOut(duration: 0.3), value: mode)
                     modeButtons
                 }
                 .overlay (
@@ -108,6 +162,16 @@ struct HomeView: View {
                 )
                 .padding()
                 .safeAreaPadding(.bottom, tabBarHeight)
+                .hideFloatingTabBar(sosPressed ? true : false)
+                
+                VStack {
+                    Spacer()
+                    Text("The SOS mode is designed to be used in situations of potential harm and should not be used deliberately.")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.5))
+                        .opacity(sosPressed ? 1 : 0)
+                }
+                .padding([.horizontal, .bottom])
             }
             .onAppear {
                 updateTorch()
@@ -145,26 +209,169 @@ struct HomeView: View {
         }
     }
     
-    private var brightnessSliders: some View {
-        HStack(alignment: .top, spacing: 50) {
-            let scaledOpacity = Double(brightnessLevel) / Double(maxLevel)
-            let shadowRadius = 5 + (15 * scaledOpacity)
-            
-            // MARK: Flashlight Slider
-            VStack(spacing: 10) {
-                VStack(spacing: 5) {
-                    curvedRectangle(topRadius: 40, bottomRadius: 5)
-                        .fill(!flashlightOn ? Color.gray.opacity(0.2) : (brightnessLevel == maxLevel ? Color.white : Color.gray.opacity(0.2)))
-                        .frame(width: 125, height: 80)
-                        .onTapGesture {
-                            guard !isLockedPower else { return }
-                            HapticManager.shared.notify(.impact(.light))
-                            flashlightOn = true
-                            brightnessLevel = maxLevel
-                            updateTorch()
+    // MARK: SOS Function
+    private var sosView: some View {
+        VStack(spacing: 10) {
+            if let number = locationManager.emergencyNumber {
+                Button(action: {
+                    if let url = URL(string: "tel://\(number)"),
+                       UIApplication.shared.canOpenURL(url) {
+                        UIApplication.shared.open(url)
+                    }
+                    print("Phone number: \(number)")
+                }) {
+                    curvedRectangle(topRadius: 40, bottomRadius: 0)
+                        .fill(.green.opacity(0.2))
+                        .rotationEffect(.degrees(90))
+                        .frame(width: 200, height: 200)
+                        .overlay {
+                            VStack(spacing: 25) {
+                                VStack(spacing: 5) {
+                                    Image(systemName: "phone.circle.fill")
+                                        .font(.system(size: 30))
+                                        .foregroundStyle(.green)
+                                    
+                                    Text("Call Emergency \nServices")
+                                        .bold()
+                                        .foregroundStyle(.white)
+                                }
+                                
+                                HStack {
+                                    Text("Tap to call")
+                                        .font(.system(size: 14).bold())
+                                        .foregroundStyle(.white.opacity(0.5))
+                                    
+                                    Image(systemName: "chevron.compact.right")
+                                        .font(.system(size: 14).bold())
+                                        .foregroundStyle(.white.opacity(0.5))
+                                }
+                            }
                         }
-                        .disabled(isLockedPower)
-                    
+                }
+            } else {
+                curvedRectangle(topRadius: 40, bottomRadius: 0)
+                    .fill(.green.opacity(0.2))
+                    .rotationEffect(.degrees(90))
+                    .frame(width: 200, height: 200)
+                    .overlay {
+                        VStack(spacing: 25) {
+                            VStack(spacing: 5) {
+                                Image(systemName: "phone.circle.fill")
+                                    .font(.system(size: 30))
+                                    .foregroundStyle(.green)
+                                
+                                Text("Call Emergency \nServices")
+                                    .bold()
+                                    .foregroundStyle(.white)
+                            }
+                            
+                            ProgressView("Detecting your location…")
+                                .font(.system(size: 14).bold())
+                                .foregroundStyle(.white.opacity(0.5))
+                        }
+                    }
+            }
+            
+            Button(action: {}) {
+                curvedRectangle(topRadius: 40, bottomRadius: 0)
+                    .fill(.gray.opacity(0.2))
+                    .rotationEffect(.degrees(90))
+                    .frame(width: 200, height: 200)
+                    .overlay {
+                        VStack(spacing: 25) {
+                            Label("Requires clear sky",systemImage: "exclamationmark.triangle.fill")
+                                .font(.system(size: 13))
+                                .foregroundStyle(.gray.opacity(0.5))
+                            
+                            VStack(spacing: 5) {
+                                Image(systemName: "iphone.landscape")
+                                    .font(.system(size: 30))
+                                    .foregroundStyle(.white)
+                                    .overlay {
+                                        ZStack {
+                                            Circle()
+                                                .fill(Color.black)
+                                                .frame(width: 10, height: 10)
+                                            
+                                            Image(systemName: "sun.max.circle.fill")
+                                                .foregroundStyle(.yellow)
+                                        }
+                                        .offset(x: 14, y: -8) // x = side to side and y = up and down
+                                    }
+                                
+                                Text("Signaling \nMirror")
+                                    .bold()
+                                    .foregroundStyle(.white)
+                            }
+                            
+                            HStack {
+                                Text("Instructions")
+                                    .font(.system(size: 14).bold())
+                                    .foregroundStyle(.white.opacity(0.5))
+                                
+                                Image(systemName: "chevron.compact.right")
+                                    .font(.system(size: 14).bold())
+                                    .foregroundStyle(.white.opacity(0.5))
+                            }
+                        }
+                    }
+            }
+        }
+    }
+    
+    // MARK: Flashlight controls
+    private var flashlightView: some View {
+        VStack(spacing: 10) {
+            VStack(spacing: 5) {
+                curvedRectangle(topRadius: 40, bottomRadius: 5)
+                    .fill(!flashlightOn ? Color.gray.opacity(0.2) : (brightnessLevel == maxLevel ? Color.white : Color.gray.opacity(0.2)))
+                    .frame(width: 125, height: 80)
+                    .onTapGesture {
+                        guard !isLockedPower else { return }
+                        HapticManager.shared.notify(.impact(.light))
+                        flashlightOn = true
+                        brightnessLevel = maxLevel
+                        updateTorch()
+                    }
+                    .disabled(mode == .sos || mode == .strobe || isLockedPower)
+                
+                if sosPressed {
+                    Button(action: {}) {
+                        RoundedRectangle(cornerRadius: 5)
+                            .fill(Color("darkRed"))
+                            .frame(width: 125, height: 250)
+                            .overlay {
+                                VStack(spacing: 4) {
+                                    Image(systemName: "speaker.wave.2.circle.fill")
+                                        .font(.system(size: 30))
+                                        .foregroundStyle(.white)
+                                        .overlay {
+                                            ZStack {
+                                                Triangle()
+                                                    .fill(Color.black)
+                                                    .frame(width: 10, height: 10)
+                                                
+                                                Image(systemName: "exclamationmark.triangle.fill")
+                                                    .foregroundStyle(.red)
+                                            }
+                                            .offset(x: 13, y: 10) // x = side to side and y = up and down
+                                        }
+                                    
+                                    Text("Emergency Siren")
+                                        .foregroundStyle(.white)
+                                    
+                                    RoundedRectangle(cornerRadius: 2)
+                                        .fill(Color.red)
+                                        .frame(width: 45, height: 2)
+                                        .padding([.top, .bottom], 12)
+                                    
+                                    Text("3 SECONDS DELAY")
+                                        .font(.system(size: 14))
+                                        .foregroundStyle(.white)
+                                }
+                            }
+                    }
+                } else {
                     ForEach((1..<(maxLevel)).reversed(), id: \.self) { level in
                         RoundedRectangle(cornerRadius: 5)
                             .fill(!flashlightOn ? Color.gray.opacity(0.2) : (level <= brightnessLevel ? Color.white : Color.gray.opacity(0.2)))
@@ -176,62 +383,61 @@ struct HomeView: View {
                                 brightnessLevel = level
                                 updateTorch()
                             }
-                            .disabled(showSecondSlider || isLockedPower)
+                            .disabled(mode == .strobe || isLockedPower)
                     }
                 }
-                .shadow(color: .white.opacity(flashlightOn ? scaledOpacity : 0.1), radius: shadowRadius)
-                powerButton
-                lockHint
             }
-            .animation(.easeInOut(duration: 0.3), value: showSecondSlider)
-            .offset(x: showSecondSlider ? 10 : 112)
+            .shadow(color: .white.opacity(flashlightOn ? scaledOpacity : 0.1), radius: sosPressed ? 0 : shadowRadius)
             
-            // MARK: Strobe Slider
-            VStack(spacing: 6) {
-                ForEach(0..<strobeData.count, id: \.self) { index in
-                    let item = strobeData[index]
-                    let isTop = index == 0
-                    let isBottom = index == strobeData.count - 1
+            powerButton
+            lockHint
+        }
+    }
+    
+    // MARK: Strobe controls
+    private var strobeView: some View {
+        VStack(spacing: 6) {
+            ForEach(0..<strobeData.count, id: \.self) { index in
+                let item = strobeData[index]
+                let isTop = index == 0
+                let isBottom = index == strobeData.count - 1
+                
+                HStack {
+                    // Frequency Label
+                    Text("\(item.label) ·")
+                        .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.3))
+                        .font(.caption)
+                        .frame(width: 40, alignment: .leading)
                     
-                    HStack {
-                        // Frequency Label
-                        Text(item.label)
+                    // Strobe Bar
+                    curvedRectangle(topRadius: isTop ? 40 : 5, bottomRadius: isBottom ? 40 : 5)
+                        .fill(item.frequency <= (selectedMaxFrequency ?? 0) ? Color("strobeHzColor") : Color.gray.opacity(0.3))
+                        .frame(width: 80, height: 80)
+                        .onTapGesture {
+                            HapticManager.shared.notify(.impact(.light))
+                            flashlightOn = true
+                            selectedMaxFrequency = item.frequency // Light up all ≤ this frequency
+                            
+                            flashControllerInstance.startFlashing(
+                                frequencyHz: item.frequency,
+                                intensity: Float(brightnessLevel) / Float(maxLevel)
+                            )
+                        }
+                        .disabled(isLockedPower)
+                    
+                    // PPM Label
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("\(item.ppm)")
                             .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.3))
                             .font(.caption)
-                            .frame(width: 40, alignment: .leading)
-                        
-                        // Strobe Bar
-                        curvedRectangle(topRadius: isTop ? 40 : 5, bottomRadius: isBottom ? 40 : 5)
-                            .fill(item.frequency <= (selectedMaxFrequency ?? 0) ? Color("strobeHzColor") : Color.gray.opacity(0.3))
-                            .frame(width: 80, height: 80)
-                            .onTapGesture {
-                                HapticManager.shared.notify(.impact(.light))
-                                flashlightOn = true
-                                selectedMaxFrequency = item.frequency // Light up all ≤ this frequency
-                                
-                                flashControllerInstance.startFlashing(
-                                    frequencyHz: item.frequency,
-                                    intensity: Float(brightnessLevel) / Float(maxLevel)
-                                )
-                            }
-                            .disabled(isLockedPower)
-                        
-                        // PPM Label
-                        VStack(alignment: .leading, spacing: 0) {
-                            Text("\(item.ppm)")
-                                .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.3))
-                                .font(.caption)
-                            Text("ppm")
-                                .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.3))
-                                .font(.caption)
-                                .italic()
-                        }
-                        .frame(width: 40, alignment: .leading)
+                        Text("ppm")
+                            .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.3))
+                            .font(.caption)
+                            .italic()
                     }
+                    .frame(width: 40, alignment: .leading)
                 }
             }
-            .animation(.easeInOut(duration: 0.3), value: showSecondSlider)
-            .offset(x: showSecondSlider ? 10 : 200)
         }
     }
     
@@ -276,7 +482,7 @@ struct HomeView: View {
             brightnessLevel = maxLevel
             
             if flashlightOn {
-                if showSecondSlider {
+                if mode == .strobe {
                     // Restore strobe flashing at last selected frequency
                     let frequency = selectedMaxFrequency ?? 2.0 // fallback to 2Hz
                     selectedMaxFrequency = frequency // ensure UI stays lit
@@ -306,13 +512,18 @@ struct HomeView: View {
         .foregroundStyle(Color("lightGreen"))
     }
     
-    // MARK: Action Buttons
+    // MARK: Mode Buttons
     private var modeButtons: some View {
         HStack(spacing: 13) {
-            modeButton(title: "SOS", subtitle: "Emergency", BGColor: sosPressed ? .red : Color("darkGray"))
+            modeButton(title: "SOS", subtitle: "Siren", BGColor: sosPressed ? .red : Color("darkGray"))
                 .onTapGesture {
+                    guard mode != .strobe else { return }
+                    
                     HapticManager.shared.notify(.impact(.light))
                     sosPressed.toggle()
+                    withAnimation {
+                        mode = mode == .sos ? .neutral : .sos
+                    }
                 }
             
             modeButton(title: "Screen", BGColor: screenPressed ? .yellow : Color("darkGray"))
@@ -329,9 +540,13 @@ struct HomeView: View {
             
             modeButton(title: "Strobe", BGColor: strobePressed ? .blue : Color("darkGray"))
                 .onTapGesture {
+                    guard mode != .sos else { return }
+                    
                     HapticManager.shared.notify(.impact(.light))
                     strobePressed.toggle()
-                    showSecondSlider.toggle()
+                    withAnimation {
+                        mode = mode == .strobe ? .neutral : .strobe
+                    }
                     
                     if strobePressed {
                         flashlightOn = true
@@ -450,5 +665,16 @@ struct AnyShape: Shape {
     
     func path(in rect: CGRect) -> Path {
         pathClosure(rect)
+    }
+}
+
+struct Triangle: Shape {
+    func path(in rect: CGRect) -> Path {
+        Path { path in
+            path.move(to: CGPoint(x: rect.midX, y: rect.minY))      // top
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))   // bottom right
+            path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))   // bottom left
+            path.closeSubpath()
+        }
     }
 }
