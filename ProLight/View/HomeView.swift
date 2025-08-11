@@ -175,6 +175,7 @@ struct HomeView: View {
             }
             .onAppear {
                 updateTorch()
+                NotificationManager.shared.requestAuthorization()
             }
             .onDisappear {
                 flashControllerInstance.stopFlashing()
@@ -405,13 +406,13 @@ struct HomeView: View {
                 HStack {
                     // Frequency Label
                     Text("\(item.label) ·")
-                        .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.3))
+                        .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.2))
                         .font(.caption)
                         .frame(width: 40, alignment: .leading)
                     
                     // Strobe Bar
                     curvedRectangle(topRadius: isTop ? 40 : 5, bottomRadius: isBottom ? 40 : 5)
-                        .fill(item.frequency <= (selectedMaxFrequency ?? 0) ? Color("strobeHzColor") : Color.gray.opacity(0.3))
+                        .fill(item.frequency <= (selectedMaxFrequency ?? 0) ? Color("strobeHzColor") : Color.gray.opacity(0.2))
                         .frame(width: 80, height: 80)
                         .onTapGesture {
                             HapticManager.shared.notify(.impact(.light))
@@ -428,10 +429,10 @@ struct HomeView: View {
                     // PPM Label
                     VStack(alignment: .leading, spacing: 0) {
                         Text("\(item.ppm)")
-                            .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.3))
+                            .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.2))
                             .font(.caption)
                         Text("ppm")
-                            .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.3))
+                            .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.2))
                             .font(.caption)
                             .italic()
                     }

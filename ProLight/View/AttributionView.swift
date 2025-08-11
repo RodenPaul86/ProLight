@@ -6,36 +6,36 @@
 //
 
 import SwiftUI
+import WeatherKit
 
 struct AttributionView: View {
-    let logo: URL
-    let link: URL
+    @Environment(\.colorScheme) private var colorScheme
+    let weatherManager = WeatherManager.shared
+    @State private var attribution: WeatherAttribution?
     
     var body: some View {
-        VStack {
-            AsyncImage(url: logo) { image in
-                image
-                    .resizable()
-                    .frame(width: 110, height: 20)
-                    .clipShape(Rectangle())
-            } placeholder: {
-                ProgressView()
+        HStack {
+            if let attribution {
+                AsyncImage(url: attribution.combinedMarkDarkURL) { image in
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 15)
+                } placeholder: {
+                    ProgressView()
+                }
+                Text(.init("[\(attribution.serviceName)](\(attribution.legalPageURL))"))
+                //Text()
             }
-            .frame(width: 110, height: 20)
-            
-            NavigationLink(destination: {
-                webView(url: "\(link)").edgesIgnoringSafeArea(.bottom)
-                    .navigationTitle("\(link)")
-                    .toolbar {
-                        Link(destination: URL(string: "\(link)")!) {
-                            Image(systemName: "safari")
-                        }
-                    }
-            }, label: {
-                Text("Other data sources")
-            })
         }
-        .padding()
-        .background(Color(UIColor.systemBackground).opacity(0.8))
+        .task {
+            Task.detached { @MainActor in
+                attribution = await weatherManager.weatherAttribution()
+            }
+        }
     }
+}
+
+#Preview {
+    AttributionView()
 }

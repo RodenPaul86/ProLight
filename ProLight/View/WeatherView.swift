@@ -164,9 +164,8 @@ struct WeatherView: View {
                             }
                         }
                     }
-                    
                     // MARK: Attribution
-                    AppleWeatherAttributionView()
+                    AttributionView()
                 }
                 .padding(.horizontal)
             }
@@ -267,26 +266,5 @@ struct HourlyWeatherCard: View {
         .frame(width: 50, height: 100)
         .background(Color.black.opacity(0.3))
         .cornerRadius(20)
-    }
-}
-
-struct AppleWeatherAttributionView: View {
-    var body: some View {
-        HStack(spacing: 6) {
-            // Apple logo
-            Image(systemName: "apple.logo")
-                .font(.system(size: 10))
-                .foregroundStyle(.white)
-            
-            // Attribution text
-            Text("Weather")
-                .font(.system(size: 15))
-                .foregroundColor(.white)
-            
-            // Link to Apple Weather
-            Link("Other data sources", destination: URL(string: "https://developer.apple.com/weatherkit/data-source-attribution/")!)
-                .font(.system(size: 15))
-        }
-        .padding(.top, 8)
     }
 }
