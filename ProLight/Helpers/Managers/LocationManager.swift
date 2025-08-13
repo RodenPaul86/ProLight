@@ -11,16 +11,23 @@ import CoreLocation
 import SwiftUI
 import WeatherKit
 import WidgetKit
+import UserNotifications
 
+@MainActor
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
+    private let weatherService = WeatherService.shared
     
+    // MARK: - Published properties
     @Published var lastLocation: CLLocation?
     @Published var currentWeather: CurrentWeather?
     @Published var dailyForecast: Forecast<DayWeather>?
     @Published var hourlyForecast: Forecast<HourWeather>?
+    @Published var weatherAlerts: [WeatherAlert] = []  // New property!
     @Published var cityName: String = ""
     @Published var stateName: String = ""
+    @Published var countryCode: String = ""
+    @Published var emergencyNumber: String?
     
     @Published var trackedRoute: [CLLocationCoordinate2D] = []
     @Published var currentLocation: CLLocation?
@@ -28,26 +35,24 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var movingTime: TimeInterval = 0
     @Published var totalDistanceInMeters: Double = 0
     
-    @Published var emergencyNumber: String?
-    @Published var countryCode: String = ""
-    
     private var previousLocation: CLLocation?
     private var previousTimestamp: Date?
     private let movementThreshold: CLLocationDistance = 5.0 // meters
     
     var isTrackingRoute = false
     
+    // MARK: - Initialization
     override init() {
         super.init()
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyBest
-        manager.startUpdatingLocation()
         manager.distanceFilter = kCLDistanceFilterNone
+        manager.startUpdatingLocation()
     }
     
+    // MARK: - Permissions & Location Tracking
     func requestPermission() {
         manager.requestWhenInUseAuthorization()
-        manager.requestLocation()
         manager.startUpdatingLocation()
     }
     
@@ -69,40 +74,23 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         movingTime = 0
     }
     
+    // MARK: - Location Updates
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let newLocation = locations.last, newLocation.horizontalAccuracy >= 0 else { return }
         
         lastLocation = newLocation
         reverseGeocode(location: newLocation)
-        
         saveForWidget(newLocation)
         WidgetCenter.shared.reloadAllTimelines()
         
-        // Fetch weather once, or update when significant change occurs
-        Task {
-            await fetchWeather(for: newLocation)
-        }
+        Task { await fetchWeather(for: newLocation) }
         
         if isTrackingRoute {
-            trackedRoute.append(newLocation.coordinate)
-            
-            if let previous = previousLocation,
-               let previousTime = previousTimestamp {
-                
-                let distance = newLocation.distance(from: previous)
-                let timeDelta = newLocation.timestamp.timeIntervalSince(previousTime)
-                
-                if distance >= movementThreshold {
-                    totalDistanceInMeters += distance
-                    movingTime += timeDelta
-                }
-            }
-            
-            previousLocation = newLocation
-            previousTimestamp = newLocation.timestamp
+            updateMovement(with: newLocation)
         }
     }
     
+    // MARK: - Weather & Alerts
     private func fetchWeather(for location: CLLocation) async {
         do {
             let weather = try await WeatherService.shared.weather(for: location)
@@ -116,47 +104,25 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
     }
     
-    // MARK: Share location with widget
-    func saveForWidget(_ location: CLLocation) {
-        let defaults = UserDefaults(suiteName: "group.app.prolight.widget")
-        defaults?.set(location.coordinate.latitude, forKey: "widget_latitude")
-        defaults?.set(location.coordinate.longitude, forKey: "widget_longitude")
+    // MARK: - Movement Tracking
+    private func updateMovement(with newLocation: CLLocation) {
+        trackedRoute.append(newLocation.coordinate)
         
-        //print("Saved lat/lon:", location.coordinate)
-    }
-}
-
-extension LocationManager {
-    private func lookupEmergencyNumber(for countryCode: String) -> String {
-        let emergencyNumbers: [String: String] = [
-            "US": "911",    // United States
-            "CA": "911",    // Canada
-            "GB": "999",    // United Kingdom
-            "AU": "000",    // Australia
-            "NZ": "111",    // New Zealand
-            "FR": "112",    // France
-            "DE": "112",    // Germany
-            "EU": "112",    // European Union
-            "MX": "911",    // Mexico
-            "BR": "190",    // Brazil (police; 192 for ambulance, 193 for fire)
-            "JP": "110",    // Japan (police; 119 for ambulance/fire)
-            "CN": "110",    // China (police; 120 for ambulance, 119 for fire)
-            "IN": "112",    // India
-            "ZA": "10111",  // South Africa (police; 10177 for ambulance)
-            "RU": "112",    // Russia
-            "SG": "999",    // Singapore
-            "MY": "999",    // Malaysia
-            "HK": "999",    // Hong Kong
-            "KR": "112",    // South Korea (police; 119 ambulance/fire)
-            "TW": "110",    // Taiwan (police; 119 ambulance/fire)
-            "SA": "999",    // Saudi Arabia
-            "AE": "999",    // United Arab Emirates
-            "IL": "100",    // Israel (police; 101 ambulance, 102 fire)
-            "EG": "122",    // Egypt (police; 123 ambulance)
-        ]
-        return emergencyNumbers[countryCode] ?? "112" // default to 112
+        if let previous = previousLocation, let previousTime = previousTimestamp {
+            let distance = newLocation.distance(from: previous)
+            let timeDelta = newLocation.timestamp.timeIntervalSince(previousTime)
+            
+            if distance >= movementThreshold {
+                totalDistanceInMeters += distance
+                movingTime += timeDelta
+            }
+        }
+        
+        previousLocation = newLocation
+        previousTimestamp = newLocation.timestamp
     }
     
+    // MARK: - Geocoding & Emergency
     private func reverseGeocode(location: CLLocation) {
         let geocoder = CLGeocoder()
         geocoder.reverseGeocodeLocation(location) { placemarks, error in
@@ -170,13 +136,29 @@ extension LocationManager {
             DispatchQueue.main.async {
                 self.cityName = placemark.locality ?? ""
                 self.stateName = placemark.administrativeArea ?? ""
-                
-                if let countryCode = placemark.isoCountryCode {
-                    self.countryCode = countryCode
-                    self.emergencyNumber = self.lookupEmergencyNumber(for: countryCode)
+                if let iso = placemark.isoCountryCode {
+                    self.countryCode = iso
+                    self.emergencyNumber = self.lookupEmergencyNumber(for: iso)
                 }
             }
         }
+    }
+    
+    private func lookupEmergencyNumber(for countryCode: String) -> String {
+        [
+            "US": "911", "CA": "911", "GB": "999", "AU": "000", "NZ": "111",
+            "FR": "112", "DE": "112", "EU": "112", "MX": "911", "BR": "190",
+            "JP": "110", "CN": "110", "IN": "112", "ZA": "10111", "RU": "112",
+            "SG": "999", "MY": "999", "HK": "999", "KR": "112", "TW": "110",
+            "SA": "999", "AE": "999", "IL": "100", "EG": "122"
+        ][countryCode] ?? "112"
+    }
+    
+    // MARK: - Widget Sharing
+    private func saveForWidget(_ location: CLLocation) {
+        let defaults = UserDefaults(suiteName: "group.app.prolight.widget")
+        defaults?.set(location.coordinate.latitude, forKey: "widget_latitude")
+        defaults?.set(location.coordinate.longitude, forKey: "widget_longitude")
     }
 }
 

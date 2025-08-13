@@ -120,7 +120,7 @@ struct HomeView: View {
                     modeButtons
                 }
                 .overlay (
-                    HStack {
+                    HStack(alignment: .top) {
                         if let weather = locationManager.currentWeather {
                             let temp = selectedUnit == .fahrenheit
                             ? weather.temperature.converted(to: .fahrenheit)
@@ -155,6 +155,8 @@ struct HomeView: View {
                             }
                         }
                         Spacer()
+                        CompassView()
+                            .frame(width: 80, height: 80)
                     }
                         .padding(.leading)
                         .padding(.top, -10),
