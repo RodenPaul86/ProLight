@@ -16,6 +16,7 @@ enum ControlMode {
     case neutral
     case sos
     case strobe
+    case camping
 }
 
 struct HomeView: View {
@@ -87,6 +88,8 @@ struct HomeView: View {
             return 100 // shift right when SOS is shown
         case .strobe:
             return -100 // shift left when strobe is shown
+        case .camping:
+            return 0
         }
     }
     
@@ -96,6 +99,15 @@ struct HomeView: View {
             return 100 // visible position
         default:
             return 400 // hidden offscreen to the right
+        }
+    }
+    
+    var campingOffset: CGFloat {
+        switch mode {
+        case .camping:
+            return -220
+        default:
+            return -400
         }
     }
     
@@ -110,8 +122,45 @@ struct HomeView: View {
                         sosView
                             .offset(x: sosOffset)
                         
+                        
+                        
+                        
+                        /*
+                        VStack {
+                            if mode == .camping {
+                                campingButton(icon: "tent", color: .green)
+                                    .transition(.move(edge: .leading))
+                                campingButton(icon: "flame.fill", color: .orange)
+                                    .transition(.move(edge: .leading))
+                            }
+                            Spacer()
+                        }
+                         */
+                        
+                        // Camping buttons from LEFT
+                        campingButton(icon: "tent", color: .green)
+                            .offset(x: campingOffset)
+                        
                         flashlightView
                             .offset(x: flashlightOffset)
+                        
+                        
+                        
+                        // Camping buttons from RIGHT
+                        
+                        /*
+                        VStack {
+                            Spacer()
+                            if mode == .camping {
+                                campingButton(icon: "drop.fill", color: .blue)
+                                    .transition(.move(edge: .trailing))
+                                campingButton(icon: "binoculars.fill", color: .purple)
+                                    .transition(.move(edge: .trailing))
+                            }
+                        }
+                        .padding(.horizontal)
+                        .animation(.spring(), value: mode)
+                         */
                             
                         strobeView
                             .offset(x: strobeOffset)
@@ -444,6 +493,31 @@ struct HomeView: View {
         }
     }
     
+    // MARK: Camping controls
+    private func campingButton(icon: String, color: Color) -> some View {
+        Button {
+            print("\(icon) tapped")
+        } label: {
+            curvedRectangle(topRadius: 40, bottomRadius: 0)
+                .fill(color.opacity(0.2))
+                .rotationEffect(.degrees(90))
+                .frame(width: 160, height: 160)
+                .overlay {
+                    VStack {
+                        Text("Emergency")
+                            .bold()
+                            .foregroundStyle(.white)
+                            .padding(.top)
+                            
+                        Spacer()
+                        
+                    }
+                    .rotationEffect(.degrees(90))
+                    
+                }
+        }
+    }
+    
     private func sliderSegment(level: Int, fillColor: Color) -> some View {
         let shape: AnyShape = level == maxLevel ? AnyShape(curvedRectangle(topRadius: 40, bottomRadius: 5)) : AnyShape(RoundedRectangle(cornerRadius: 5))
         
@@ -520,7 +594,7 @@ struct HomeView: View {
         HStack(spacing: 13) {
             modeButton(title: "SOS", subtitle: "Siren", BGColor: sosPressed ? .red : Color("darkGray"))
                 .onTapGesture {
-                    guard mode != .strobe else { return }
+                    guard mode != .strobe && mode != .camping else { return }
                     
                     HapticManager.shared.notify(.impact(.light))
                     sosPressed.toggle()
@@ -529,21 +603,20 @@ struct HomeView: View {
                     }
                 }
             
-            modeButton(title: "Screen", BGColor: screenPressed ? .yellow : Color("darkGray"))
+            modeButton(title: "Camping", BGColor: screenPressed ? .yellow : Color("darkGray"))
                 .onTapGesture {
+                    guard mode != .sos && mode != .strobe else { return }
+                    
                     HapticManager.shared.notify(.impact(.light))
                     screenPressed.toggle()
-                    
-                    if screenPressed {
-                        
-                    } else {
-                        
+                    withAnimation {
+                        mode = mode == .camping ? .neutral : .camping
                     }
                 }
             
             modeButton(title: "Strobe", BGColor: strobePressed ? .blue : Color("darkGray"))
                 .onTapGesture {
-                    guard mode != .sos else { return }
+                    guard mode != .sos && mode != .camping else { return }
                     
                     HapticManager.shared.notify(.impact(.light))
                     strobePressed.toggle()
