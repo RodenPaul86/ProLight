@@ -52,6 +52,7 @@ struct HomeView: View {
     @State private var mode: ControlMode = .neutral
     
     var tabBarHeight: CGFloat
+    @State private var hideTabBar: Bool = false
     
     var scaledOpacity: Double {
         Double(brightnessLevel) / Double(maxLevel)
@@ -102,12 +103,21 @@ struct HomeView: View {
         }
     }
     
-    var campingOffset: CGFloat {
+    var campingOffsetLeft: CGFloat {
         switch mode {
         case .camping:
             return -220
         default:
             return -400
+        }
+    }
+    
+    var campingOffsetRight: CGFloat {
+        switch mode {
+        case .camping:
+            return 220
+        default:
+            return 400
         }
     }
     
@@ -122,45 +132,22 @@ struct HomeView: View {
                         sosView
                             .offset(x: sosOffset)
                         
-                        
-                        
-                        
-                        /*
-                        VStack {
-                            if mode == .camping {
-                                campingButton(icon: "tent", color: .green)
-                                    .transition(.move(edge: .leading))
-                                campingButton(icon: "flame.fill", color: .orange)
-                                    .transition(.move(edge: .leading))
-                            }
-                            Spacer()
-                        }
-                         */
-                        
                         // Camping buttons from LEFT
-                        campingButton(icon: "tent", color: .green)
-                            .offset(x: campingOffset)
+                        VStack(spacing: 20) {
+                            campingButton(icon: "tent", title: "Poisonous Plants", color: .green, rotation: 90, destination: PoisonousPlantsEntryView())
+                            campingButton(icon: "flame.fill", title: "Safety Whistle", color: .orange, rotation: 90, destination: EmptyView())
+                        }
+                        .offset(x: campingOffsetLeft)
                         
                         flashlightView
                             .offset(x: flashlightOffset)
                         
-                        
-                        
                         // Camping buttons from RIGHT
-                        
-                        /*
-                        VStack {
-                            Spacer()
-                            if mode == .camping {
-                                campingButton(icon: "drop.fill", color: .blue)
-                                    .transition(.move(edge: .trailing))
-                                campingButton(icon: "binoculars.fill", color: .purple)
-                                    .transition(.move(edge: .trailing))
-                            }
+                        VStack(spacing: 20) {
+                            campingButton(icon: "drop.fill", title: "Bug Repellent", color: .blue, rotation: -90, destination: UltrasonicRepellentView())
+                            campingButton(icon: "binoculars.fill", title: "First Aid", color: .red, rotation: -90, destination: FirstAidListView())
                         }
-                        .padding(.horizontal)
-                        .animation(.spring(), value: mode)
-                         */
+                        .offset(x: campingOffsetRight)
                             
                         strobeView
                             .offset(x: strobeOffset)
@@ -227,6 +214,7 @@ struct HomeView: View {
             .onAppear {
                 updateTorch()
                 NotificationManager.shared.requestAuthorization()
+                hideTabBar = false
             }
             .onDisappear {
                 flashControllerInstance.stopFlashing()
@@ -494,26 +482,24 @@ struct HomeView: View {
     }
     
     // MARK: Camping controls
-    private func campingButton(icon: String, color: Color) -> some View {
-        Button {
-            print("\(icon) tapped")
+    private func campingButton<Destination: View>(icon: String, title: String, color: Color, rotation: Double, destination: Destination) -> some View {
+        NavigationLink {
+            destination
         } label: {
             curvedRectangle(topRadius: 40, bottomRadius: 0)
                 .fill(color.opacity(0.2))
-                .rotationEffect(.degrees(90))
+                .rotationEffect(.degrees(rotation))
                 .frame(width: 160, height: 160)
                 .overlay {
                     VStack {
-                        Text("Emergency")
+                        Text(title)
                             .bold()
                             .foregroundStyle(.white)
                             .padding(.top)
-                            
-                        Spacer()
                         
+                        Spacer()
                     }
-                    .rotationEffect(.degrees(90))
-                    
+                    .rotationEffect(.degrees(rotation))
                 }
         }
     }
