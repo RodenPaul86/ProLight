@@ -34,7 +34,7 @@ struct ContentView: View {
             case .home: HomeView(tabBarHeight: tabBarHeight)
             case .map: NightWalkMapView(tabBarHeight: tabBarHeight)
             case .fitness: UserActivityView()
-            case .morseCode: Text("TODO: Morse Code")
+            case .morseCode: MorseTranslatorWithAudioView(tabBarHeight: tabBarHeight)
             case .settings: SettingsView(tabBarHeight: tabBarHeight)
             }
         }
