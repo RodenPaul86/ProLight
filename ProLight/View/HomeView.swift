@@ -193,7 +193,7 @@ struct HomeView: View {
                         }
                         Spacer()
                         CompassView()
-                            .frame(width: 80, height: 80)
+                            .frame(width: 65, height: 65)
                     }
                         .padding(.leading)
                         .padding(.top, -10),
