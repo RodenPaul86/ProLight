@@ -32,6 +32,7 @@ struct HomeView: View {
     @State private var strobePressed: Bool = false
     @State private var sosPressed: Bool = false
     @State private var campingPressed: Bool = false
+    @State private var screenPressed: Bool = false
     @State private var aiPressed: Bool = false
     
     @State private var selectedLevel: Int = 4
@@ -591,6 +592,8 @@ struct HomeView: View {
                         mode = mode == .sos ? .neutral : .sos
                     }
                 }
+            
+            //modeButton(icon: "iphone", BGColor: screenPressed ? .yellow : Color("darkGray"))
             
             modeButton(icon: "tent.fill", BGColor: campingPressed ? .green : Color("darkGray"))
                 .onTapGesture {
