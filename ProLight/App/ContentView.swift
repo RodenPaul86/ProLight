@@ -9,7 +9,6 @@ import SwiftUI
 
 enum AppTab: String, CaseIterable, FloatingTabProtocol {
     case home = "Home"
-    case morseCode = "Code"
     case map = "Map"
     case fitness = "Fitness"
     case settings = "Settings"
@@ -17,7 +16,6 @@ enum AppTab: String, CaseIterable, FloatingTabProtocol {
     var symbolImage: String {
         switch self {
         case .home: "flashlight.on.fill"
-        case .morseCode: "dot.radiowaves.left.and.right"
         case .map: "point.topleft.filled.down.to.point.bottomright.curvepath"
         case .fitness: "chart.line.uptrend.xyaxis"
         case .settings: "gear"
@@ -34,7 +32,6 @@ struct ContentView: View {
             case .home: HomeView(tabBarHeight: tabBarHeight)
             case .map: NightWalkMapView(tabBarHeight: tabBarHeight)
             case .fitness: UserActivityView()
-            case .morseCode: MorseTranslatorWithAudioView(tabBarHeight: tabBarHeight)
             case .settings: SettingsView(tabBarHeight: tabBarHeight)
             }
         }

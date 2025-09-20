@@ -16,166 +16,162 @@ struct MorseTranslatorWithAudioView: View {
     @State private var showingShare = false
     @State private var shareText: String = ""
     
-    var tabBarHeight: CGFloat
-    
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 12) {
-                    // Mode + separator
-                    HStack {
-                        Picker("", selection: $vm.mode) {
-                            ForEach(MorseAudioViewModel.Mode.allCases, id: \.self) { mode in
-                                Text(mode.label).tag(mode)
-                            }
-                        }
-                        .pickerStyle(SegmentedPickerStyle())
-                        
-                        Spacer()
-                        
-                        Menu {
-                            Picker("Letter separator", selection: $vm.separatorMode) {
-                                ForEach(MorseAudioViewModel.SeparatorMode.allCases, id: \.self) {
-                                    Text($0.label).tag($0)
-                                }
-                            }
-                        } label: {
-                            Label("Separator", systemImage: "ellipsis.circle")
+        ScrollView {
+            VStack(spacing: 12) {
+                // Mode + separator
+                HStack {
+                    Picker("", selection: $vm.mode) {
+                        ForEach(MorseAudioViewModel.Mode.allCases, id: \.self) { mode in
+                            Text(mode.label).tag(mode)
                         }
                     }
-                    .padding(.horizontal)
+                    .pickerStyle(SegmentedPickerStyle())
                     
-                    // Input
-                    Group {
-                        Text("Input").font(.headline).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal)
-                        TextEditor(text: $vm.input)
-                            .padding(8)
-                            .frame(minHeight: 120)
-                            .background(RoundedRectangle(cornerRadius: 10).stroke(Color.secondary.opacity(0.2)))
-                            .padding(.horizontal)
-                    }
+                    Spacer()
                     
-                    
-                    HStack {
-                        Button(action: vm.swap) {
-                            Image(systemName: "arrow.left.arrow.right")
-                                .font(.headline)
-                                .padding(.horizontal)
-                                .padding(.vertical, 8)
-                                .background(RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.2)))
-                        }
-                        
-                        Button(action: { UIPasteboard.general.string = vm.input }) {
-                            Image(systemName: "doc.on.doc")
-                                .font(.headline)
-                                .padding(.horizontal)
-                                .padding(.vertical, 8)
-                                .background(RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.2)))
-                        }
-                        
-                        Button(action: {
-                            vm.clear()
-                        }) {
-                            Image(systemName: "trash")
-                                .font(.headline)
-                                .foregroundStyle(.red)
-                                .padding(.horizontal)
-                                .padding(.vertical, 8)
-                                .background(RoundedRectangle(cornerRadius: 10).fill(Color.red.opacity(0.2)))
-                        }
-                        
-                        Button(action: {
-                            UIApplication.shared.dismissKeyboard()
-                            vm.computeTranslation()
-                            if vm.isFlashEnabled == true {
-                                vm.flashCurrentOutput()
+                    Menu {
+                        Picker("Letter separator", selection: $vm.separatorMode) {
+                            ForEach(MorseAudioViewModel.SeparatorMode.allCases, id: \.self) {
+                                Text($0.label).tag($0)
                             }
-                        }) {
-                            Label("Translate", systemImage: "captions.bubble")
-                                .font(.headline)
-                                .padding(.horizontal)
-                                .padding(.vertical, 8)
-                                .frame(maxWidth: .infinity)
-                                .background(RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.2)))
                         }
+                    } label: {
+                        Label("Separator", systemImage: "ellipsis.circle")
                     }
-                    .padding(.horizontal)
-                    
-                    // Output
-                    Group {
-                        Text("Output").font(.headline).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal)
-                        ScrollView {
-                            Text(vm.output).frame(maxWidth: .infinity, alignment: .leading).padding(12)
-                        }
+                }
+                .padding(.horizontal)
+                
+                // Input
+                Group {
+                    Text("Input").font(.headline).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal)
+                    TextEditor(text: $vm.input)
+                        .padding(8)
                         .frame(minHeight: 120)
                         .background(RoundedRectangle(cornerRadius: 10).stroke(Color.secondary.opacity(0.2)))
                         .padding(.horizontal)
+                }
+                
+                
+                HStack {
+                    Button(action: vm.swap) {
+                        Image(systemName: "arrow.left.arrow.right")
+                            .font(.headline)
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.2)))
                     }
                     
-                    // Controls: WPM + Play
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text("WPM: \(vm.wpm)")
-                            Slider(value: $vm.wpmDouble, in: 5...40, step: 1)
-                                .frame(minWidth: 180)
-                                .onChange(of: vm.wpmDouble) { _, _ in vm.updateWPM() }
-                        }
-                        
-                        Spacer()
-                        
-                        Button(action: {
-                            if vm.isPlaying { vm.stopPlayback() } else { vm.playCurrentOutput() }
-                        }) {
-                            Label(vm.isPlaying ? "Stop" : "Play", systemImage: vm.isPlaying ? "stop.fill" : "play.fill")
-                                .padding(.horizontal)
-                                .padding(.vertical, 8)
-                                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.primary))
-                        }
+                    Button(action: { UIPasteboard.general.string = vm.input }) {
+                        Image(systemName: "doc.on.doc")
+                            .font(.headline)
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.2)))
                     }
-                    .padding(.horizontal)
                     
-                    HStack(spacing: 12) {
-                        Button(action: { UIPasteboard.general.string = vm.output }) {
-                            Image(systemName: "doc.on.doc")
-                                .font(.headline)
-                                .padding(.horizontal)
-                                .padding(.vertical, 8)
-                                .background(RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.2)))
-                        }
-                        
-                        Button(action: {
-                            shareText = vm.output
-                            showingShare = true
-                        }) {
-                            Image(systemName: "square.and.arrow.up")
-                                .font(.headline)
-                                .padding(.horizontal)
-                                .padding(.vertical, 8)
-                                .background(RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.2)))
-                        }
-                        
-                        Spacer()
-                        
-                        Text("letter sep: \(vm.letterSeparatorDescription)").font(.caption).foregroundColor(.secondary)
+                    Button(action: {
+                        vm.clear()
+                    }) {
+                        Image(systemName: "trash")
+                            .font(.headline)
+                            .foregroundStyle(.red)
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.red.opacity(0.2)))
                     }
+                    
+                    Button(action: {
+                        UIApplication.shared.dismissKeyboard()
+                        vm.computeTranslation()
+                        if vm.isFlashEnabled == true {
+                            vm.flashCurrentOutput()
+                        }
+                    }) {
+                        Label("Translate", systemImage: "captions.bubble")
+                            .font(.headline)
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            .frame(maxWidth: .infinity)
+                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.2)))
+                    }
+                }
+                .padding(.horizontal)
+                
+                // Output
+                Group {
+                    Text("Output").font(.headline).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal)
+                    ScrollView {
+                        Text(vm.output).frame(maxWidth: .infinity, alignment: .leading).padding(12)
+                    }
+                    .frame(minHeight: 120)
+                    .background(RoundedRectangle(cornerRadius: 10).stroke(Color.secondary.opacity(0.2)))
                     .padding(.horizontal)
+                }
+                
+                // Controls: WPM + Play
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("WPM: \(vm.wpm)")
+                        Slider(value: $vm.wpmDouble, in: 5...40, step: 1)
+                            .frame(minWidth: 180)
+                            .onChange(of: vm.wpmDouble) { _, _ in vm.updateWPM() }
+                    }
                     
                     Spacer()
-                }
-            }
-            .navigationTitle("Morse Code")
-            .safeAreaPadding(.bottom, tabBarHeight)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: { vm.isFlashEnabled.toggle() }) {
-                        Image(systemName:vm.isFlashEnabled ? "bolt.fill" : "bolt.slash")
+                    
+                    Button(action: {
+                        if vm.isPlaying { vm.stopPlayback() } else { vm.playCurrentOutput() }
+                    }) {
+                        Label(vm.isPlaying ? "Stop" : "Play", systemImage: vm.isPlaying ? "stop.fill" : "play.fill")
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            .background(RoundedRectangle(cornerRadius: 8).stroke(Color.primary))
                     }
                 }
+                .padding(.horizontal)
+                
+                HStack(spacing: 12) {
+                    Button(action: { UIPasteboard.general.string = vm.output }) {
+                        Image(systemName: "doc.on.doc")
+                            .font(.headline)
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.2)))
+                    }
+                    
+                    Button(action: {
+                        shareText = vm.output
+                        showingShare = true
+                    }) {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.headline)
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.2)))
+                    }
+                    
+                    Spacer()
+                    
+                    Text("letter sep: \(vm.letterSeparatorDescription)").font(.caption).foregroundColor(.secondary)
+                }
+                .padding(.horizontal)
+                
+                Spacer()
             }
-            .onAppear { vm.start() }
-            .sheet(isPresented: $showingShare) {
-                ActivityViewController(activityItems: [shareText])
+        }
+        .navigationTitle("Morse Code")
+        .navigationBarTitleDisplayMode(.automatic)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: { vm.isFlashEnabled.toggle() }) {
+                    Image(systemName:vm.isFlashEnabled ? "bolt.fill" : "bolt.slash")
+                }
             }
+        }
+        .onAppear { vm.start() }
+        .sheet(isPresented: $showingShare) {
+            ActivityViewController(activityItems: [shareText])
         }
     }
 }

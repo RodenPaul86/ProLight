@@ -59,38 +59,46 @@ struct WeatherView: View {
                             .foregroundStyle(.white)
                     }
                     
-                    Text("Today")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.7))
-                    
                     // MARK: Today + daily cards
                     HStack(spacing: 12) {
-                        TodayWeatherCard(
-                            temp: "\(Int(temp.value))°",
-                            description: weather.condition.description.capitalized,
-                            imageName: nowSymbol,
-                            low: "\(Int(low.value))°",
-                            high: "\(Int(high.value))°"
-                        )
+                        VStack(alignment: .leading) {
+                            Text("Today")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.7))
+                            
+                            TodayWeatherCard(
+                                temp: "\(Int(temp.value))°",
+                                description: weather.condition.description.capitalized,
+                                imageName: nowSymbol,
+                                low: "\(Int(low.value))°",
+                                high: "\(Int(high.value))°"
+                            )
+                        }
                         
-                        if let daily = locationManager.dailyForecast?.forecast.dropFirst().prefix(6) {
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 8) {
-                                    ForEach(Array(daily.enumerated()), id: \.offset) { index, day in
-                                        let high = selectedUnit == .fahrenheit
-                                        ? day.highTemperature.converted(to: .fahrenheit)
-                                        : day.highTemperature.converted(to: .celsius)
-                                        
-                                        let symbol = day.symbolName == "wind" ? "wind" : "\(day.symbolName).fill"
-                                        let weekday = Calendar.current.shortWeekdaySymbols[
-                                            Calendar.current.component(.weekday, from: day.date) - 1
-                                        ]
-                                        
-                                        DailyWeatherCard(
-                                            day: weekday.uppercased(),
-                                            temp: "\(Int(high.value))°",
-                                            imageName: symbol
-                                        )
+                        VStack(alignment: .leading) {
+                            Text("Week")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.7))
+                            
+                            if let daily = locationManager.dailyForecast?.forecast.dropFirst().prefix(6) {
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: 8) {
+                                        ForEach(Array(daily.enumerated()), id: \.offset) { index, day in
+                                            let high = selectedUnit == .fahrenheit
+                                            ? day.highTemperature.converted(to: .fahrenheit)
+                                            : day.highTemperature.converted(to: .celsius)
+                                            
+                                            let symbol = day.symbolName == "wind" ? "wind" : "\(day.symbolName).fill"
+                                            let weekday = Calendar.current.shortWeekdaySymbols[
+                                                Calendar.current.component(.weekday, from: day.date) - 1
+                                            ]
+                                            
+                                            DailyWeatherCard(
+                                                day: weekday.uppercased(),
+                                                temp: "\(Int(high.value))°",
+                                                imageName: symbol
+                                            )
+                                        }
                                     }
                                 }
                             }

@@ -28,10 +28,10 @@ struct HomeView: View {
     @State private var intensityLevel: Int = 1
     @State private var flashlightOn: Bool = true
     @State private var isLockedPower: Bool = false
-    @State private var strobePressed: Bool = false
     @State private var showSecondSlider: Bool = false
+    @State private var strobePressed: Bool = false
     @State private var sosPressed: Bool = false
-    @State private var screenPressed: Bool = false
+    @State private var campingPressed: Bool = false
     @State private var aiPressed: Bool = false
     
     @State private var selectedLevel: Int = 4
@@ -128,6 +128,7 @@ struct HomeView: View {
                 
                 VStack(spacing: 40) {
                     Spacer()
+                    // MARK: Camping Functions
                     ZStack(alignment: .top) {
                         sosView
                             .offset(x: sosOffset)
@@ -135,7 +136,7 @@ struct HomeView: View {
                         // Camping buttons from LEFT
                         VStack(spacing: 20) {
                             campingButton(icon: "tent", title: "Poisonous Plants", color: .green, rotation: 90, destination: PoisonousPlantsEntryView())
-                            campingButton(icon: "flame.fill", title: "Safety Whistle", color: .orange, rotation: 90, destination: EmptyView())
+                            campingButton(icon: "flame.fill", title: "Morse Code", color: .orange, rotation: 90, destination: MorseTranslatorWithAudioView())
                         }
                         .offset(x: campingOffsetLeft)
                         
@@ -235,6 +236,7 @@ struct HomeView: View {
         }
     }
     
+    // MARK: Flashlight Indicator
     private var flashlightIndicator: some View {
         VStack(spacing: 8) {
             let scaledOpacity = Double(brightnessLevel) / Double(maxLevel)
@@ -518,6 +520,7 @@ struct HomeView: View {
             }
     }
     
+    // MARK: Main Power Button
     private var powerButton: some View {
         ZStack {
             curvedRectangle(topRadius: 0, bottomRadius: 40)
@@ -578,7 +581,7 @@ struct HomeView: View {
     // MARK: Mode Buttons
     private var modeButtons: some View {
         HStack(spacing: 13) {
-            modeButton(title: "SOS", subtitle: "Siren", BGColor: sosPressed ? .red : Color("darkGray"))
+            modeButton(icon: "sos", BGColor: sosPressed ? .red : Color("darkGray"))
                 .onTapGesture {
                     guard mode != .strobe && mode != .camping else { return }
                     
@@ -589,18 +592,18 @@ struct HomeView: View {
                     }
                 }
             
-            modeButton(title: "Camping", BGColor: screenPressed ? .yellow : Color("darkGray"))
+            modeButton(icon: "tent.fill", BGColor: campingPressed ? .green : Color("darkGray"))
                 .onTapGesture {
                     guard mode != .sos && mode != .strobe else { return }
                     
                     HapticManager.shared.notify(.impact(.light))
-                    screenPressed.toggle()
+                    campingPressed.toggle()
                     withAnimation {
                         mode = mode == .camping ? .neutral : .camping
                     }
                 }
             
-            modeButton(title: "Strobe", BGColor: strobePressed ? .blue : Color("darkGray"))
+            modeButton(icon: "light.beacon.max.fill", BGColor: strobePressed ? .blue : Color("darkGray"))
                 .onTapGesture {
                     guard mode != .sos && mode != .camping else { return }
                     
@@ -629,7 +632,7 @@ struct HomeView: View {
                 }
             
             if isAssistantEnabled {
-                modeButton(title: "AI", subtitle: "Assistant", BGColor: aiPressed ? .green : Color("darkGray"))
+                modeButton(icon: "questionmark.bubble", BGColor: aiPressed ? .purple : Color("darkGray"))
                     .onTapGesture {
                         HapticManager.shared.notify(.impact(.light))
                         aiPressed.toggle()
@@ -638,18 +641,11 @@ struct HomeView: View {
         }
     }
     
-    private func modeButton(title: String, subtitle: String? = nil, BGColor: Color = Color("darkGray")) -> some View {
+    private func modeButton(icon: String, BGColor: Color = Color.blue) -> some View {
         VStack(spacing: 4) {
-            Text(title)
-                .font(.headline)
+            Image(systemName: icon)
+                .font(.title)
                 .foregroundColor(.white)
-            
-            if let subtitle = subtitle {
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundColor(.gray)
-                    .multilineTextAlignment(.leading)
-            }
         }
         .padding(.horizontal, 5)
         .frame(maxWidth: .infinity, maxHeight: 70, alignment: .center)
