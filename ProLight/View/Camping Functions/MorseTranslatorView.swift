@@ -15,6 +15,7 @@ struct MorseTranslatorWithAudioView: View {
     @StateObject private var vm = MorseAudioViewModel()
     @State private var showingShare = false
     @State private var shareText: String = ""
+    @State private var hideTabBar: Bool = false
     
     var body: some View {
         ScrollView {
@@ -52,7 +53,6 @@ struct MorseTranslatorWithAudioView: View {
                         .padding(.horizontal)
                 }
                 
-                
                 HStack {
                     Button(action: vm.swap) {
                         Image(systemName: "arrow.left.arrow.right")
@@ -71,6 +71,7 @@ struct MorseTranslatorWithAudioView: View {
                     }
                     
                     Button(action: {
+                        UIApplication.shared.dismissKeyboard()
                         vm.clear()
                     }) {
                         Image(systemName: "trash")
@@ -111,27 +112,6 @@ struct MorseTranslatorWithAudioView: View {
                 
                 // Controls: WPM + Play
                 HStack {
-                    VStack(alignment: .leading) {
-                        Text("WPM: \(vm.wpm)")
-                        Slider(value: $vm.wpmDouble, in: 5...40, step: 1)
-                            .frame(minWidth: 180)
-                            .onChange(of: vm.wpmDouble) { _, _ in vm.updateWPM() }
-                    }
-                    
-                    Spacer()
-                    
-                    Button(action: {
-                        if vm.isPlaying { vm.stopPlayback() } else { vm.playCurrentOutput() }
-                    }) {
-                        Label(vm.isPlaying ? "Stop" : "Play", systemImage: vm.isPlaying ? "stop.fill" : "play.fill")
-                            .padding(.horizontal)
-                            .padding(.vertical, 8)
-                            .background(RoundedRectangle(cornerRadius: 8).stroke(Color.primary))
-                    }
-                }
-                .padding(.horizontal)
-                
-                HStack(spacing: 12) {
                     Button(action: { UIPasteboard.general.string = vm.output }) {
                         Image(systemName: "doc.on.doc")
                             .font(.headline)
@@ -153,7 +133,27 @@ struct MorseTranslatorWithAudioView: View {
                     
                     Spacer()
                     
+                    Button(action: { if vm.isPlaying { vm.stopPlayback() } else { vm.playCurrentOutput() } }) {
+                        Label(vm.isPlaying ? "Stop" : "Play", systemImage: vm.isPlaying ? "stop.fill" : "play.fill")
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            .frame(maxWidth: .infinity)
+                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.2)))
+                    }
+                }
+                .padding(.horizontal)
+                
+                VStack(alignment: .leading) {
+                    Text("WPM: \(vm.wpm)")
+                    Slider(value: $vm.wpmDouble, in: 5...40, step: 1)
+                        .frame(minWidth: 180)
+                        .onChange(of: vm.wpmDouble) { _, _ in vm.updateWPM() }
+                }
+                .padding(.horizontal)
+                
+                HStack(spacing: 12) {
                     Text("letter sep: \(vm.letterSeparatorDescription)").font(.caption).foregroundColor(.secondary)
+                    Spacer()
                 }
                 .padding(.horizontal)
                 
@@ -161,7 +161,11 @@ struct MorseTranslatorWithAudioView: View {
             }
         }
         .navigationTitle("Morse Code")
-        .navigationBarTitleDisplayMode(.automatic)
+        .hideFloatingTabBar(hideTabBar)
+        .onAppear {
+            hideTabBar = true
+            vm.start()
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: { vm.isFlashEnabled.toggle() }) {
@@ -169,7 +173,6 @@ struct MorseTranslatorWithAudioView: View {
                 }
             }
         }
-        .onAppear { vm.start() }
         .sheet(isPresented: $showingShare) {
             ActivityViewController(activityItems: [shareText])
         }
@@ -279,12 +282,13 @@ final class MorseAudioViewModel: ObservableObject {
     }
     
     // MARK: Published
-    @Published var input: String = "Enter text or Morse code" { didSet { publishInputChange() } }
+    @Published var input: String = "" { didSet { publishInputChange() } }
     @Published private(set) var output: String = ""
     @Published var mode: Mode = .auto { didSet { computeTranslation() } }
     @Published var autoTranslate: Bool = true
     @Published var separatorMode: SeparatorMode = .slash { didSet { computeTranslation() } }
     @Published var isFlashEnabled: Bool = false
+    @Published var isSpeakerEnable: Bool = false
     
     // WPM controls (exposed as Double for Slider)
     @Published var wpm: Int = 18 { didSet { updateDurations() } }
