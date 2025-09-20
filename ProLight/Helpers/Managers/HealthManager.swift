@@ -54,21 +54,34 @@ class HealthManager: ObservableObject {
     func fetchTodaySteps() {
         let steps = HKQuantityType(.stepCount)
         let predicate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
+        
         let query = HKStatisticsQuery(quantityType: steps, quantitySamplePredicate: predicate) { _, result, error in
-            guard let quantity = result?.sumQuantity(), error == nil else {
-                print("error fetching todays step count...")
-                return
+            var displayAmount: String
+            
+            if let error = error {
+                print("error fetching todays step count: \(error.localizedDescription)")
+                displayAmount = "Error"
+            } else if let quantity = result?.sumQuantity() {
+                let stepCount = quantity.doubleValue(for: .count())
+                displayAmount = stepCount.formattedString() ?? "0"
+                print(stepCount.formattedString())
+            } else {
+                // No data for today
+                displayAmount = "No Data"
             }
             
-            let stepCount = quantity.doubleValue(for: .count())
-            let displayAmount = stepCount.formattedString() ?? "No Data"
-            let activity = cardElements(id: 0, title: "Steps", subtitle: "Steps", image: "shoeprints.fill", tintColor: .green, amount: displayAmount)
+            let activity = cardElements(
+                id: 0,
+                title: "Steps",
+                subtitle: "Steps",
+                image: "shoeprints.fill",
+                tintColor: .green,
+                amount: displayAmount
+            )
             
             DispatchQueue.main.async {
                 self.activities["todaySteps"] = activity
             }
-            
-            print(stepCount.formattedString())
         }
         healthStore.execute(query)
     }
