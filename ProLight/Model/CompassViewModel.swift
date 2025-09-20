@@ -23,8 +23,13 @@ class CompassViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
     }
     
+    func locationManagerShouldDisplayHeadingCalibration(_ manager: CLLocationManager) -> Bool {
+        return true
+    }
+    
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
-        let newAngle = newHeading.magneticHeading
+        guard newHeading.headingAccuracy >= 0 else { return } // invalid reading
+        let newAngle = newHeading.trueHeading > 0 ? newHeading.trueHeading : newHeading.magneticHeading
         DispatchQueue.main.async {
             self.heading = newAngle
             self.directionText = self.headingToDirection(angle: newAngle)
@@ -91,7 +96,7 @@ struct CompassView: View {
                         .foregroundColor(.red)
                         .offset(y: -(size / 2) + size * 0.1)
                 }
-                .rotationEffect(.degrees(viewModel.heading))
+                .rotationEffect(.degrees(-viewModel.heading))
                 
                 // Center direction text
                 Text(viewModel.directionText)
