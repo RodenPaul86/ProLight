@@ -25,7 +25,6 @@ struct AttributionView: View {
                     ProgressView()
                 }
                 Text(.init("[\(attribution.serviceName)](\(attribution.legalPageURL))"))
-                //Text()
             }
         }
         .task {

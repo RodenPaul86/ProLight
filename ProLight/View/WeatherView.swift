@@ -27,7 +27,7 @@ struct WeatherView: View {
     }
     
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             Color("darkGray").ignoresSafeArea()
             
             if let weather = locationManager.currentWeather,
@@ -76,7 +76,7 @@ struct WeatherView: View {
                         }
                         
                         VStack(alignment: .leading) {
-                            Text("Week")
+                            Text("Rest of the Week")
                                 .font(.caption)
                                 .foregroundColor(.white.opacity(0.7))
                             
@@ -172,15 +172,21 @@ struct WeatherView: View {
                             }
                         }
                     }
-                    // MARK: Attribution
-                    AttributionView()
                 }
+                .padding(.top, 20)
                 .padding(.horizontal)
+                .overlay(alignment: .bottom) {
+                    AttributionView()
+                        .padding(.bottom)
+                        .ignoresSafeArea(.container, edges: .bottom)
+                        .offset(y: 90)
+                }
             }
         }
     }
 }
 
+// MARK: Today's Card
 struct TodayWeatherCard: View {
     var temp: String
     var description: String
@@ -223,6 +229,7 @@ struct TodayWeatherCard: View {
     }
 }
 
+// MARK: Daily Card
 struct DailyWeatherCard: View {
     var day: String
     var temp: String
@@ -250,6 +257,7 @@ struct DailyWeatherCard: View {
     }
 }
 
+// MARK: Hourly Card
 struct HourlyWeatherCard: View {
     var hour: String
     var temp: String
@@ -276,3 +284,4 @@ struct HourlyWeatherCard: View {
         .cornerRadius(20)
     }
 }
+
