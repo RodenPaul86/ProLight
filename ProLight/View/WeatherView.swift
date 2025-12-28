@@ -45,7 +45,19 @@ struct WeatherView: View {
                 ? today.highTemperature.converted(to: .fahrenheit)
                 : today.highTemperature.converted(to: .celsius)
                 
-                let nowSymbol = weather.symbolName == "wind" ? "wind" : "\(weather.symbolName).fill"
+                //let nowSymbol = weather.symbolName == "wind" ? "wind" : "\(weather.symbolName).fill"
+                
+                let nowSymbol: String = {
+                    if weather.symbolName == "wind" {
+                        return "wind"
+                    }
+                    
+                    if weather.symbolName == "snowflake" {
+                        return "snowflake"
+                    }
+                    
+                    return "\(weather.symbolName).fill"
+                }()
                 
                 VStack(alignment: .leading, spacing: 10) {
                     // MARK: City name + State name
@@ -88,7 +100,20 @@ struct WeatherView: View {
                                             ? day.highTemperature.converted(to: .fahrenheit)
                                             : day.highTemperature.converted(to: .celsius)
                                             
-                                            let symbol = day.symbolName == "wind" ? "wind" : "\(day.symbolName).fill"
+                                            //let symbol = day.symbolName == "wind" ? "wind" : "\(day.symbolName).fill"
+                                            
+                                            let symbol: String = {
+                                                if day.symbolName == "wind" {
+                                                    return "wind"
+                                                }
+                                                
+                                                if day.symbolName == "snowflake" {
+                                                    return "snowflake"
+                                                }
+                                                
+                                                return "\(day.symbolName).fill"
+                                            }()
+                                            
                                             let weekday = Calendar.current.shortWeekdaySymbols[
                                                 Calendar.current.component(.weekday, from: day.date) - 1
                                             ]
@@ -123,7 +148,20 @@ struct WeatherView: View {
                         
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 12) {
-                                let nowSymbol = weather.symbolName == "wind" ? "wind" : "\(weather.symbolName).fill"
+                                // Weather for right now
+                                //let nowSymbol = weather.symbolName == "wind" ? "wind" : "\(weather.symbolName).fill"
+                                
+                                let nowSymbol: String = {
+                                    if weather.symbolName == "wind" {
+                                        return "wind"
+                                    }
+                                    
+                                    if weather.symbolName == "snowflake" {
+                                        return "snowflake"
+                                    }
+                                    
+                                    return "\(weather.symbolName).fill"
+                                }()
                                 
                                 HourlyWeatherCard(
                                     hour: "Now",
@@ -131,13 +169,25 @@ struct WeatherView: View {
                                     imageName: nowSymbol
                                 )
                                 
-                                // Next hours from WeatherKit
+                                // The hours after current aka: now
                                 ForEach(Array(hourly), id: \.date) { hourData in
                                     let hourTemp = selectedUnit == .fahrenheit
                                     ? hourData.temperature.converted(to: .fahrenheit)
                                     : hourData.temperature.converted(to: .celsius)
                                     
-                                    let symbol = hourData.symbolName == "wind" ? "wind" : "\(hourData.symbolName).fill"
+                                    //let symbol = hourData.symbolName == "wind" ? "wind" : "\(hourData.symbolName).fill"
+                                    
+                                    let symbol: String = {
+                                        if hourData.symbolName == "wind" {
+                                            return "wind"
+                                        }
+                                        
+                                        if hourData.symbolName == "snowflake" {
+                                            return "snowflake"
+                                        }
+                                        
+                                        return "\(hourData.symbolName).fill"
+                                    }()
                                     
                                     // Special case for sunrise/sunset
                                     if let sunrise = todaySunrise, Calendar.current.isDate(hourData.date, equalTo: sunrise, toGranularity: .hour) {
@@ -146,22 +196,19 @@ struct WeatherView: View {
                                             temp: "Sunrise",
                                             imageName: "sunrise.fill"
                                         )
-                                    }
-                                    else if let sunset = todaySunset, Calendar.current.isDate(hourData.date, equalTo: sunset, toGranularity: .hour) {
+                                    } else if let sunset = todaySunset, Calendar.current.isDate(hourData.date, equalTo: sunset, toGranularity: .hour) {
                                         HourlyWeatherCard(
                                             hour: formattedHour(sunset),
                                             temp: "Sunset",
                                             imageName: "sunset.fill"
                                         )
-                                    }
-                                    else if let tomorrowSunrise = tomorrowSunrise, Calendar.current.isDate(hourData.date, equalTo: tomorrowSunrise, toGranularity: .hour) {
+                                    } else if let tomorrowSunrise = tomorrowSunrise, Calendar.current.isDate(hourData.date, equalTo: tomorrowSunrise, toGranularity: .hour) {
                                         HourlyWeatherCard(
                                             hour: formattedHour(tomorrowSunrise),
                                             temp: "Sunrise",
                                             imageName: "sunrise.fill"
                                         )
-                                    }
-                                    else {
+                                    } else {
                                         HourlyWeatherCard(
                                             hour: formattedHour(hourData.date),
                                             temp: "\(Int(hourTemp.value))°",
@@ -219,8 +266,8 @@ struct TodayWeatherCard: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 50, height: 50)
-                .symbolRenderingMode(imageName == "wind" ? .monochrome : .multicolor)
-                .foregroundStyle(imageName == "wind" ? .white : .primary)
+                .symbolRenderingMode(["wind", "snowflake"].contains(imageName) ? .monochrome : .multicolor)
+                .foregroundStyle(.white)
         }
         .padding()
         .frame(width: 220, height: 100)
@@ -244,8 +291,8 @@ struct DailyWeatherCard: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 24, height: 24)
-                .symbolRenderingMode(imageName == "wind" ? .monochrome : .multicolor)
-                .foregroundStyle(imageName == "wind" ? .white : .primary)
+                .symbolRenderingMode(["wind", "snowflake"].contains(imageName) ? .monochrome : .multicolor)
+                .foregroundStyle(.white)
             Text(temp)
                 .font(.caption)
                 .foregroundColor(.white)
@@ -272,8 +319,8 @@ struct HourlyWeatherCard: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 24, height: 24)
-                .symbolRenderingMode(imageName == "wind" ? .monochrome : .multicolor)
-                .foregroundStyle(imageName == "wind" ? .white : .primary)
+                .symbolRenderingMode(["wind", "snowflake"].contains(imageName) ? .monochrome : .multicolor)
+                .foregroundStyle(.white)
             Text(temp)
                 .font(.caption)
                 .foregroundStyle(.white)
