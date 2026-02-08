@@ -12,11 +12,19 @@ import WeatherKit
 import CoreLocation
 import ActivityKit
 
+// MARK: - Control State
 enum ControlMode {
     case neutral
     case sos
     case strobe
     case camping
+}
+
+// MARK: - SOS State
+enum SOSState: Equatable {
+    case idle
+    case countdown(Int)
+    case sounding
 }
 
 struct HomeView: View {
@@ -32,12 +40,17 @@ struct HomeView: View {
     @State private var strobePressed: Bool = false
     @State private var sosPressed: Bool = false
     @State private var campingPressed: Bool = false
-    @State private var screenPressed: Bool = false
     @State private var aiPressed: Bool = false
     
     @State private var selectedLevel: Int = 4
     @State private var selectedFrequency: Double? = nil
     @State private var selectedMaxFrequency: Double? = nil
+    
+    @State private var sosState: SOSState = .idle
+    @State private var countdownTimer: Timer?
+    
+    @State private var countdownValue = 3
+    @State private var glow = false
     
     @StateObject private var locationManager = LocationManager()
     @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
@@ -379,40 +392,13 @@ struct HomeView: View {
                     .disabled(mode == .sos || mode == .strobe || isLockedPower)
                 
                 if sosPressed {
-                    Button(action: {}) {
+                    Button(action: { handleSOSAction() }) {
                         RoundedRectangle(cornerRadius: 5)
-                            .fill(Color("darkRed"))
+                            .fill(backgroundColor)
                             .frame(width: 125, height: 250)
-                            .overlay {
-                                VStack(spacing: 4) {
-                                    Image(systemName: "speaker.wave.2.circle.fill")
-                                        .font(.system(size: 30))
-                                        .foregroundStyle(.white)
-                                        .overlay {
-                                            ZStack {
-                                                Triangle()
-                                                    .fill(Color.black)
-                                                    .frame(width: 10, height: 10)
-                                                
-                                                Image(systemName: "exclamationmark.triangle.fill")
-                                                    .foregroundStyle(.red)
-                                            }
-                                            .offset(x: 13, y: 10) // x = side to side and y = up and down
-                                        }
-                                    
-                                    Text("Emergency Siren")
-                                        .foregroundStyle(.white)
-                                    
-                                    RoundedRectangle(cornerRadius: 2)
-                                        .fill(Color.red)
-                                        .frame(width: 45, height: 2)
-                                        .padding([.top, .bottom], 12)
-                                    
-                                    Text("3 SECONDS DELAY")
-                                        .font(.system(size: 14))
-                                        .foregroundStyle(.white)
-                                }
-                            }
+                            .overlay(content)
+                            .overlay(glowOverlay)
+                            .animation(.easeInOut, value: sosState)
                     }
                 } else {
                     ForEach((1..<(maxLevel)).reversed(), id: \.self) { level in
@@ -593,8 +579,12 @@ struct HomeView: View {
                     }
                 }
             
-            //modeButton(icon: "iphone", BGColor: screenPressed ? .yellow : Color("darkGray"))
+            modeButton(icon: "iphone", BGColor: Color("darkGray"))
+                .onTapGesture {
+                    HapticManager.shared.notify(.impact(.light))
+                }
             
+            /*
             modeButton(icon: "tent.fill", BGColor: campingPressed ? .green : Color("darkGray"))
                 .onTapGesture {
                     guard mode != .sos && mode != .strobe else { return }
@@ -605,6 +595,7 @@ struct HomeView: View {
                         mode = mode == .camping ? .neutral : .camping
                     }
                 }
+             */
             
             modeButton(icon: "light.beacon.max.fill", BGColor: strobePressed ? .blue : Color("darkGray"))
                 .onTapGesture {
@@ -729,13 +720,220 @@ struct AnyShape: Shape {
     }
 }
 
+// MARK: - Triangle Shape (Your Warning Icon)
 struct Triangle: Shape {
     func path(in rect: CGRect) -> Path {
-        Path { path in
-            path.move(to: CGPoint(x: rect.midX, y: rect.minY))      // top
-            path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))   // bottom right
-            path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))   // bottom left
-            path.closeSubpath()
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        path.closeSubpath()
+        return path
+    }
+}
+
+// MARK: - Background
+extension HomeView {
+    private var backgroundColor: Color {
+        switch sosState {
+        case .idle:
+            return Color("darkRed")
+        case .countdown:
+            return Color("darkRed")
+        case .sounding:
+            return Color.red
         }
+    }
+}
+
+// MARK: - Glow (Sounding State)
+extension HomeView {
+    private var glowOverlay: some View {
+        Group {
+            if sosState == .sounding {
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(Color.red.opacity(0.8), lineWidth: 6)
+                    .blur(radius: 12)
+                    .scaleEffect(glow ? 1.06 : 1.0)
+                    .opacity(glow ? 0.9 : 0.4)
+                    .onAppear {
+                        withAnimation(
+                            .easeInOut(duration: 1.1)
+                            .repeatForever(autoreverses: true)
+                        ) {
+                            glow = true
+                        }
+                    }
+            }
+        }
+    }
+}
+
+// MARK: - Content Switcher
+extension HomeView {
+    @ViewBuilder
+    private var content: some View {
+        switch sosState {
+        case .idle:
+            idleContent
+        case .countdown(let value):
+            countdownContent(value: value)
+        case .sounding:
+            soundingContent
+        }
+    }
+}
+
+// MARK: - Idle Content
+extension HomeView {
+    private var idleContent: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "speaker.wave.2.circle.fill")
+                .font(.system(size: 30))
+                .foregroundStyle(.white)
+                .overlay {
+                    ZStack {
+                        Triangle()
+                            .fill(Color.black)
+                            .frame(width: 10, height: 10)
+                        
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                    }
+                    .offset(x: 13, y: 10)
+                }
+            
+            Text("Emergency Siren")
+                .foregroundStyle(.white)
+            
+            RoundedRectangle(cornerRadius: 2)
+                .fill(Color.red)
+                .frame(width: 45, height: 2)
+                .padding(.vertical, 12)
+            
+            Text("3 SECONDS DELAY")
+                .font(.system(size: 14))
+                .foregroundStyle(.white)
+        }
+    }
+}
+
+// MARK: - Countdown Content
+extension HomeView {
+    private func countdownContent(value: Int) -> some View {
+        ZStack {
+            Circle()
+                .fill(Color.red)
+                .frame(width: 110, height: 110)
+                .scaleEffect(circleScale(for: value))
+                .animation(
+                    .easeOut(duration: 0.9),
+                    value: value
+                )
+            
+            VStack(spacing: 12) {
+                Image(systemName: "speaker.wave.2.circle.fill")
+                    .font(.system(size: 30))
+                    .foregroundStyle(.white)
+                    .overlay {
+                        ZStack {
+                            Triangle()
+                                .fill(Color.black)
+                                .frame(width: 10, height: 10)
+                            
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundStyle(.red)
+                        }
+                        .offset(x: 13, y: 10)
+                    }
+                
+                Text("\(value)")
+                    .font(.system(size: 60, weight: .bold))
+                    .foregroundStyle(.white)
+                
+                Text("TAP TO\nCANCEL")
+                    .font(.headline.bold())
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.white.opacity(0.9))
+            }
+        }
+    }
+    
+    private func circleScale(for value: Int) -> CGFloat {
+        switch value {
+        case 3: return 0.0
+        case 2: return 0.7
+        case 1: return 1.1
+        default: return 1.1
+        }
+    }
+}
+
+// MARK: - Sounding Content
+extension HomeView {
+    private var soundingContent: some View {
+        VStack(spacing: 12) {
+            Text("Sounding…")
+                .foregroundStyle(.white)
+                .font(.headline)
+            
+            Spacer()
+            
+            Image(systemName: "speaker.wave.2.circle.fill")
+                .font(.system(size: 50))
+                .foregroundStyle(.white)
+            
+            Spacer()
+            
+            Text("TAP TO\nSTOP")
+                .font(.headline.bold())
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.white.opacity(0.9))
+        }
+        .padding([.top, .bottom], 30)
+    }
+}
+
+// MARK: - Logic
+extension HomeView {
+    private func handleSOSAction() {
+        switch sosState {
+        case .idle:
+            startCountdown()
+        case .countdown:
+            cancelCountdown()
+        case .sounding:
+            stopSiren()
+        }
+    }
+    
+    private func startCountdown() {
+        countdownTimer?.invalidate()
+        
+        countdownValue = 3
+        sosState = .countdown(countdownValue)
+        
+        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
+            countdownValue -= 1
+            
+            if countdownValue > 0 {
+                sosState = .countdown(countdownValue)
+            } else {
+                timer.invalidate()
+                countdownTimer = nil
+                sosState = .sounding
+            }
+        }
+    }
+    
+    private func cancelCountdown() {
+        countdownTimer?.invalidate()
+        countdownTimer = nil
+        sosState = .idle
+    }
+    
+    private func stopSiren() {
+        // stop audio, flashlight, haptics, etc
+        sosState = .idle
     }
 }
