@@ -896,7 +896,7 @@ extension HomeView {
     }
 }
 
-// MARK: - Logic
+// MARK: - SOS Alarm Logic
 extension HomeView {
     private func handleSOSAction() {
         switch sosState {
@@ -925,7 +925,6 @@ extension HomeView {
                 timer.invalidate()
                 countdownTimer = nil
                 sosState = .sounding
-                //AudioManager.shared.playSiren()
                 toneEngine.start()
             }
         }
@@ -940,7 +939,7 @@ extension HomeView {
     
     private func stopSiren() {
         // stop audio, flashlight, haptics, etc
-        //AudioManager.shared.stop()
+        HapticManager.shared.notify(.notification(.success))
         toneEngine.stop()
         sosState = .idle
     }
