@@ -75,6 +75,8 @@ struct HomeView: View {
         5 + (15 * scaledOpacity)
     }
     
+    private let toneEngine = EmergencyToneEngine()
+    
     let maxLevel: Int = 4
     let frequencies: [Int: Double] = [1: 2.0, 2: 3.0, 3: 6.0, 4: 10.0]
     
@@ -917,11 +919,14 @@ extension HomeView {
             countdownValue -= 1
             
             if countdownValue > 0 {
+                HapticManager.shared.notify(.impact(.light))
                 sosState = .countdown(countdownValue)
             } else {
                 timer.invalidate()
                 countdownTimer = nil
                 sosState = .sounding
+                //AudioManager.shared.playSiren()
+                toneEngine.start()
             }
         }
     }
@@ -929,11 +934,14 @@ extension HomeView {
     private func cancelCountdown() {
         countdownTimer?.invalidate()
         countdownTimer = nil
+        HapticManager.shared.notify(.notification(.success))
         sosState = .idle
     }
     
     private func stopSiren() {
         // stop audio, flashlight, haptics, etc
+        //AudioManager.shared.stop()
+        toneEngine.stop()
         sosState = .idle
     }
 }
