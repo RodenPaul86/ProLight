@@ -58,6 +58,7 @@ struct HomeView: View {
     @AppStorage("isAssistantEnabled") private var isAssistantEnabled: Bool = true
     
     @State private var showWeatherSheet: Bool = false
+    @State private var showSignalingMirrorSheet: Bool = false
     
     var selectedUnit: TemperatureUnit {
         TemperatureUnit(rawValue: selectedUnitRaw) ?? .fahrenheit
@@ -237,16 +238,24 @@ struct HomeView: View {
                 flashControllerInstance.stopFlashing()
             }
             .onChange(of: scenePhase) { _, newPhase in
-                if newPhase == .background {
-                    // App is now in background
-                    print("App moved to background — leave flashlight ON")
-                } else if newPhase == .active {
+                switch newPhase {
+                case .background:
+                    print("App moved to background")
+                    
+                    // Only needed if you DO NOT want torch in background
+                    // setTorch(active: false)
+                    
+                case .active:
                     // App became active again
-                    print("App is active — optionally update torch")
+                    print("App became active")
                     updateTorch()
-                } else if newPhase == .inactive {
+                    
+                case .inactive:
                     //App going inactive (home button, app switcher)
-                    print("App is inactive")
+                    print("App inactive")
+                    
+                @unknown default:
+                    break
                 }
             }
         }
@@ -267,10 +276,11 @@ struct HomeView: View {
         }
     }
     
-    // MARK: SOS Function
+    // MARK: SOS View
     private var sosView: some View {
         VStack(spacing: 10) {
             if let number = locationManager.emergencyNumber {
+                // Call Emergency Services Button
                 Button(action: {
                     if let url = URL(string: "tel://\(number)"),
                        UIApplication.shared.canOpenURL(url) {
@@ -330,6 +340,7 @@ struct HomeView: View {
                     }
             }
             
+            // Signaling Mirror Instructions Button
             Button(action: {}) {
                 curvedRectangle(topRadius: 40, bottomRadius: 0)
                     .fill(.gray.opacity(0.2))
@@ -425,7 +436,7 @@ struct HomeView: View {
         }
     }
     
-    // MARK: Strobe controls
+    // MARK: Strobe View and Controls
     private var strobeView: some View {
         VStack(spacing: 6) {
             ForEach(0..<strobeData.count, id: \.self) { index in
@@ -472,7 +483,7 @@ struct HomeView: View {
         }
     }
     
-    // MARK: Camping controls
+    // MARK: Camping View and Controls
     private func campingButton<Destination: View>(icon: String, title: String, color: Color, rotation: Double, destination: Destination) -> some View {
         NavigationLink {
             destination
@@ -922,9 +933,11 @@ extension HomeView {
                 HapticManager.shared.notify(.impact(.light))
                 sosState = .countdown(countdownValue)
             } else {
+                VolumeManager.saveCurrentVolume()
                 timer.invalidate()
                 countdownTimer = nil
                 sosState = .sounding
+                VolumeManager.setSystemVolume(to: 1.0)
                 toneEngine.start()
             }
         }
@@ -939,6 +952,7 @@ extension HomeView {
     
     private func stopSiren() {
         // stop audio, flashlight, haptics, etc
+        VolumeManager.restoreVolume()
         HapticManager.shared.notify(.notification(.success))
         toneEngine.stop()
         sosState = .idle
