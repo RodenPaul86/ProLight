@@ -141,8 +141,6 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.black.ignoresSafeArea()
-                
                 VStack(spacing: 40) {
                     Spacer()
                     // MARK: Camping Functions
@@ -229,34 +227,34 @@ struct HomeView: View {
                 }
                 .padding([.horizontal, .bottom])
             }
-            .onAppear {
+        }
+        .onAppear {
+            updateTorch()
+            NotificationManager.shared.requestAuthorization()
+            hideTabBar = false
+        }
+        .onDisappear {
+            flashControllerInstance.stopFlashing()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            switch newPhase {
+            case .background:
+                print("App moved to background")
+                
+                // Only needed if you DO NOT want torch in background
+                // setTorch(active: false)
+                
+            case .active:
+                // App became active again
+                print("App became active")
                 updateTorch()
-                NotificationManager.shared.requestAuthorization()
-                hideTabBar = false
-            }
-            .onDisappear {
-                flashControllerInstance.stopFlashing()
-            }
-            .onChange(of: scenePhase) { _, newPhase in
-                switch newPhase {
-                case .background:
-                    print("App moved to background")
-                    
-                    // Only needed if you DO NOT want torch in background
-                    // setTorch(active: false)
-                    
-                case .active:
-                    // App became active again
-                    print("App became active")
-                    updateTorch()
-                    
-                case .inactive:
-                    //App going inactive (home button, app switcher)
-                    print("App inactive")
-                    
-                @unknown default:
-                    break
-                }
+                
+            case .inactive:
+                //App going inactive (home button, app switcher)
+                print("App inactive")
+                
+            @unknown default:
+                break
             }
         }
     }

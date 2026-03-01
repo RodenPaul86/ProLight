@@ -23,6 +23,7 @@ struct ProLightApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(.dark)
                 .environmentObject(appSubModel)
                 .environmentObject(healthManager)
         }
