@@ -433,7 +433,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ProLight/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSCameraUsageDescription = "ProLight needs to use your camera to turn on/off the torch light.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "ProLight needs to use your camera to gain accsess to the LED light.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "ProLight needs to use your health data.";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "ProLight needs background location access to track your night walk.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ProLight tracks your walk for distance and pace.";
@@ -481,7 +481,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ProLight/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSCameraUsageDescription = "ProLight needs to use your camera to turn on/off the torch light.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "ProLight needs to use your camera to gain accsess to the LED light.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "ProLight needs to use your health data.";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "ProLight needs background location access to track your night walk.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ProLight tracks your walk for distance and pace.";
