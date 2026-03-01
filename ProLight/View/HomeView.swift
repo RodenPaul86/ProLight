@@ -261,6 +261,7 @@ struct HomeView: View {
         }
     }
     
+    /*
     // MARK: Flashlight Indicator
     private var flashlightIndicator: some View {
         VStack(spacing: 8) {
@@ -275,6 +276,7 @@ struct HomeView: View {
                 .shadow(color: flashlightOn ? .white.opacity(scaledOpacity) : .white.opacity(0.0), radius: shadowRadius)
         }
     }
+     */
     
     // MARK: SOS View
     private var sosView: some View {
@@ -341,7 +343,7 @@ struct HomeView: View {
             }
             
             // Signaling Mirror Instructions Button
-            Button(action: {}) {
+            Button(action: { showSignalingMirrorSheet = true }) {
                 curvedRectangle(topRadius: 40, bottomRadius: 0)
                     .fill(.gray.opacity(0.2))
                     .rotationEffect(.degrees(90))
@@ -384,6 +386,11 @@ struct HomeView: View {
                             }
                         }
                     }
+            }
+            .sheet(isPresented: $showSignalingMirrorSheet) {
+                SignalingMirrorView()
+                    .presentationDetents([.fraction(0.50)]) /// <-- 50% of screen height
+                    .presentationDragIndicator(.visible) /// <-- Shows the line at top
             }
         }
     }
