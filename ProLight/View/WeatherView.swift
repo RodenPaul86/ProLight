@@ -15,6 +15,7 @@ private func formattedHour(_ date: Date) -> String {
 }
 
 struct WeatherView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var locationManager = LocationManager()
     @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
     
@@ -27,100 +28,181 @@ struct WeatherView: View {
     }
     
     var body: some View {
-        ZStack(alignment: .top) {
-            Color("darkGray").ignoresSafeArea()
-            
-            if let weather = locationManager.currentWeather,
-               let today = locationManager.dailyForecast?.forecast.first {
+        NavigationStack {
+            ZStack(alignment: .top) {
+                Color("darkGray").ignoresSafeArea()
                 
-                let temp = selectedUnit == .fahrenheit
-                ? weather.temperature.converted(to: .fahrenheit)
-                : weather.temperature.converted(to: .celsius)
-                
-                let low = selectedUnit == .fahrenheit
-                ? today.lowTemperature.converted(to: .fahrenheit)
-                : today.lowTemperature.converted(to: .celsius)
-                
-                let high = selectedUnit == .fahrenheit
-                ? today.highTemperature.converted(to: .fahrenheit)
-                : today.highTemperature.converted(to: .celsius)
-                
-                //let nowSymbol = weather.symbolName == "wind" ? "wind" : "\(weather.symbolName).fill"
-                
-                let nowSymbol: String = {
-                    if weather.symbolName == "wind" {
-                        return "wind"
-                    }
+                if let weather = locationManager.currentWeather,
+                   let today = locationManager.dailyForecast?.forecast.first {
                     
-                    if weather.symbolName == "snowflake" {
-                        return "snowflake"
-                    }
+                    let temp = selectedUnit == .fahrenheit
+                    ? weather.temperature.converted(to: .fahrenheit)
+                    : weather.temperature.converted(to: .celsius)
                     
-                    return "\(weather.symbolName).fill"
-                }()
-                
-                VStack(alignment: .leading, spacing: 10) {
-                    // MARK: City name + State name
-                    if !locationManager.cityName.isEmpty {
-                        Text("\(locationManager.cityName), \(locationManager.stateName)")
-                            .font(.title3)
-                            .foregroundStyle(.white)
-                    } else {
-                        Text("Loading...")
-                            .font(.title3)
-                            .foregroundStyle(.white)
-                    }
+                    let low = selectedUnit == .fahrenheit
+                    ? today.lowTemperature.converted(to: .fahrenheit)
+                    : today.lowTemperature.converted(to: .celsius)
                     
-                    // MARK: Today + daily cards
-                    HStack(spacing: 12) {
-                        VStack(alignment: .leading) {
-                            Text("Today")
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.7))
-                            
-                            TodayWeatherCard(
-                                temp: "\(Int(temp.value))°",
-                                description: weather.condition.description.capitalized,
-                                imageName: nowSymbol,
-                                low: "\(Int(low.value))°",
-                                high: "\(Int(high.value))°"
-                            )
+                    let high = selectedUnit == .fahrenheit
+                    ? today.highTemperature.converted(to: .fahrenheit)
+                    : today.highTemperature.converted(to: .celsius)
+                    
+                    //let nowSymbol = weather.symbolName == "wind" ? "wind" : "\(weather.symbolName).fill"
+                    
+                    let nowSymbol: String = {
+                        if weather.symbolName == "wind" {
+                            return "wind"
                         }
                         
-                        VStack(alignment: .leading) {
-                            Text("Rest of the Week")
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.7))
+                        if weather.symbolName == "snowflake" {
+                            return "snowflake"
+                        }
+                        
+                        return "\(weather.symbolName).fill"
+                    }()
+                    
+                    VStack(alignment: .leading, spacing: 10) {
+                        // MARK: Today + daily cards
+                        HStack(spacing: 12) {
+                            VStack(alignment: .leading) {
+                                Text("Today")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.7))
+                                
+                                TodayWeatherCard(
+                                    temp: "\(Int(temp.value))°",
+                                    description: weather.condition.description.capitalized,
+                                    imageName: nowSymbol,
+                                    low: "\(Int(low.value))°",
+                                    high: "\(Int(high.value))°"
+                                )
+                            }
                             
-                            if let daily = locationManager.dailyForecast?.forecast.dropFirst().prefix(6) {
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 8) {
-                                        ForEach(Array(daily.enumerated()), id: \.offset) { index, day in
-                                            let high = selectedUnit == .fahrenheit
-                                            ? day.highTemperature.converted(to: .fahrenheit)
-                                            : day.highTemperature.converted(to: .celsius)
-                                            
-                                            //let symbol = day.symbolName == "wind" ? "wind" : "\(day.symbolName).fill"
-                                            
-                                            let symbol: String = {
-                                                if day.symbolName == "wind" {
-                                                    return "wind"
-                                                }
+                            VStack(alignment: .leading) {
+                                Text("Rest of the Week")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.7))
+                                
+                                if let daily = locationManager.dailyForecast?.forecast.dropFirst().prefix(6) {
+                                    ScrollView(.horizontal, showsIndicators: false) {
+                                        HStack(spacing: 8) {
+                                            ForEach(Array(daily.enumerated()), id: \.offset) { index, day in
+                                                let high = selectedUnit == .fahrenheit
+                                                ? day.highTemperature.converted(to: .fahrenheit)
+                                                : day.highTemperature.converted(to: .celsius)
                                                 
-                                                if day.symbolName == "snowflake" {
-                                                    return "snowflake"
-                                                }
+                                                //let symbol = day.symbolName == "wind" ? "wind" : "\(day.symbolName).fill"
                                                 
-                                                return "\(day.symbolName).fill"
-                                            }()
+                                                let symbol: String = {
+                                                    if day.symbolName == "wind" {
+                                                        return "wind"
+                                                    }
+                                                    
+                                                    if day.symbolName == "snowflake" {
+                                                        return "snowflake"
+                                                    }
+                                                    
+                                                    return "\(day.symbolName).fill"
+                                                }()
+                                                
+                                                let weekday = Calendar.current.shortWeekdaySymbols[
+                                                    Calendar.current.component(.weekday, from: day.date) - 1
+                                                ]
+                                                
+                                                DailyWeatherCard(
+                                                    day: weekday.uppercased(),
+                                                    temp: "\(Int(high.value))°",
+                                                    imageName: symbol
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        Text("Hourly")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.7))
+                        
+                        // MARK: Hourly forecast starting with Now
+                        if let hourly = locationManager.hourlyForecast?.forecast.filter({ $0.date >= Date() }).prefix(12),
+                           let daily = locationManager.dailyForecast?.forecast {
+                            
+                            let today = daily.first
+                            let tomorrow = daily.dropFirst().first
+                            
+                            // Sunrise/sunset times
+                            let todaySunrise = today?.sun.sunrise
+                            let todaySunset = today?.sun.sunset
+                            let tomorrowSunrise = tomorrow?.sun.sunrise
+                            
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 12) {
+                                    // Weather for right now
+                                    //let nowSymbol = weather.symbolName == "wind" ? "wind" : "\(weather.symbolName).fill"
+                                    
+                                    let nowSymbol: String = {
+                                        if weather.symbolName == "wind" {
+                                            return "wind"
+                                        }
+                                        
+                                        if weather.symbolName == "snowflake" {
+                                            return "snowflake"
+                                        }
+                                        
+                                        return "\(weather.symbolName).fill"
+                                    }()
+                                    
+                                    HourlyWeatherCard(
+                                        hour: "Now",
+                                        temp: "\(Int(temp.value))°",
+                                        imageName: nowSymbol
+                                    )
+                                    
+                                    // The hours after current aka: now
+                                    ForEach(Array(hourly), id: \.date) { hourData in
+                                        let hourTemp = selectedUnit == .fahrenheit
+                                        ? hourData.temperature.converted(to: .fahrenheit)
+                                        : hourData.temperature.converted(to: .celsius)
+                                        
+                                        //let symbol = hourData.symbolName == "wind" ? "wind" : "\(hourData.symbolName).fill"
+                                        
+                                        let symbol: String = {
+                                            if hourData.symbolName == "wind" {
+                                                return "wind"
+                                            }
                                             
-                                            let weekday = Calendar.current.shortWeekdaySymbols[
-                                                Calendar.current.component(.weekday, from: day.date) - 1
-                                            ]
+                                            if hourData.symbolName == "snowflake" {
+                                                return "snowflake"
+                                            }
                                             
-                                            DailyWeatherCard(
-                                                day: weekday.uppercased(),
-                                                temp: "\(Int(high.value))°",
+                                            return "\(hourData.symbolName).fill"
+                                        }()
+                                        
+                                        // Special case for sunrise/sunset
+                                        if let sunrise = todaySunrise, Calendar.current.isDate(hourData.date, equalTo: sunrise, toGranularity: .hour) {
+                                            HourlyWeatherCard(
+                                                hour: formattedHour(sunrise),
+                                                temp: "Sunrise",
+                                                imageName: "sunrise.fill"
+                                            )
+                                        } else if let sunset = todaySunset, Calendar.current.isDate(hourData.date, equalTo: sunset, toGranularity: .hour) {
+                                            HourlyWeatherCard(
+                                                hour: formattedHour(sunset),
+                                                temp: "Sunset",
+                                                imageName: "sunset.fill"
+                                            )
+                                        } else if let tomorrowSunrise = tomorrowSunrise, Calendar.current.isDate(hourData.date, equalTo: tomorrowSunrise, toGranularity: .hour) {
+                                            HourlyWeatherCard(
+                                                hour: formattedHour(tomorrowSunrise),
+                                                temp: "Sunrise",
+                                                imageName: "sunrise.fill"
+                                            )
+                                        } else {
+                                            HourlyWeatherCard(
+                                                hour: formattedHour(hourData.date),
+                                                temp: "\(Int(hourTemp.value))°",
                                                 imageName: symbol
                                             )
                                         }
@@ -129,104 +211,24 @@ struct WeatherView: View {
                             }
                         }
                     }
-                    
-                    Text("Hourly")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.7))
-                    
-                    // MARK: Hourly forecast starting with Now
-                    if let hourly = locationManager.hourlyForecast?.forecast.filter({ $0.date >= Date() }).prefix(12),
-                       let daily = locationManager.dailyForecast?.forecast {
-                        
-                        let today = daily.first
-                        let tomorrow = daily.dropFirst().first
-                        
-                        // Sunrise/sunset times
-                        let todaySunrise = today?.sun.sunrise
-                        let todaySunset = today?.sun.sunset
-                        let tomorrowSunrise = tomorrow?.sun.sunrise
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
-                                // Weather for right now
-                                //let nowSymbol = weather.symbolName == "wind" ? "wind" : "\(weather.symbolName).fill"
-                                
-                                let nowSymbol: String = {
-                                    if weather.symbolName == "wind" {
-                                        return "wind"
-                                    }
-                                    
-                                    if weather.symbolName == "snowflake" {
-                                        return "snowflake"
-                                    }
-                                    
-                                    return "\(weather.symbolName).fill"
-                                }()
-                                
-                                HourlyWeatherCard(
-                                    hour: "Now",
-                                    temp: "\(Int(temp.value))°",
-                                    imageName: nowSymbol
-                                )
-                                
-                                // The hours after current aka: now
-                                ForEach(Array(hourly), id: \.date) { hourData in
-                                    let hourTemp = selectedUnit == .fahrenheit
-                                    ? hourData.temperature.converted(to: .fahrenheit)
-                                    : hourData.temperature.converted(to: .celsius)
-                                    
-                                    //let symbol = hourData.symbolName == "wind" ? "wind" : "\(hourData.symbolName).fill"
-                                    
-                                    let symbol: String = {
-                                        if hourData.symbolName == "wind" {
-                                            return "wind"
-                                        }
-                                        
-                                        if hourData.symbolName == "snowflake" {
-                                            return "snowflake"
-                                        }
-                                        
-                                        return "\(hourData.symbolName).fill"
-                                    }()
-                                    
-                                    // Special case for sunrise/sunset
-                                    if let sunrise = todaySunrise, Calendar.current.isDate(hourData.date, equalTo: sunrise, toGranularity: .hour) {
-                                        HourlyWeatherCard(
-                                            hour: formattedHour(sunrise),
-                                            temp: "Sunrise",
-                                            imageName: "sunrise.fill"
-                                        )
-                                    } else if let sunset = todaySunset, Calendar.current.isDate(hourData.date, equalTo: sunset, toGranularity: .hour) {
-                                        HourlyWeatherCard(
-                                            hour: formattedHour(sunset),
-                                            temp: "Sunset",
-                                            imageName: "sunset.fill"
-                                        )
-                                    } else if let tomorrowSunrise = tomorrowSunrise, Calendar.current.isDate(hourData.date, equalTo: tomorrowSunrise, toGranularity: .hour) {
-                                        HourlyWeatherCard(
-                                            hour: formattedHour(tomorrowSunrise),
-                                            temp: "Sunrise",
-                                            imageName: "sunrise.fill"
-                                        )
-                                    } else {
-                                        HourlyWeatherCard(
-                                            hour: formattedHour(hourData.date),
-                                            temp: "\(Int(hourTemp.value))°",
-                                            imageName: symbol
-                                        )
-                                    }
-                                }
-                            }
-                        }
+                    .padding(.top, 10)
+                    .padding(.horizontal)
+                    .overlay(alignment: .bottom) {
+                        AttributionView()
+                            .padding(.bottom)
+                            .ignoresSafeArea(.container, edges: .bottom)
+                            .offset(y: 80)
                     }
+                    
                 }
-                .padding(.top, 20)
-                .padding(.horizontal)
-                .overlay(alignment: .bottom) {
-                    AttributionView()
-                        .padding(.bottom)
-                        .ignoresSafeArea(.container, edges: .bottom)
-                        .offset(y: 90)
+            }
+            .navigationTitle(!locationManager.cityName.isEmpty ? "\(locationManager.cityName), \(locationManager.stateName)" : "Loading...")
+            .toolbarTitleDisplayMode(.inlineLarge)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Cancel", systemImage: "xmark") {
+                        dismiss()
+                    }
                 }
             }
         }
