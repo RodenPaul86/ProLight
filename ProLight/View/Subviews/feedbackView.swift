@@ -26,128 +26,74 @@ struct feedbackView: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                List {
-                    // Topic Row
-                    Section {
-                        HStack {
-                            Text("Topic")
-                                .font(.headline)
-                            
-                            Spacer()
-                            
-                            Menu { /// <-- Menu with Chevron
-                                ForEach(topics, id: \.self) { topic in
-                                    Button(action: {
-                                        selectedTopic = topic
-                                        if isHapticsEnabled {
-                                            HapticManager.shared.notify(.impact(.light))
-                                        }
-                                    }) {
-                                        HStack {
-                                            Text(topic)
-                                            if selectedTopic == topic {
-                                                Spacer()
-                                                Image(systemName: "checkmark")
-                                                    .tint(.primary)
-                                            }
-                                        }
-                                    }
-                                }
-                            } label: {
-                                HStack {
-                                    Text(selectedTopic)
-                                    Image(systemName: "chevron.up.chevron.down") /// <-- Chevron next to text
-                                }
-                                .foregroundStyle(.gray)
-                            }
+            List {
+                // MARK: - Topic Row
+                LabeledContent("Topic") {
+                    Picker("", selection: $selectedTopic) {
+                        ForEach(topics, id: \.self) { topic in
+                            Text(topic)
+                        }
+                    }
+                    .tint(.gray)
+                }
+                
+                // MARK: - Expanding TextField
+                TextField("Enter text here...", text: $textBody, axis: .vertical)
+                    .padding(.vertical, 8)
+                    .frame(minHeight: 120, alignment: .top) /// <-- Ensures expansion
+                
+                Section(header: Text("Additional Info (Optional)"), footer: Text("Only send images related to your ''\(selectedTopic)''.")) {
+                    HStack {
+                        // MARK: - Image Preview
+                        if let image = selectedImage {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 70, height: 70)
+                                .cornerRadius(10)
                         }
                         
-                        // MARK: Expanding TextField
-                        TextField("Enter text here...", text: $textBody, axis: .vertical)
-                            .padding(.vertical, 8)
-                            .frame(minHeight: 120, alignment: .top) /// <-- Ensures expansion
+                        // MARK: - Image section
+                        PhotosPicker(selection: $selectedItem, matching: .screenshots) {
+                            Text("Select an image to attach...")
+                        }
+                        .onChange(of: selectedItem) { oldItem, newItem in
+                            loadImage(from: newItem)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(.gray)
+                    }
+                }
+                
+                // MARK: - Other sections
+                Section(header: Text("Device Info")) {
+                    LabeledContent("Device") {
+                        Text("\(UIDevice.current.modelName)")
                     }
                     
-                    Section(header: Text("Additional Info"), footer: Text("Only upload images related to your ''\(selectedTopic)''.")) {
-                        HStack {
-                            // Image Preview
-                            if let image = selectedImage {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 70, height: 70)
-                                    .cornerRadius(10)
-                            }
-                            
-                            // Image section
-                            PhotosPicker(selection: $selectedItem, matching: .screenshots) {
-                                Text("Select an image to attach...")
-                            }
-                            .onChange(of: selectedItem) { oldItem, newItem in
-                                loadImage(from: newItem)
-                            }
-                            
-                            Spacer()
-                            
-                            Image(systemName: "chevron.right")
-                                .foregroundStyle(.gray)
-                        }
+                    LabeledContent("\(UIDevice.current.deviceOS)") {
+                        Text("\(UIDevice.current.OSVersion)")
+                    }
+                }
+                
+                Section(header: Text("App Info")) {
+                    LabeledContent("Name") {
+                        Text(Bundle.main.appName)
                     }
                     
-                    // MARK: Other sections
-                    Section(header: Text("Device Info")) {
-                        HStack {
-                            Text("Device")
-                            
-                            Spacer()
-                            
-                            Text("\(UIDevice.current.modelName)")
-                                .foregroundColor(.gray)
-                        }
-                        HStack {
-                            Text("\(UIDevice.current.deviceOS)")
-                            
-                            Spacer()
-                            
-                            Text("\(UIDevice.current.OSVersion)")
-                                .foregroundColor(.gray)
-                        }
+                    LabeledContent("Version") {
+                        Text("\(Bundle.main.appVersion)")
                     }
                     
-                    Section(header: Text("App Info")) {
-                        HStack {
-                            Text("Name")
-                            
-                            Spacer()
-                            
-                            Text(Bundle.main.appName)
-                                .foregroundColor(.gray)
-                        }
-                        HStack {
-                            Text("Version")
-                            
-                            Spacer()
-                            
-                            Text("\(Bundle.main.appVersion)")
-                                .foregroundColor(.gray)
-                        }
-                        HStack {
-                            Text("Build")
-                            
-                            Spacer()
-                            
-                            Text("\(Bundle.main.appBuild)")
-                                .foregroundColor(.gray)
-                        }
-                        HStack {
-                            Text("Subscriber")
-                            
-                            Spacer()
-                            
-                            Text(appSubModel.isSubscriptionActive ? "Yes" : "No")
-                                .foregroundStyle(.gray)
-                        }
+                    LabeledContent("Build") {
+                        Text("\(Bundle.main.appBuild)")
+                    }
+                    
+                    LabeledContent("Subscriber") {
+                        Text(appSubModel.isSubscriptionActive ? "Yes" : "No")
                     }
                 }
             }
@@ -163,32 +109,43 @@ struct feedbackView: View {
             .onDisappear {
                 NotificationCenter.default.removeObserver(self)
             }
-            .navigationBarTitle("Support")
+            .navigationBarTitle("Send: \(selectedTopic)")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { isShowingMailView.toggle() }) {
-                        Text("Send")
-                    }
-                    .disabled(textBody.isEmpty)
-                    .sheet(isPresented: $isShowingMailView) {
-                        MailView(
-                            isShowing: $isShowingMailView,
-                            recipient: "support@docmatic.app",
-                            subject: "DocMatic: \(selectedTopic)",
-                            body: generateEmailBody(),
-                            imageData: imageData
-                        ) {
-                            presentationMode.wrappedValue.dismiss()
+                ToolbarItem(placement: .confirmationAction) {
+                    if #available(iOS 26.0, *) {
+                        Button("Send", systemImage: "paperplane") {
+                            isShowingMailView.toggle()
+                            HapticManager.shared.notify(.impact(.light))
                         }
+                        .disabled(textBody.isEmpty)
+                        
+                    } else {
+                        Button("Send") {
+                            isShowingMailView.toggle()
+                            HapticManager.shared.notify(.impact(.light))
+                        }
+                        .disabled(textBody.isEmpty)
                     }
                 }
             }
+            .sheet(isPresented: $isShowingMailView) {
+                MailView(
+                    isShowing: $isShowingMailView,
+                    recipient: "support@paulrodenjr.dev",
+                    subject: "ProLight: \(selectedTopic)",
+                    body: generateEmailBody(),
+                    imageData: imageData
+                ) {
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
             .hideFloatingTabBar(hideTabBar)
+            
         }
     }
     
-    // MARK: Selection Screen
+    // MARK: - Selection Screen
     struct TopicSelectionView: View {
         @Binding var selectedTopic: String
         let topics: [String]
@@ -232,7 +189,7 @@ struct feedbackView: View {
             """
     }
     
-    // MARK: Function to load image from PhotosPicker
+    // MARK: - Function to load image from PhotosPicker
     private func loadImage(from item: PhotosPickerItem?) {
         guard let item = item else { return }
         
@@ -254,7 +211,7 @@ struct feedbackView: View {
     feedbackView()
 }
 
-// MARK: MailView Wrapper
+// MARK: - MailView Wrapper
 struct MailView: UIViewControllerRepresentable {
     @Binding var isShowing: Bool
     var recipient: String
