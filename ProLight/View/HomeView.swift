@@ -66,7 +66,7 @@ struct HomeView: View {
     
     @State private var mode: ControlMode = .neutral
     
-    var tabBarHeight: CGFloat
+    var tabBarHeight: CGFloat?
     @State private var hideTabBar: Bool = false
     
     var scaledOpacity: Double {

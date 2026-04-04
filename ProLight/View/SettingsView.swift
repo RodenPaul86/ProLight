@@ -27,7 +27,7 @@ struct SettingsView: View {
     @State private var showStoreView = false
     @State private var hideTabBar: Bool = false
     
-    var tabBarHeight: CGFloat
+    var tabBarHeight: CGFloat?
     
     var selectedUnit: TemperatureUnit {
         TemperatureUnit(rawValue: selectedUnitRaw) ?? .fahrenheit
