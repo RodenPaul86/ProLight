@@ -141,7 +141,6 @@ struct feedbackView: View {
                 }
             }
             .hideFloatingTabBar(hideTabBar)
-            
         }
     }
     
