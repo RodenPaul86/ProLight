@@ -21,6 +21,10 @@ struct mapView: View {
     // MARK: Map Selection Detail Properties
     @State private var showDetails: Bool = false
     @State private var lookAroundScene: MKLookAroundScene?
+    // MARK: Route Properties
+    @State private var routeDisplaying: Bool = false
+    @State private var route: MKRoute?
+    @State private var routeDestination: MKMapItem?
     
     var body: some View {
         NavigationStack {
@@ -34,8 +38,23 @@ struct mapView: View {
                 
                 /// Simply Display Annotations as Marker, as we seen before
                 ForEach(searchResults, id: \.self) { mapItem in
-                    let placemark = mapItem.placemark
-                    Marker(placemark.name ?? "Place", coordinate: placemark.coordinate)
+                    /// Hiding All other Markers, Expect Destionation One
+                    if routeDisplaying {
+                        if mapItem == routeDestination {
+                            let placemark = mapItem.placemark
+                            Marker(placemark.name ?? "Place", coordinate: placemark.coordinate)
+                        }
+                    } else {
+                        let placemark = mapItem.placemark
+                        Marker(placemark.name ?? "Place", coordinate: placemark.coordinate)
+                    }
+                }
+                
+                /// Display Route using Polyline
+                if let route {
+                    MapPolyline(route.polyline)
+                    /// Applying Bigger Stroke
+                        .stroke(.blue, lineWidth: 7)
                 }
                 
                 /// To Show User Current Location
@@ -61,13 +80,43 @@ struct mapView: View {
             /// Showing Trasnlucent ToolBar
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
-            .sheet(isPresented: $showDetails, content: {
+            /// When Route Displaying Hiding Top and Bottom Bar
+            .toolbar(routeDisplaying ? .hidden : .visible, for: .navigationBar)
+            .sheet(isPresented: $showDetails, onDismiss: {
+                withAnimation(.snappy) {
+                    /// Zooming Route
+                    if let boundingRect = route?.polyline.boundingMapRect, routeDisplaying {
+                        cameraPosition = .rect(boundingRect)
+                    }
+                }
+            }, content: {
                 MapDetails()
                     .presentationDetents([.height(300)])
                     .presentationBackgroundInteraction(.enabled(upThrough: .height(300)))
                     .presentationCornerRadius(25)
                     .interactiveDismissDisabled(true)
             })
+            .safeAreaInset(edge: .bottom) {
+                if routeDisplaying {
+                    Button("End Route") {
+                        /// Closing The Route and Setting the Selection
+                        withAnimation(.snappy) {
+                            routeDisplaying = false
+                            showDetails = true
+                            mapSelection = routeDestination
+                            routeDestination = nil
+                            route = nil
+                            cameraPosition = .region(.myRegion)
+                        }
+                    }
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(.red.gradient, in: .rect(cornerRadius: 15))
+                    .padding()
+                    .background(.ultraThinMaterial)
+                }
+            }
         }
         .onSubmit(of: .search) {
             Task {
@@ -128,13 +177,11 @@ struct mapView: View {
             }
             
             /// Direction's Button
-            Button("Get Directions") {
-                
-            }
-            .foregroundStyle(.white)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical)
-            .background(.blue.gradient, in: .rect(cornerRadius: 15))
+            Button("Get Directions", action: fetchRoute)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical)
+                .background(.blue.gradient, in: .rect(cornerRadius: 15))
         }
         .padding(15)
     }
@@ -169,7 +216,16 @@ struct mapView: View {
             request.destination = mapSelection
             
             Task {
+                let result = try? await MKDirections(request: request).calculate()
+                route = result?.routes.first
+                /// Saving Route Destination
+                routeDestination = mapSelection
                 
+                withAnimation(.snappy) {
+                    routeDisplaying = true
+                    showDetails = false
+                    
+                }
             }
         }
     }
