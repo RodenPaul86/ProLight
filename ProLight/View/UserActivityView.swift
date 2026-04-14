@@ -37,7 +37,7 @@ struct UserActivityView: View {
                 .padding()
             }
             .navigationTitle("Fitness Stats")
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inlineLarge)
             .onAppear {
                 loadArrayFromDict()
             }
