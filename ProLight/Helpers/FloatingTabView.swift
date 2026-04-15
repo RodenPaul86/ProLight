@@ -147,8 +147,15 @@ fileprivate struct FloatingTabBar<Value: CaseIterable & Hashable & FloatingTabPr
                         .fill(.background)
                 }
                 
-                Rectangle()
-                    .fill(config.backgroundColor)
+                if #available(iOS 26.0, *) {
+                    Rectangle()
+                        .fill(config.backgroundColor)
+                        .glassEffect(.regular.interactive(), in: .capsule)
+                } else {
+                    // Fallback on earlier versions
+                    Rectangle()
+                        .fill(config.backgroundColor)
+                }
             }
         }
         .clipShape(.capsule(style: .continuous))
