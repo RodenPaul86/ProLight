@@ -26,16 +26,11 @@ struct mapView: View {
     @State private var route: MKRoute?
     @State private var routeDestination: MKMapItem?
     
+    var tabBarHeight: CGFloat?
+    
     var body: some View {
         NavigationStack {
             Map(position: $cameraPosition, selection: $mapSelection, scope: locationSpace) {
-                /// Map Annotations
-                Annotation("Apple Park", coordinate: .myLocation) {
-                    ZStack {
-                        Image(systemName: "applelogo")
-                    }
-                }
-                
                 /// Simply Display Annotations as Marker, as we seen before
                 ForEach(searchResults, id: \.self) { mapItem in
                     /// Hiding All other Markers, Expect Destionation One
@@ -63,9 +58,15 @@ struct mapView: View {
             .onMapCameraChange({ ctx in
                 viewingRegion = ctx.region
             })
-            .overlay(alignment: .bottomTrailing) {
-                VStack(spacing: 15) {
+            .overlay(alignment: .topTrailing) {
+                HStack(spacing: 10) {
                     MapCompass(scope: locationSpace)
+                }
+                .buttonBorderShape(.circle)
+                .padding()
+            }
+            .overlay(alignment: .bottomTrailing) {
+                VStack(spacing: 10) {
                     MapPitchToggle(scope: locationSpace)
                     MapUserLocationButton(scope: locationSpace)
                 }
@@ -73,15 +74,15 @@ struct mapView: View {
                 .padding()
             }
             .mapScope(locationSpace)
-            .navigationTitle("Map")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Explore Map")
+            .toolbarTitleDisplayMode(.inlineLarge)
             /// Search Bar
             .searchable(text: $searchText, isPresented: $showSearch)
             /// Showing Trasnlucent ToolBar
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             /// When Route Displaying Hiding Top and Bottom Bar
             .toolbar(routeDisplaying ? .hidden : .visible, for: .navigationBar)
+            .safeAreaPadding(.bottom, tabBarHeight)
             .sheet(isPresented: $showDetails, onDismiss: {
                 withAnimation(.snappy) {
                     /// Zooming Route
