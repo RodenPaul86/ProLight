@@ -133,16 +133,6 @@ struct SettingsView: View {
             .listStyle(InsetGroupedListStyle())
             .navigationTitle("Settings")
             .toolbarTitleDisplayMode(.inlineLarge)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    if UIDevice.current.userInterfaceIdiom == .pad {
-                        Button(action: { dismiss() }) {
-                            Text("Done")
-                                .foregroundStyle(Color.theme.accent)
-                        }
-                    }
-                }
-            }
             .safeAreaPadding(.bottom, tabBarHeight)
             .hideFloatingTabBar(hideTabBar)
             .fullScreenCover(isPresented: $isPaywallPresented) {
