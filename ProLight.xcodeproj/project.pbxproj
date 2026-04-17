@@ -12,6 +12,7 @@
 		3A160CAE2E37E48400DEA6D6 /* ProLight WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3A160C9F2E37E48100DEA6D6 /* ProLight WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3A3C9BB42E35123F007A3007 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A3C9BB32E35123F007A3007 /* StoreKit.framework */; };
 		3AADAD0E2E3283BE0044EE64 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 3AADAD0D2E3283BE0044EE64 /* Lottie */; };
+		3ABB8FA22F92890D00608BF3 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3ABB8FA12F92890D00608BF3 /* SDWebImageSwiftUI */; };
 		3ADC62F62E2E72DE00B66E31 /* ConfidentialKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3ADC62F52E2E72DE00B66E31 /* ConfidentialKit */; };
 		3ADC63B42E2E789700B66E31 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 3ADC63B32E2E789700B66E31 /* RevenueCat */; };
 		3ADC63B62E2E789700B66E31 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3ADC63B52E2E789700B66E31 /* RevenueCatUI */; };
@@ -108,6 +109,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3ABB8FA22F92890D00608BF3 /* SDWebImageSwiftUI in Frameworks */,
 				3ADC63B42E2E789700B66E31 /* RevenueCat in Frameworks */,
 				3ADC62F62E2E72DE00B66E31 /* ConfidentialKit in Frameworks */,
 				3A3C9BB42E35123F007A3007 /* StoreKit.framework in Frameworks */,
@@ -185,6 +187,7 @@
 				3ADC63B32E2E789700B66E31 /* RevenueCat */,
 				3ADC63B52E2E789700B66E31 /* RevenueCatUI */,
 				3AADAD0D2E3283BE0044EE64 /* Lottie */,
+				3ABB8FA12F92890D00608BF3 /* SDWebImageSwiftUI */,
 			);
 			productName = ProLight;
 			productReference = 3A0D29B12DE7819100F1F704 /* ProLight.app */;
@@ -244,6 +247,7 @@
 				3ADC62F72E2E735100B66E31 /* XCRemoteSwiftPackageReference "swift-confidential-plugin" */,
 				3ADC63B22E2E789700B66E31 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
 				3AADAD0C2E3283BE0044EE64 /* XCRemoteSwiftPackageReference "lottie-ios" */,
+				3ABB8F7F2F92605900608BF3 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3A0D29B22DE7819100F1F704 /* Products */;
@@ -625,6 +629,14 @@
 				minimumVersion = 4.5.2;
 			};
 		};
+		3ABB8F7F2F92605900608BF3 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.4;
+			};
+		};
 		3ADC62F42E2E72DE00B66E31 /* XCRemoteSwiftPackageReference "swift-confidential" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/securevale/swift-confidential";
@@ -656,6 +668,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3AADAD0C2E3283BE0044EE64 /* XCRemoteSwiftPackageReference "lottie-ios" */;
 			productName = Lottie;
+		};
+		3ABB8FA12F92890D00608BF3 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3ABB8F7F2F92605900608BF3 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
 		};
 		3ADC62F52E2E72DE00B66E31 /* ConfidentialKit */ = {
 			isa = XCSwiftPackageProductDependency;

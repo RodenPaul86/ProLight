@@ -1,5 +1,5 @@
 {
-  "originHash" : "686bfb16142c902b019515cc5e55970e612ab61dc33429d248bdb5c2d22768c8",
+  "originHash" : "12f6ea6663381006621524faa4be8ea788cc937e9f0ab6f72262c6cd47f9f444",
   "pins" : [
     {
       "identity" : "lottie-ios",
@@ -17,6 +17,24 @@
       "state" : {
         "revision" : "8f5df97653eb361a2097119479332afccf0aa816",
         "version" : "5.58.0"
+      }
+    },
+    {
+      "identity" : "sdwebimage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SDWebImage/SDWebImage.git",
+      "state" : {
+        "revision" : "2de3a496eaf6df9a1312862adcfd54acd73c39c0",
+        "version" : "5.21.7"
+      }
+    },
+    {
+      "identity" : "sdwebimageswiftui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SDWebImage/SDWebImageSwiftUI",
+      "state" : {
+        "revision" : "0e331457ca9af2f0b08bcaa138a91ffb907b004f",
+        "version" : "3.1.4"
       }
     },
     {

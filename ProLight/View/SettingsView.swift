@@ -24,6 +24,9 @@ struct SettingsView: View {
     @State private var debugMessage: String = ""
     @State private var isPaywallPresented: Bool = false
     @State private var isPresentedManageSubscription: Bool = false
+    @State private var model: PaywallModel?
+    @State private var showDefaultView: Bool = false
+    
     @State private var showStoreView = false
     @State private var hideTabBar: Bool = false
     
@@ -48,7 +51,7 @@ struct SettingsView: View {
                 
                 Section(header: Text("General")) {
                     customRow(icon: "figure.walk", firstLabel: "Walking History", destination: AnyView(WorkoutHistoryView()))
-                    customRow(icon: "", firstLabel: "AI Assistant", showToggle: true, toggleValue: $isAssistantEnabled)
+                    //customRow(icon: "", firstLabel: "AI Assistant", showToggle: true, toggleValue: $isAssistantEnabled)
                 }
                 
                 Section(header: Text("Customization")) {
@@ -136,8 +139,18 @@ struct SettingsView: View {
             .safeAreaPadding(.bottom, tabBarHeight)
             .hideFloatingTabBar(hideTabBar)
             .fullScreenCover(isPresented: $isPaywallPresented) {
-                SubscriptionView(isPaywallPresented: $isPaywallPresented)
-                    .preferredColorScheme(.dark)
+                CustomPaywallView(
+                    model: $model,
+                    showDefaultView: $showDefaultView
+                )
+            }
+            .task {
+                do {
+                    try await fetchPaywallData()
+                } catch {
+                    print(error.localizedDescription)
+                    showDefaultView = true
+                }
             }
             .background(
                 StoreProductPresenter(appStoreID: 693041126, isPresented: $showStoreView)
@@ -145,6 +158,18 @@ struct SettingsView: View {
             .manageSubscriptionsSheet(isPresented: $isPresentedManageSubscription)
             .debugRevenueCatOverlay(isPresented: $showDebug) /// <-- Disable this before sending for review.
         }
+    }
+    
+    func fetchPaywallData() async throws {
+        guard let jsonDict = try await Purchases.shared.offerings().current?.metadata else {
+            showDefaultView = true
+            return
+        }
+        /// Converting into JSON Data
+        let jsonData = try JSONSerialization.data(withJSONObject: jsonDict, options: .prettyPrinted)
+        let model = try JSONDecoder().decode(PaywallModel.self, from: jsonData)
+        self.model = model
+        showDefaultView = model.showDefaultVfew
     }
     
     private func resetUserDefaults() {

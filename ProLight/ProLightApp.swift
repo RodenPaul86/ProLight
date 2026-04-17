@@ -16,7 +16,7 @@ struct ProLightApp: App {
     @StateObject var healthManager = HealthManager()
     
     init() {
-        Purchases.logLevel = .error
+        Purchases.logLevel = .debug
         Purchases.configure(withAPIKey: "\(Secrets.$apiKey)")
     }
     
