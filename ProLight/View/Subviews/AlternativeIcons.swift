@@ -68,6 +68,8 @@ enum AppIcon: String, CaseIterable {
 struct AlternativeIcons: View {
     @State private var currentAppIcon: AppIcon = .defaultIcon
     @EnvironmentObject var appSubModel: appSubscriptionModel
+    @State private var model: PaywallModel?
+    @State private var showDefaultView: Bool = false
     @State private var isPaywallPresented: Bool = false
     @State private var hideTabBar: Bool = false
     
@@ -142,8 +144,7 @@ struct AlternativeIcons: View {
             )
         }
         .fullScreenCover(isPresented: $isPaywallPresented) {
-            SubscriptionView(isPaywallPresented: $isPaywallPresented)
-                .preferredColorScheme(.dark)
+            CustomPaywallView(model: $model, showDefaultView: $showDefaultView)
         }
     }
 }

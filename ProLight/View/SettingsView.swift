@@ -27,7 +27,6 @@ struct SettingsView: View {
     @State private var isPresentedManageSubscription: Bool = false
     @State private var model: PaywallModel?
     @State private var showDefaultView: Bool = false
-    
     @State private var showStoreView = false
     @State private var hideTabBar: Bool = false
     
