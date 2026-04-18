@@ -7,6 +7,7 @@
 
 import SwiftUI
 import RevenueCat
+import RevenueCatUI
 import WebKit
 
 struct SettingsView: View {
@@ -139,10 +140,7 @@ struct SettingsView: View {
             .safeAreaPadding(.bottom, tabBarHeight)
             .hideFloatingTabBar(hideTabBar)
             .fullScreenCover(isPresented: $isPaywallPresented) {
-                CustomPaywallView(
-                    model: $model,
-                    showDefaultView: $showDefaultView
-                )
+                CustomPaywallView(model: $model, showDefaultView: $showDefaultView)
             }
             .task {
                 do {
@@ -169,7 +167,7 @@ struct SettingsView: View {
         let jsonData = try JSONSerialization.data(withJSONObject: jsonDict, options: .prettyPrinted)
         let model = try JSONDecoder().decode(PaywallModel.self, from: jsonData)
         self.model = model
-        showDefaultView = model.showDefaultVfew
+        showDefaultView = model.showDefaultView
     }
     
     private func resetUserDefaults() {

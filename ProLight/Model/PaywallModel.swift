@@ -17,7 +17,7 @@ struct PaywallModel: Codable {
     var points: [Point]
     var reviews: [Review]
     var showReviews: Bool
-    var showDefaultVfew: Bool
+    var showDefaultView: Bool
     
     enum CodingKeys: CodingKey {
         case title
@@ -29,7 +29,7 @@ struct PaywallModel: Codable {
         case points
         case reviews
         case showReviews
-        case showDefaultVfew
+        case showDefaultView
     }
     
     struct Point: Identifiable, Codable {

@@ -12,6 +12,7 @@ import SDWebImageSwiftUI
 struct CustomPaywallView: View {
     @Binding var model: PaywallModel?
     @Binding var showDefaultView: Bool
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         GeometryReader {
@@ -47,11 +48,86 @@ struct CustomPaywallView: View {
                     let size = $0.size
                     let isSticky = model.stickyHeader
                     let stretchyHeader = model.stretchyHeader
+                    let minY = $0.frame(in: .global).minY
+                    /// Limited Header
+                    let limitedHeaderHeight = size.height - (60 + safeArea.top)
+                    /// Progress
+                    let progress = min(max((-minY / limitedHeaderHeight), 0), 1)
+                    let limitedMinY = -minY > limitedHeaderHeight ? -(minY + limitedHeaderHeight) : 0
+                    let stickyHeaderTitle = model.stickyHeaderTitle
                     
                     WebImage(url: URL(string: model.headerImage))
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: size.width, height: size.height + (stretchyHeader ? (minY > 0 ? minY : 0) : 0))
+                        .overlay {
+                            Rectangle()
+                                .fill(.ultraThinMaterial)
+                                .opacity(progress)
+                                .overlay(alignment: .bottom) {
+                                    Text(stickyHeaderTitle)
+                                        .font(.title3.bold())
+                                        .foregroundStyle(Color.primary)
+                                        .offset(y: 90 - (100 * progress))
+                                    
+                                }
+                        }
+                        .clipped()
+                        .offset(y: isSticky ? (minY > 0 ? -minY : (isSticky ? limitedMinY : 0)) : 0)
+                        .overlay(alignment: .topTrailing) {
+                            Button(action: { dismiss() }, label: {
+                                Image(systemName: "xmark")
+                                    .font(.callout)
+                                    .frame(width: 35, height: 35)
+                                    .foregroundStyle(Color.primary)
+                                    .background(.ultraThinMaterial, in: .circle)
+                                    .contentShape(.circle)
+                            })
+                            .padding(.top, safeArea.top + 12)
+                            .padding(.trailing)
+                            .offset(y: -minY)
+                        }
                 }
+                .frame(height: size.height - (140 + 320 - safeArea.top))
+                .zIndex(1000)
+                
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(model.title)
+                        .font(.largeTitle.bold())
+                    
+                    Text(model.subTitle)
+                        .font(.caption)
+                        .foregroundStyle(.gray)
+                    
+                    /// Points View
+                    VStack(spacing: 15) {
+                        ForEach(model.points) { point in
+                            PointView(
+                                point: point,
+                                allPoints: model.points,
+                                size: size
+                            )
+                        }
+                    }
+                    .padding(.top, 12)
+                    
+                    /// Review View
+                    VStack(spacing: 15) {
+                        ForEach(model.reviews) { review in
+                            ReviewView(
+                                review: review,
+                                allReviews: model.reviews,
+                                size: size
+                            )
+                        }
+                    }
+                    .padding(.top, 15)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(15)
             }
         }
+        .ignoresSafeArea(.container, edges: .top)
         .scrollIndicators(.hidden)
         .originalTemplatePaywallFooter(condensed: true) { info in
             /// Completed
@@ -61,6 +137,114 @@ struct CustomPaywallView: View {
     }
 }
 
-#Preview {
-    ContentView()
+/// Points View
+fileprivate struct PointView: View {
+    var point: PaywallModel.Point
+    /// For Calculating Delay with the help of index
+    var allPoints: [PaywallModel.Point]
+    var size: CGSize
+    /// View Properties
+    @State private var animateSymbol: Bool = false
+    @State private var animateContent: Bool = false
+    
+    var body: some View {
+        HStack(spacing: 0) {
+            ZStack {
+                if animateSymbol {
+                    Image(systemName: point.symbol)
+                        .font(.title)
+                        .foregroundStyle(point.colorValue.gradient)
+                        .transition(.scale)
+                }
+            }
+            .frame(width: 35, height: 35)
+            
+            Text(point.content)
+                .font(.callout)
+                .foregroundStyle(Color.primary)
+                .offset(x: animateContent ? -size.width : 0)
+                .clipped()
+                .padding(.leading, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .task {
+            guard !animateSymbol else { return }
+            /// Delay
+            try? await Task.sleep(for: .seconds(initialDelay))
+            withAnimation(.snappy(duration: 0.3)) {
+                animateSymbol = true
+            }
+            
+            try? await Task.sleep(for: .seconds(0.1))
+            withAnimation(.easeInOut(duration: 0.25)) {
+                animateContent = true
+            }
+            
+            
+            
+        }
+    }
+    
+    var initialDelay: Double {
+        return Double(allPoints.firstIndex(where: { $0.id == point.id }) ?? 0) * 0.4
+    }
+}
+
+/// Review View
+fileprivate struct ReviewView: View {
+    var review: PaywallModel.Review
+    var allReviews: [PaywallModel.Review]
+    var size: CGSize
+    /// View Properties
+    @State private var animateReview: Bool = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(review.name)
+                .font(.caption)
+                .foregroundStyle(.gray)
+            
+            /// Rating View
+            ratingView(review.rating)
+            
+            Text(review.content)
+                .font(.callout)
+                .textScale(.secondary)
+                .foregroundStyle(Color.primary)
+        }
+        .padding(10)
+        .background(.ultraThinMaterial, in: .rect(cornerRadius: 12))
+        .padding(positionEdge, 35)
+        .frame(maxWidth: .infinity, alignment: positionEdge == .leading ? .trailing : .leading)
+        .offset(x: animateReview ? 0 : (positionEdge == .leading ? size.width : -size.width))
+        .overlay {
+            GeometryReader {
+                let minY = $0.frame(in: .global).minY
+                
+                Color.clear
+                    .onChange(of: minY) { oldValue, newValue in
+                        if newValue < (size.height - 140) && !animateReview {
+                            withAnimation(.smooth(duration: 0.45)) {
+                                animateReview = true
+                            }
+                        }
+                    }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    func ratingView(_ rating: Int) -> some View {
+        HStack(spacing: 10) {
+            ForEach(1...5, id: \.self) { index in
+                Image(systemName: "star.fill")
+                    .foregroundStyle(rating >= index ? .yellow : .gray)
+            }
+        }
+    }
+    
+    var positionEdge: Edge.Set {
+        let index = allReviews.firstIndex(where: { $0.id == review.id }) ?? 0
+        return index % 2 == 0 ? .leading : .trailing
+    }
 }
