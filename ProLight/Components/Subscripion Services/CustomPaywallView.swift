@@ -162,7 +162,7 @@ fileprivate struct PointView: View {
             Text(point.content)
                 .font(.callout)
                 .foregroundStyle(Color.primary)
-                .offset(x: animateContent ? -size.width : 0)
+                .offset(x: !animateContent ? -size.width : 0)
                 .clipped()
                 .padding(.leading, 12)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -179,9 +179,6 @@ fileprivate struct PointView: View {
             withAnimation(.easeInOut(duration: 0.25)) {
                 animateContent = true
             }
-            
-            
-            
         }
     }
     
