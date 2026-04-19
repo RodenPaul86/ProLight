@@ -50,12 +50,12 @@ struct HomeView: View {
     @State private var countdownTimer: Timer?
     
     @State private var countdownValue = 3
-    @State private var glow = false
+    @State private var glow: Bool = false
     
     @StateObject private var locationManager = LocationManager()
     @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
     @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
-    @AppStorage("isAssistantEnabled") private var isAssistantEnabled: Bool = true
+    @AppStorage("isAssistantEnabled") private var isAssistantEnabled: Bool = false /// <-- This is for the forth feature button.
     
     @State private var showWeatherSheet: Bool = false
     @State private var showSignalingMirrorSheet: Bool = false

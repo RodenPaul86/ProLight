@@ -56,6 +56,11 @@ struct WorkoutHistoryView: View {
             hideTabBar = true
         }
         .navigationTitle("Past Walks")
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Walking History")
+            }
+        }
         .hideFloatingTabBar(hideTabBar)
     }
     
