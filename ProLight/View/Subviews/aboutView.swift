@@ -36,6 +36,7 @@ struct aboutView: View {
                 hideTabBar = true
             }
             .navigationTitle("About")
+            .navigationBarTitleDisplayMode(.inline)
             .hideFloatingTabBar(hideTabBar)
         }
     }

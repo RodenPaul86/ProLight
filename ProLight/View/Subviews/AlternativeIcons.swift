@@ -123,6 +123,7 @@ struct AlternativeIcons: View {
             }
         }
         .navigationTitle("Alternate Icons")
+        .navigationBarTitleDisplayMode(.inline)
         .hideFloatingTabBar(hideTabBar)
         .onAppear {
             hideTabBar = true

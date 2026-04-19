@@ -73,6 +73,7 @@ DocMatic is designed to streamline your workflow and simplify document managemen
             }
             .padding()
             .navigationTitle("Release Notes")
+            .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 hideTabBar = true
             }
