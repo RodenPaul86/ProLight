@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import RevenueCat
 
 enum AppIcon: String, CaseIterable {
     case defaultIcon = "Default"
@@ -146,6 +147,26 @@ struct AlternativeIcons: View {
         .fullScreenCover(isPresented: $isPaywallPresented) {
             CustomPaywallView(model: $model, showDefaultView: $showDefaultView)
         }
+        .task {
+            do {
+                try await fetchPaywallData()
+            } catch {
+                print(error.localizedDescription)
+                showDefaultView = true
+            }
+        }
+    }
+    
+    func fetchPaywallData() async throws {
+        guard let jsonDict = try await Purchases.shared.offerings().current?.metadata else {
+            showDefaultView = true
+            return
+        }
+        /// Converting into JSON Data
+        let jsonData = try JSONSerialization.data(withJSONObject: jsonDict, options: .prettyPrinted)
+        let model = try JSONDecoder().decode(PaywallModel.self, from: jsonData)
+        self.model = model
+        showDefaultView = model.showDefaultView
     }
 }
 
