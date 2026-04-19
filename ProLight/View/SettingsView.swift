@@ -83,6 +83,7 @@ struct SettingsView: View {
                             isPresentedManageSubscription = true
                         }
                     }
+                    customRow(icon: "", firstLabel: "Acknowledgments", destination: AnyView(Acknowledgments()))
                     customRow(icon: "widget.small", firstLabel: "Install Widget", destination: AnyView(WidgetSetupView()))
                     customRow(icon: "square.fill.text.grid.1x2", firstLabel: "More Apps") {
                         showStoreView.toggle()
