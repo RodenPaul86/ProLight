@@ -76,15 +76,9 @@ struct SettingsView: View {
                     customRow(icon: "envelope", firstLabel: "Contact Support", destination: AnyView(feedbackView()))
                 }
                 
-                Section(header: Text("Info"), footer: Text("Help shape future updates of DocMatic. Your feedback makes a difference!")) {
-                    customRow(icon: "list.clipboard", firstLabel: "About", destination: AnyView(aboutView()))
-                    if appSubModel.isSubscriptionActive {
-                        customRow(icon: "crown", firstLabel: "Manage Subscription") {
-                            isPresentedManageSubscription = true
-                        }
-                    }
-                    customRow(icon: "", firstLabel: "Acknowledgments", destination: AnyView(Acknowledgments()))
+                Section(header: Text("Info"), footer: Text("Help shape future updates of ProLight. Your feedback makes a difference!")) {
                     customRow(icon: "widget.small", firstLabel: "Install Widget", destination: AnyView(WidgetSetupView()))
+                    customRow(icon: "rosette", firstLabel: "Acknowledgments", destination: AnyView(Acknowledgments()))
                     customRow(icon: "square.fill.text.grid.1x2", firstLabel: "More Apps") {
                         showStoreView.toggle()
                     }
@@ -92,7 +86,7 @@ struct SettingsView: View {
                     customRow(icon: "paperplane", firstLabel: "Join TestFlight (Beta)", url: "https://testflight.apple.com/join/8rtJj2JX", showJoinInsteadOfSafari: true)
                 }
                 
-                Section(header: Text("Legal")) {
+                Section(header: Text("Legal"), footer: Text("© 2016 - \(Date(), format: .dateTime.year()) Paul Roden Jr. All Rights Reserved, Made in USA 🇺🇸.")) {
                     customRow(icon: "hand.raised", firstLabel: "Privacy Policy", url: "https://docmatic.app/privacy.html")
                     customRow(icon: "doc.text", firstLabel: "Terms of Service", url: "https://docmatic.app/terms.html")
                     customRow(icon: "append.page", firstLabel: "EULA", url: "https://docmatic.app/EULA.html")
@@ -137,6 +131,15 @@ struct SettingsView: View {
             .listStyle(InsetGroupedListStyle())
             .navigationTitle("Settings")
             .toolbarTitleDisplayMode(.inlineLarge)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    if appSubModel.isSubscriptionActive {
+                        Button(action: { isPresentedManageSubscription = true }) {
+                            Image(systemName: "crown")
+                        }
+                    }
+                }
+            }
             .safeAreaPadding(.bottom, tabBarHeight)
             .hideFloatingTabBar(hideTabBar)
             .fullScreenCover(isPresented: $isPaywallPresented) {
@@ -188,64 +191,61 @@ struct customRow: View {
     var firstLabel: String
     var firstLabelColor: Color = .gray
     var secondLabel: String?
-    var action: (() -> Void)? = nil  /// <-- Optional action
-    var destination: AnyView? = nil  /// <-- Optional navigation
-    var url: String? = nil           /// <-- Optional URL
+    var action: (() -> Void)? = nil
+    var destination: AnyView? = nil
+    var url: String? = nil
     var showToggle: Bool = false
-    var toggleValue: Binding<Bool>? = nil /// <-- Optional toggle switch
+    var toggleValue: Binding<Bool>? = nil
     var showMenu: Bool = false
     var menuOptions: [String] = []
     var selectedOption: Binding<String?>? = nil
-    var shareURL: URL? = nil             /// <-- Optional share link
+    var shareURL: URL? = nil
     var showJoinInsteadOfSafari: Bool? = nil
     var selectedOptionRaw: Binding<String>?
     
-    @State private var isNavigating: Bool = false
     @State private var isSharing: Bool = false
-    @State private var hideTabBar: Bool = false
+    
+    // MARK: NEW: Safari sheet state
+    @State private var selectedURL: IdentifiableURL?
+    private struct IdentifiableURL: Identifiable {
+        let id = UUID()
+        let url: URL
+    }
     
     var body: some View {
         Group {
+            // MARK: URL → Present Safari Sheet
             if let urlString = url {
-                NavigationLink {
-                    webView(url: urlString)
-                        .onAppear {
-                            hideTabBar = true
+                rowContent(showChevron: true)
+                    .onTapGesture {
+                        if let link = URL(string: urlString) {
+                            selectedURL = IdentifiableURL(url: link)
                         }
-                        .hideFloatingTabBar(hideTabBar)
-                        .edgesIgnoringSafeArea(.all)
-                        .navigationTitle(firstLabel)
-                        .navigationBarTitleDisplayMode(.inline)
-                        .toolbar {
-                            ToolbarItem(placement: .navigationBarTrailing) {
-                                if let link = URL(string: urlString) {
-                                    Link(destination: link) {
-                                        if showJoinInsteadOfSafari ?? false {
-                                            Text("Join")
-                                                .fontWeight(.bold)
-                                        } else {
-                                            Image(systemName: "safari")
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                } label: {
-                    rowContent(showChevron: false)
-                }
-                .buttonStyle(.plain)
-            } else if let destination = destination {
+                    }
+            }
+            
+            // MARK: Navigation destination (unchanged)
+            else if let destination = destination {
                 NavigationLink {
                     destination
                 } label: {
                     rowContent(showChevron: false)
                 }
                 .buttonStyle(.plain)
-            } else if showToggle {
+            }
+            
+            // MARK: Toggle
+            else if showToggle {
                 rowContent(showChevron: false)
-            } else if showMenu {
+            }
+            
+            // MARK: Menu
+            else if showMenu {
                 rowContent(showChevron: false)
-            } else {
+            }
+            
+            // MARK: Action / Share
+            else {
                 rowContent(showChevron: action != nil || shareURL != nil)
                     .onTapGesture {
                         if shareURL != nil {
@@ -256,18 +256,26 @@ struct customRow: View {
                     }
             }
         }
+        
+        // MARK: Share Sheet (unchanged)
         .sheet(isPresented: $isSharing) {
             if let shareURL = shareURL {
                 ActivityView(activityItems: [shareURL])
                     .presentationDetents([.medium])
             }
         }
+        
+        // MARK: NEW: Safari Sheet
+        .sheet(item: $selectedURL) { item in
+            SafariView(url: item.url)
+                .ignoresSafeArea()
+        }
     }
     
     private func rowContent(showChevron: Bool) -> some View {
         HStack {
             Image(systemName: icon)
-                .font(.system(size: 18)) /// <-- Fixed size, unaffected by user settings
+                .font(.system(size: 18))
                 .foregroundColor(.white)
                 .frame(width: 32, height: 32)
                 .background(Color.theme.accent)
@@ -291,17 +299,16 @@ struct customRow: View {
                 Image(systemName: "chevron.right")
                     .font(.headline)
                     .imageScale(.small)
-                    .foregroundColor(Color.init(uiColor: .systemGray3))
+                    .foregroundColor(Color(uiColor: .systemGray3))
             } else {
                 Text(secondLabel ?? "")
-                    .foregroundStyle((action == nil && destination == nil && url == nil && shareURL == nil) ? .gray : .primary)
+                    .foregroundStyle(
+                        (action == nil && destination == nil && url == nil && shareURL == nil)
+                        ? .gray : .primary
+                    )
             }
         }
         .contentShape(Rectangle())
-    }
-    
-    private func isWebsite(_ urlString: String) -> Bool {
-        return urlString.hasPrefix("http")
     }
 }
 
@@ -333,24 +340,12 @@ struct ActivityView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
-// MARK: WebView
-struct webView: UIViewRepresentable {
-    var url: String
-    func makeUIView(context: UIViewRepresentableContext<webView>) -> WKWebView {
-        let view = WKWebView()
-        view.load(URLRequest(url: URL(string: url)!))
-        return view
-    }
-    func updateUIView(_ uiView: WKWebView, context: UIViewRepresentableContext<webView>) {
-    }
-}
-
 // MARK: Custom Banner
 struct customPremiumBanner: View {
     var onTap: () -> Void
     
     let features = [
-        "Unlock All Major Features"
+        "Unlock all Features"
     ]
     
     var body: some View {
@@ -373,7 +368,7 @@ struct customPremiumBanner: View {
                         .foregroundColor(.white)
                         .padding(.vertical, 10)
                         .padding(.horizontal, 20)
-                        .background(Color("darkGreen"))
+                        .background(Color.theme.accent)
                         .clipShape(Capsule())
                 }
                 

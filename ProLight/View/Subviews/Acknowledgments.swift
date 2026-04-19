@@ -8,14 +8,15 @@
 import SwiftUI
 
 struct Acknowledgments: View {
+    @State private var selectedURL: IdentifiableURL?
+    private struct IdentifiableURL: Identifiable { let id = UUID(); let url: URL }
     
     @State private var animateGlow = false
     @State private var fadeIn = false
     
     var body: some View {
         ZStack {
-            
-            // Background gradient (adapts to feel like night + light spill)
+            // MARK: Background gradient (adapts to feel like night + light spill)
             LinearGradient(
                 colors: [
                     Color.black,
@@ -27,7 +28,7 @@ struct Acknowledgments: View {
             )
             .ignoresSafeArea()
             
-            // Soft "flashlight glow" effect
+            // MARK: Soft "flashlight glow" effect
             Circle()
                 .fill(
                     RadialGradient(
@@ -52,14 +53,14 @@ struct Acknowledgments: View {
             ScrollView {
                 VStack(spacing: 28) {
                     
-                    // Title
+                    // MARK: Title
                     Text("Thank You")
                         .font(.system(size: 42, weight: .bold, design: .rounded))
                         .opacity(fadeIn ? 1 : 0)
                         .offset(y: fadeIn ? 0 : 10)
                         .animation(.easeOut(duration: 1), value: fadeIn)
                     
-                    // Subtitle
+                    // MARK: Subtitle
                     Text("ProLight is built with gratitude")
                         .font(.title3.weight(.medium))
                         .foregroundStyle(.secondary)
@@ -95,7 +96,7 @@ Thank you for using ProLight and being part of its journey.
                     .offset(y: fadeIn ? 0 : 20)
                     .animation(.easeOut(duration: 1).delay(0.4), value: fadeIn)
                     
-                    // Signature
+                    // MARK: Signature
                     Text("— Paul Roden Jr.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
@@ -108,10 +109,39 @@ Thank you for using ProLight and being part of its journey.
                 .padding(.top, 60)
             }
         }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button {
+                        selectedURL = URL(string: "https://github.com/RodenPaul86").map { IdentifiableURL(url: $0) }
+                    } label: {
+                        Label("GitHub", systemImage: "person.circle")
+                    }
+                    
+                    Button {
+                        selectedURL = URL(string: "https://paulrodenjr.dev").map { IdentifiableURL(url: $0) }
+                    } label: {
+                        Label("Portfolio", systemImage: "globe")
+                    }
+                    
+                } label: {
+                    Image(systemName: "ellipsis")
+                }
+                .sheet(item: $selectedURL) { identifiable in
+                    SafariView(url: identifiable.url)
+                        .ignoresSafeArea()
+                }
+            }
+        }
         .onAppear {
             animateGlow = true
             fadeIn = true
         }
+    }
+    
+    func openURL(_ string: String) {
+        guard let url = URL(string: string) else { return }
+        UIApplication.shared.open(url)
     }
 }
 
