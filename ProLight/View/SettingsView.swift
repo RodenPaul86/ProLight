@@ -311,28 +311,13 @@ struct EnumSelectionMenu<T: CaseIterable & RawRepresentable & Identifiable & Equ
     var displayName: (T) -> String
     
     var body: some View {
-        Menu {
+        Picker("", selection: $selection) {
             ForEach(options) { option in
-                Button {
-                    selection = option.rawValue
-                } label: {
-                    HStack {
-                        Text(displayName(option))
-                        if selection == option.rawValue {
-                            Image(systemName: "checkmark")
-                        }
-                    }
-                }
-            }
-        } label: {
-            if let selectedEnum = options.first(where: { $0.rawValue == selection }) {
-                HStack {
-                    Text(displayName(selectedEnum))
-                    Image(systemName: "chevron.up.chevron.down") /// <-- Chevron next to text
-                }
-                .foregroundColor(.secondary)
+                Text(displayName(option))
+                    .tag(option.rawValue)
             }
         }
+        .tint(.gray)
     }
 }
 
