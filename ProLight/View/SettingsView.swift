@@ -349,8 +349,7 @@ struct customPremiumBanner: View {
     var onTap: () -> Void
     
     let features = [
-        "Unlimited Scans",
-        "Remove Watermark"
+        "Unlock All Major Features"
     ]
     
     var body: some View {
@@ -367,6 +366,14 @@ struct customPremiumBanner: View {
                             .foregroundStyle(.white)
                             .opacity(0.7)
                     }
+                    
+                    Text("Subscribe")
+                        .font(.footnote.bold())
+                        .foregroundColor(.white)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 20)
+                        .background(Color("darkGreen"))
+                        .clipShape(Capsule())
                 }
                 
                 Spacer()
