@@ -451,10 +451,12 @@ struct HomeView: View {
                 
                 HStack {
                     // Frequency Label
-                    Text("\(item.label) ·")
-                        .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.2))
-                        .font(.caption)
-                        .frame(width: 40, alignment: .leading)
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("\(item.label)·")
+                            .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.2))
+                            .font(.footnote)
+                    }
+                    .frame(width: 40, alignment: .leading)
                     
                     // Strobe Bar
                     curvedRectangle(topRadius: isTop ? 40 : 5, bottomRadius: isBottom ? 40 : 5)
@@ -476,10 +478,10 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         Text("\(item.ppm)")
                             .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.2))
-                            .font(.caption)
+                            .font(.footnote)
                         Text("ppm")
                             .foregroundColor(item.frequency == selectedMaxFrequency ? .white : Color.gray.opacity(0.2))
-                            .font(.caption)
+                            .font(.footnote)
                             .italic()
                     }
                     .frame(width: 40, alignment: .leading)
