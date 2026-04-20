@@ -27,6 +27,6 @@ struct ProLightApp: App {
                 .environmentObject(appSubModel)
                 .environmentObject(healthManager)
         }
-        .modelContainer(for: Workout.self) // <- registers Workout as a SwiftData model
+        .modelContainer(for: Workout.self) /// <-- registers Workout as a SwiftData model
     }
 }

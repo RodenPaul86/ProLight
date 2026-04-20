@@ -29,6 +29,7 @@ enum SOSState: Equatable {
 
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.requestReview) private var requestReview
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var flashControllerInstance = FlashController()
     @State private var brightnessLevel: Int = 4
@@ -553,6 +554,17 @@ struct HomeView: View {
             HapticManager.shared.notify(.impact(.medium))
             flashlightOn.toggle()
             brightnessLevel = maxLevel
+            
+            if AppReviewRequest.requestAvailable {
+                Task {
+                    try await Task.sleep(
+                        until: .now + .seconds(1),
+                        tolerance: .seconds(0.5),
+                        clock: .suspending
+                    )
+                    requestReview()
+                }
+            }
             
             if flashlightOn {
                 if mode == .strobe {
