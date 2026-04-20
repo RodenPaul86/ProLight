@@ -60,14 +60,14 @@ class HealthManager: ObservableObject {
             
             if let error = error {
                 print("error fetching todays step count: \(error.localizedDescription)")
-                displayAmount = "Error"
+                displayAmount = "No data"
             } else if let quantity = result?.sumQuantity() {
                 let stepCount = quantity.doubleValue(for: .count())
                 displayAmount = stepCount.formattedString() ?? "0"
-                print(stepCount.formattedString())
+                print(stepCount.formattedString() ?? "0")
             } else {
                 // No data for today
-                displayAmount = "No Data"
+                displayAmount = "No data"
             }
             
             let activity = cardElements(
@@ -92,7 +92,7 @@ class HealthManager: ObservableObject {
         
         let query = HKStatisticsQuery(quantityType: calories, quantitySamplePredicate: predicate) { _, result, error in
             
-            var displayAmount = "No Data"
+            var displayAmount = ""
             
             if let error = error {
                 print("Error fetching calories: \(error.localizedDescription)")
@@ -100,7 +100,12 @@ class HealthManager: ObservableObject {
                 displayAmount = caloriesBurned.formattedString()!
             }
             
-            let activity = cardElements(id: 1, title: "Calories", subtitle: "Burned", image: "flame", tintColor: .red, amount: "\(displayAmount) kcal")
+            let activity = cardElements(
+                id: 1, title: "Calories",
+                subtitle: "Burned",
+                image: "flame",
+                tintColor: .red,
+                amount: displayAmount.isEmpty ? "No data" : "\(displayAmount) kcal")
             
             DispatchQueue.main.async {
                 self.activities["todayCalories"] = activity
@@ -116,7 +121,7 @@ class HealthManager: ObservableObject {
         
         let query = HKStatisticsQuery(quantityType: flights, quantitySamplePredicate: predicate) { _, result, error in
             
-            var displayAmount = "No Data"
+            var displayAmount = ""
             
             if let error = error {
                 print("Error fetching stairs climbed: \(error.localizedDescription)")
@@ -124,7 +129,13 @@ class HealthManager: ObservableObject {
                 displayAmount = flightsCount.formattedString()!
             }
             
-            let activity = cardElements(id: 3, title: "Stairs", subtitle: "Flights Climbed", image: "figure.stairs", tintColor: .orange, amount: displayAmount)
+            let activity = cardElements(
+                id: 3,
+                title: "Stairs",
+                subtitle: "Flights Climbed",
+                image: "figure.stairs",
+                tintColor: .orange,
+                amount: displayAmount.isEmpty ? "No data" : "\(displayAmount)")
             
             DispatchQueue.main.async {
                 self.activities["todayStairs"] = activity
@@ -140,7 +151,7 @@ class HealthManager: ObservableObject {
         
         let query = HKStatisticsQuery(quantityType: distanceType, quantitySamplePredicate: predicate) { _, result, error in
             
-            var displayAmount = "No Data"
+            var displayAmount = ""
             
             if let error = error {
                 print("Error fetching walking distance: \(error.localizedDescription)")
@@ -148,7 +159,12 @@ class HealthManager: ObservableObject {
                 displayAmount = String(format: "%.2f km", distance / 1000)
             }
             
-            let activity = cardElements(id: 4, title: "Distance", subtitle: "Distance", image: "map", tintColor: .blue, amount: displayAmount)
+            let activity = cardElements(
+                id: 4, title: "Distance",
+                subtitle: "Distance",
+                image: "map",
+                tintColor: .blue,
+                amount: displayAmount.isEmpty ? "No data" : "\(displayAmount)")
             
             DispatchQueue.main.async {
                 self.activities["todayWalkingDistance"] = activity
@@ -164,7 +180,7 @@ class HealthManager: ObservableObject {
         
         let query = HKSampleQuery(sampleType: speedType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { _, samples, error in
             
-            var displayAmount = "No Data"
+            var displayAmount = ""
             
             if let error = error {
                 print("Error fetching walking speed samples: \(error.localizedDescription)")
@@ -177,7 +193,13 @@ class HealthManager: ObservableObject {
                 displayAmount = String(format: "%.2f mph", mph)
             }
             
-            let activity = cardElements(id: 5, title: "Speed", subtitle: "Average Speed", image: "speedometer", tintColor: .purple, amount: displayAmount)
+            let activity = cardElements(
+                id: 5,
+                title: "Speed",
+                subtitle: "Average Speed",
+                image: "speedometer",
+                tintColor: .purple,
+                amount: displayAmount.isEmpty ? "No data" : "\(displayAmount)")
             
             DispatchQueue.main.async {
                 self.activities["todayWalkingSpeed"] = activity
@@ -193,7 +215,7 @@ class HealthManager: ObservableObject {
         
         let query = HKSampleQuery(sampleType: heartRateType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { _, samples, error in
             
-            var displayAmount = "No Data"
+            var displayAmount = ""
             
             if let error = error {
                 print("Error fetching heart rate: \(error.localizedDescription)")
@@ -203,7 +225,13 @@ class HealthManager: ObservableObject {
                 displayAmount = String(format: "%.0f bpm", avgHR)
             }
             
-            let activity = cardElements(id: 6, title: "Heart Rate", subtitle: "Average Today", image: "heart.fill", tintColor: .pink, amount: displayAmount)
+            let activity = cardElements(
+                id: 6,
+                title: "Heart Rate",
+                subtitle: "Average Today",
+                image: "heart.fill",
+                tintColor: .pink,
+                amount: displayAmount.isEmpty ? "No data" : "\(displayAmount)")
             
             DispatchQueue.main.async {
                 self.activities["todayHeartRate"] = activity
@@ -224,7 +252,14 @@ class HealthManager: ObservableObject {
             }
             
             guard let workouts = sample as? [HKWorkout], !workouts.isEmpty else {
-                let activity = cardElements(id: 2, title: "Running", subtitle: "Data from Watch", image: "figure.run", tintColor: .blue, amount: "No Data")
+                let activity = cardElements(
+                    id: 2,
+                    title: "Running",
+                    subtitle: "Data from Watch",
+                    image: "figure.run",
+                    tintColor: .blue,
+                    amount: "No data")
+                
                 DispatchQueue.main.async {
                     self.activities["weekRunning"] = activity
                 }
@@ -239,7 +274,13 @@ class HealthManager: ObservableObject {
                 }
             }
             
-            let activity = cardElements(id: 2, title: "Running", subtitle: "Weekly Run", image: "figure.run", tintColor: .blue, amount: "\(runningCount) min")
+            let activity = cardElements(
+                id: 2,
+                title: "Running",
+                subtitle: "Weekly Run",
+                image: "figure.run",
+                tintColor: .blue,
+                amount: "\(runningCount) min")
             
             DispatchQueue.main.async {
                 self.activities["weekRunning"] = activity
