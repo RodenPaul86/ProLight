@@ -50,7 +50,7 @@ struct CustomPaywallView: View {
                     let stretchyHeader = model.stretchyHeader
                     let minY = $0.frame(in: .global).minY
                     /// Limited Header
-                    let limitedHeaderHeight = size.height - (60 + safeArea.top)
+                    let limitedHeaderHeight = max(0, size.height - (60 + safeArea.top))
                     /// Progress
                     let progress = min(max((-minY / limitedHeaderHeight), 0), 1)
                     let limitedMinY = -minY > limitedHeaderHeight ? -(minY + limitedHeaderHeight) : 0
@@ -68,27 +68,34 @@ struct CustomPaywallView: View {
                                     Text(stickyHeaderTitle)
                                         .font(.title3.bold())
                                         .foregroundStyle(Color.primary)
-                                        .offset(y: 90 - (100 * progress))
-                                    
+                                        .offset(y: 90 - (110 * progress)) /// <-- default was .offset(y: 90 - (100 * progress))
                                 }
                         }
                         .clipped()
                         .offset(y: isSticky ? (minY > 0 ? -minY : (isSticky ? limitedMinY : 0)) : 0)
                         .overlay(alignment: .topTrailing) {
-                            Button(action: { dismiss() }, label: {
-                                Image(systemName: "xmark")
-                                    .font(.callout)
-                                    .frame(width: 35, height: 35)
-                                    .foregroundStyle(Color.primary)
-                                    .background(.ultraThinMaterial, in: .circle)
-                                    .contentShape(.circle)
-                            })
+                            Button(action: { dismiss() }) {
+                                if #available(iOS 26.0, *) {
+                                    Image(systemName: "xmark")
+                                        .font(.callout)
+                                        .frame(width: 35, height: 35)
+                                        .foregroundStyle(Color.primary)
+                                        .glassEffect(.regular.interactive(), in: .circle)
+                                } else {
+                                    Image(systemName: "xmark")
+                                        .font(.callout)
+                                        .frame(width: 35, height: 35)
+                                        .foregroundStyle(Color.primary)
+                                        .background(.ultraThinMaterial, in: .circle)
+                                        .contentShape(.circle)
+                                }
+                            }
                             .padding(.top, safeArea.top + 12)
                             .padding(.trailing)
                             .offset(y: -minY)
                         }
                 }
-                .frame(height: size.height - (140 + 320 - safeArea.top))
+                .frame(height: max(0, size.height - (140 + 320 - safeArea.top)))
                 .zIndex(1000)
                 
                 VStack(alignment: .leading, spacing: 12) {
@@ -245,3 +252,4 @@ fileprivate struct ReviewView: View {
         return index % 2 == 0 ? .leading : .trailing
     }
 }
+

@@ -17,8 +17,9 @@ struct SettingsView: View {
     @AppStorage("resetDatastore") private var resetDatastore: Bool = false
     @AppStorage("showTipsForTesting") private var showTipsForTesting: Bool = false
     @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
-    @AppStorage("isAssistantEnabled") private var isAssistantEnabled: Bool = true
+    @AppStorage("isAssistantEnabled") private var isAssistantEnabled: Bool = false
     @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
+    @AppStorage("selectedButtonSound") private var selectedButtonSound: Bool = true
     @State private var resetOnboarding: Bool = false
     
     @State private var showDebug: Bool = false
@@ -57,6 +58,7 @@ struct SettingsView: View {
                 Section(header: Text("Customization")) {
                     customRow(icon: "questionmark.app.dashed", firstLabel: "Alternate Icons", destination: AnyView(AlternativeIcons()))
                     customRow(icon: "iphone.gen2.radiowaves.left.and.right", firstLabel: "In-App Haptics", showToggle: true, toggleValue: $isHapticsEnabled)
+                    customRow(icon: "speaker.wave.2.fill", firstLabel: "Main Button Sound", showToggle: true, toggleValue: $selectedButtonSound)
                     customRow(icon: "thermometer", firstLabel: "Primary Units", showMenu: true, selectedOptionRaw: $selectedUnitRaw)
                 }
                 
