@@ -555,7 +555,7 @@ struct HomeView: View {
             flashlightOn.toggle()
             brightnessLevel = maxLevel
             
-            if AppReviewRequest.requestAvailable {
+            if AppReviewRequest.requestAvailable { /// <-- Showing a review screen for the user.
                 Task {
                     try await Task.sleep(
                         until: .now + .seconds(1),
@@ -566,7 +566,7 @@ struct HomeView: View {
                 }
             }
             
-            if flashlightOn {
+            if flashlightOn { /// <-- This where the torch light turns on.
                 if mode == .strobe {
                     // Restore strobe flashing at last selected frequency
                     let frequency = selectedMaxFrequency ?? 2.0 // fallback to 2Hz

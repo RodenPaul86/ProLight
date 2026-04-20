@@ -10,20 +10,13 @@ import RevenueCat
 
 enum AppIcon: String, CaseIterable {
     case defaultIcon = "Default"
-    case lightIcon = "Light"
-    case darkIcon = "Dark"
-    case sunbeamIcon = "Sunbeam"
-    case peachPopIcon = "Peach Pop"
-    case firestarterIcon = "Firestarter"
-    case roseEmberIcon = "Rose Ember"
-    case jungleWalkIcon = "Jungle Walk"
-    case pineMistIcon = "Pine Mist"
-    case indigoPulseIcon = "Indigo Pulse"
-    case oceanDriftIcon  = "Ocean Drift"
-    case electricTideIcon = "Electric Tide"
-    case frostedBlueIcon = "Frosted Blue"
-    case stormWalkIcon = "Storm Walk"
-    case shadowStepIcon = "Shadow Step"
+    case v2 = "v2.0"
+    case v1 = "v1.0"
+    case fusion = "Fusion"
+    case blaze = "Blaze"
+    case mystic = "Mystic"
+    case ember = "Ember"
+    case eclipse = "Eclipse"
     
     var iconValue: String? {
         self == .defaultIcon ? nil : rawValue
@@ -31,38 +24,23 @@ enum AppIcon: String, CaseIterable {
     
     var previewImage: String {
         switch self {
-        case .defaultIcon: "Logo0"
-        case .lightIcon: "Logo1"
-        case .darkIcon: "Logo2"
-        case .sunbeamIcon: "Logo3"
-        case .peachPopIcon: "Logo4"
-        case .firestarterIcon: "Logo5"
-        case .roseEmberIcon: "Logo6"
-        case .jungleWalkIcon: "Logo7"
-        case .pineMistIcon: "Logo8"
-        case .indigoPulseIcon: "Logo9"
-        case .oceanDriftIcon : "Logo10"
-        case .electricTideIcon: "Logo11"
-        case .frostedBlueIcon: "Logo12"
-        case .stormWalkIcon: "Logo13"
-        case .shadowStepIcon: "Logo14"
+        case .defaultIcon: "Image 0"
+        case .fusion: "Image 1"
+        case .blaze: "Image 2"
+        case .mystic: "Image 3"
+        case .ember: "Image 4"
+        case .eclipse: "Image 5"
+        case .v1: ""
+        case .v2: ""
         }
     }
     
     static var mainIcons: [AppIcon] {
-        [.defaultIcon, .lightIcon, .darkIcon]
+        [.defaultIcon, .v2, .v1]
     }
     
     static var warmIcons: [AppIcon] {
-        [.sunbeamIcon, .peachPopIcon, .firestarterIcon, .roseEmberIcon]
-    }
-    
-    static var greenBlueIcons: [AppIcon] {
-        [.jungleWalkIcon, .pineMistIcon, .indigoPulseIcon, .oceanDriftIcon ]
-    }
-    
-    static var bluesNeutralIcons: [AppIcon] {
-        [.electricTideIcon, .frostedBlueIcon, .stormWalkIcon, .shadowStepIcon]
+        [.fusion, .blaze, .mystic, .ember, .eclipse]
     }
 }
 
@@ -77,7 +55,7 @@ struct AlternativeIcons: View {
     var body: some View {
         VStack {
             List {
-                Section("Original") {
+                Section("") {
                     ForEach(AppIcon.mainIcons, id: \.rawValue) { icon in
                         AppIconRow(
                             icon: icon,
@@ -88,30 +66,8 @@ struct AlternativeIcons: View {
                     }
                 }
                 
-                Section("Oranges & Reds") {
+                Section("") {
                     ForEach(AppIcon.warmIcons, id: \.rawValue) { icon in
-                        AppIconRow(
-                            icon: icon,
-                            currentAppIcon: $currentAppIcon,
-                            isSubscriptionActive: appSubModel.isSubscriptionActive,
-                            isPaywallPresented: $isPaywallPresented
-                        )
-                    }
-                }
-                
-                Section("Greens & Blues") {
-                    ForEach(AppIcon.greenBlueIcons, id: \.rawValue) { icon in
-                        AppIconRow(
-                            icon: icon,
-                            currentAppIcon: $currentAppIcon,
-                            isSubscriptionActive: appSubModel.isSubscriptionActive,
-                            isPaywallPresented: $isPaywallPresented
-                        )
-                    }
-                }
-                
-                Section("Blues & Neutrals") {
-                    ForEach(AppIcon.bluesNeutralIcons, id: \.rawValue) { icon in
                         AppIconRow(
                             icon: icon,
                             currentAppIcon: $currentAppIcon,
@@ -202,7 +158,7 @@ struct AppIconRow: View {
             
             if isLocked {
                 Image(systemName: "lock.fill")
-                    .font(.title)
+                    .font(.title2)
                     .foregroundColor(.red)
             } else {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "")
