@@ -458,7 +458,7 @@ struct HomeView: View {
                     
                     // Strobe Bar
                     curvedRectangle(topRadius: isTop ? 40 : 5, bottomRadius: isBottom ? 40 : 5)
-                        .fill(item.frequency <= (selectedMaxFrequency ?? 0) ? Color("strobeHzColor") : Color.gray.opacity(0.2))
+                        .fill(item.frequency <= (selectedMaxFrequency ?? 0) ? (!flashlightOn ? Color("strobeOff") : Color("strobeOn")) : Color.gray.opacity(0.2))
                         .frame(width: 80, height: 80)
                         .onTapGesture {
                             HapticManager.shared.notify(.impact(.light))
@@ -544,7 +544,7 @@ struct HomeView: View {
             VStack {
                 Image(systemName: "power")
                     .font(.system(size: 45))
-                    .foregroundStyle(Color("lightGreen"))
+                    .foregroundStyle(!flashlightOn ? Color("lightGreen") : .white)
             }
         }
         .onTapGesture {
