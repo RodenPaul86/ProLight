@@ -11,7 +11,7 @@ struct WidgetSetupView: View {
     @State private var hideTabBar: Bool = false
     
     var body: some View {
-        ScrollView {
+        ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 20) {
                 
                 // MARK: Icon
@@ -64,22 +64,21 @@ struct WidgetSetupView: View {
                 
                 Spacer()
                 
-                // MARK: Comfermation Button
-                /*
-                 Button(action: {
-                 dismiss()
-                 }) {
-                 Text("Got It!")
-                 .fontWeight(.semibold)
-                 .frame(maxWidth: .infinity)
-                 .padding()
-                 .background(Color.black)
-                 .foregroundColor(.white)
-                 .cornerRadius(12)
-                 }
-                 .padding(.horizontal)
-                 .padding(.bottom, 20)
-                 */
+                // MARK: Widget Preview
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Preview")
+                        .font(.headline)
+                        .padding(.horizontal)
+                    
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 16) {
+                            SmallWidgetPreview()
+                            MediumWidgetPreview()
+                            LargeWidgetPreview()
+                        }
+                        .padding(.horizontal)
+                    }
+                }
             }
             .onAppear {
                 hideTabBar = true
@@ -117,6 +116,192 @@ struct StepView: View {
                     .foregroundColor(.gray)
             }
         }
+    }
+}
+
+//
+// MARK: - Widget Previews
+//
+
+struct SmallWidgetPreview: View {
+    var body: some View {
+        VStack(alignment: .leading) {
+            
+            // MARK: Time
+            Text("12:00")
+                .font(.system(size: 46, design: .rounded))
+                .bold()
+                .foregroundColor(.green)
+                .shadow(
+                    color: Color(
+                        UIColor(
+                            displayP3Red: 96/255,
+                            green: 252/255,
+                            blue: 255/255,
+                            alpha: 1
+                        )
+                    ),
+                    radius: 1,
+                    x: 1,
+                    y: 1
+                )
+                .padding(.bottom, -10)
+            
+            Spacer()
+            
+            // MARK: Day
+            Text("Monday")
+                .font(.system(size: 20))
+                .bold()
+                .foregroundColor(.white)
+            
+            // MARK: Date
+            Text("Jun 8, 2026")
+                .font(.caption)
+                .bold()
+                .foregroundColor(.gray)
+            
+        }
+        .padding()
+        .frame(width: 170, height: 170, alignment: .leading)
+        .background(.black)
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        //.shadow(color: .black.opacity(0.25), radius: 10, y: 5)
+        .overlay(
+            RoundedRectangle(cornerRadius: 22)
+                .stroke(Color.theme.accent, lineWidth: 1)
+        )
+    }
+}
+
+struct MediumWidgetPreview: View {
+    var body: some View {
+        ZStack {
+            
+            // MARK: Time (Right Side)
+            VStack(alignment: .trailing, spacing: 0) {
+                Text("12:00")
+                    .font(.system(size: 110, design: .rounded))
+                    .bold()
+                    .foregroundColor(.green)
+                    .shadow(
+                        color: Color(
+                            UIColor(
+                                displayP3Red: 96/255,
+                                green: 252/255,
+                                blue: 255/255,
+                                alpha: 1
+                            )
+                        ),
+                        radius: 1,
+                        x: 1,
+                        y: 1
+                    )
+            }
+            .padding(.trailing, 10)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            
+            // MARK: Day + Date (Bottom Left)
+            VStack(alignment: .leading) {
+                Spacer()
+                
+                Text("Monday")
+                    .font(.largeTitle)
+                    .bold()
+                    .foregroundColor(.white)
+                
+                Text("Jun 8, 2026")
+                    .font(.subheadline)
+                    .bold()
+                    .foregroundColor(.gray)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(width: 320, height: 170)
+        .background(.black)
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        //.shadow(color: .black.opacity(0.25), radius: 10, y: 5)
+        .overlay(
+            RoundedRectangle(cornerRadius: 22)
+                .stroke(Color.theme.accent, lineWidth: 1)
+        )
+    }
+}
+
+struct LargeWidgetPreview: View {
+    var body: some View {
+        ZStack {
+            
+            // MARK: Time (Right Side - Stacked)
+            VStack(alignment: .trailing, spacing: 0) {
+                
+                Text("12")
+                    .font(.system(size: 140, design: .rounded))
+                    .bold()
+                    .foregroundColor(.green)
+                    .shadow(
+                        color: Color(
+                            UIColor(
+                                displayP3Red: 96/255,
+                                green: 252/255,
+                                blue: 255/255,
+                                alpha: 1
+                            )
+                        ),
+                        radius: 1,
+                        x: 1,
+                        y: 1
+                    )
+                    .padding(.bottom, -15)
+                
+                Text("00")
+                    .font(.system(size: 140, design: .rounded))
+                    .bold()
+                    .foregroundColor(.green)
+                    .shadow(
+                        color: Color(
+                            UIColor(
+                                displayP3Red: 96/255,
+                                green: 252/255,
+                                blue: 255/255,
+                                alpha: 1
+                            )
+                        ),
+                        radius: 1,
+                        x: 1,
+                        y: 1
+                    )
+                    .padding(.top, -15)
+            }
+            .padding(.trailing, 10)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            
+            // MARK: Day + Date (Bottom Left)
+            VStack(alignment: .leading) {
+                Spacer()
+                
+                Text("Monday")
+                    .font(.system(size: 45))
+                    .bold()
+                    .foregroundColor(.white)
+                
+                Text("Jun 8, 2026")
+                    .font(.subheadline)
+                    .bold()
+                    .foregroundColor(.gray)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(width: 320, height: 320)
+        .background(.black)
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        //.shadow(color: .black.opacity(0.25), radius: 10, y: 5)
+        .overlay(
+            RoundedRectangle(cornerRadius: 22)
+                .stroke(Color.theme.accent, lineWidth: 1)
+        )
     }
 }
 
