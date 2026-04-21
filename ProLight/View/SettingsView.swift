@@ -52,7 +52,9 @@ struct SettingsView: View {
                 
                 Section(header: Text("General")) {
                     customRow(icon: "figure.walk", firstLabel: "Walking History", destination: AnyView(WorkoutHistoryView()))
+#if DEBUG
                     customRow(icon: "tent", firstLabel: "Camping Tools", showToggle: true, toggleValue: $isCampingEnabled)
+#endif
                 }
                 
                 Section(header: Text("Customization")) {
