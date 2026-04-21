@@ -8,10 +8,15 @@
 import SwiftUI
 import RevenueCat
 
+enum IconAppearance: String, CaseIterable {
+    case light = "Light"
+    case dark = "Dark"
+}
+
 enum AppIcon: String, CaseIterable {
     case defaultIcon = "Default"
-    case v2 = "v2.0"
-    case v1 = "v1.0"
+    case gradient = "v2.0"
+    case classic = "v1.0"
     case fusion = "Blue Fusion"
     case blaze = "Crimson Blaze"
     case mystic = "Mystic Shade"
@@ -22,24 +27,37 @@ enum AppIcon: String, CaseIterable {
         self == .defaultIcon ? nil : rawValue
     }
     
-    var previewImage: String {
+    var baseImageName: String {
         switch self {
-        case .defaultIcon: "Image 0"
-        case .fusion: "Image 1"
-        case .blaze: "Image 2"
-        case .mystic: "Image 3"
-        case .ember: "Image 4"
-        case .eclipse: "Image 5"
-        case .v1: ""
-        case .v2: ""
+        case .defaultIcon: return "Image 0"
+        case .fusion: return "Image 1"
+        case .blaze: return "Image 2"
+        case .mystic: return "Image 3"
+        case .ember: return "Image 4"
+        case .eclipse: return "Image 5"
+        case .classic: return "Image 11"
+        case .gradient: return "Image 12"
+        }
+    }
+    
+    func previewImage(for appearance: IconAppearance) -> String {
+        switch appearance {
+        case .light:
+            return baseImageName
+        case .dark:
+            return baseImageName + " Dark"
         }
     }
     
     static var mainIcons: [AppIcon] {
-        [.defaultIcon, .v2, .v1]
+        [.defaultIcon]
     }
     
-    static var warmIcons: [AppIcon] {
+    static var classicIcons: [AppIcon] {
+        [.classic, .gradient]
+    }
+    
+    static var otherIcons: [AppIcon] {
         [.fusion, .blaze, .mystic, .ember, .eclipse]
     }
 }
@@ -51,28 +69,51 @@ struct AlternativeIcons: View {
     @State private var showDefaultView: Bool = false
     @State private var isPaywallPresented: Bool = false
     @State private var hideTabBar: Bool = false
+    @State private var appearance: IconAppearance = .light
     
     var body: some View {
         VStack {
+            Picker("Appearance", selection: $appearance) {
+                ForEach(IconAppearance.allCases, id: \.self) { mode in
+                    Text(mode.rawValue).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+            
             List {
-                Section("") {
+                Section("Modern") {
                     ForEach(AppIcon.mainIcons, id: \.rawValue) { icon in
                         AppIconRow(
                             icon: icon,
                             currentAppIcon: $currentAppIcon,
                             isSubscriptionActive: appSubModel.isSubscriptionActive,
-                            isPaywallPresented: $isPaywallPresented
+                            isPaywallPresented: $isPaywallPresented,
+                            appearance: appearance
                         )
                     }
                 }
                 
-                Section("") {
-                    ForEach(AppIcon.warmIcons, id: \.rawValue) { icon in
+                Section("Classic") {
+                    ForEach(AppIcon.classicIcons, id: \.rawValue) { icon in
                         AppIconRow(
                             icon: icon,
                             currentAppIcon: $currentAppIcon,
                             isSubscriptionActive: appSubModel.isSubscriptionActive,
-                            isPaywallPresented: $isPaywallPresented
+                            isPaywallPresented: $isPaywallPresented,
+                            appearance: appearance
+                        )
+                    }
+                }
+                
+                Section("Other") {
+                    ForEach(AppIcon.otherIcons, id: \.rawValue) { icon in
+                        AppIconRow(
+                            icon: icon,
+                            currentAppIcon: $currentAppIcon,
+                            isSubscriptionActive: appSubModel.isSubscriptionActive,
+                            isPaywallPresented: $isPaywallPresented,
+                            appearance: appearance
                         )
                     }
                 }
@@ -133,6 +174,7 @@ struct AppIconRow: View {
     @Binding var currentAppIcon: AppIcon
     let isSubscriptionActive: Bool
     @Binding var isPaywallPresented: Bool
+    let appearance: IconAppearance
     
     var body: some View {
         let isLocked = (icon != .defaultIcon && !isSubscriptionActive)
@@ -140,7 +182,7 @@ struct AppIconRow: View {
         
         HStack(spacing: 15) {
             ZStack {
-                Image(icon.previewImage)
+                Image(icon.previewImage(for: appearance))
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 60, height: 60)

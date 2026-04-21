@@ -426,7 +426,7 @@
 		3A0D29BE2DE7819300F1F704 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "Default \"Crimson Blaze\" \"Golden Eclipse\" \"Blue Fusion\" \"Mystic Shade\" \"Orange Ember\"";
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "Default \"Crimson Blaze\" \"Golden Eclipse\" \"Blue Fusion\" \"Mystic Shade\" \"Orange Ember\" Classic Gradient";
 				ASSETCATALOG_COMPILER_APPICON_NAME = Default;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ProLight/ProLight.entitlements;
@@ -475,7 +475,7 @@
 		3A0D29BF2DE7819300F1F704 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "Default \"Crimson Blaze\" \"Golden Eclipse\" \"Blue Fusion\" \"Mystic Shade\" \"Orange Ember\"";
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "Default \"Crimson Blaze\" \"Golden Eclipse\" \"Blue Fusion\" \"Mystic Shade\" \"Orange Ember\" Classic Gradient";
 				ASSETCATALOG_COMPILER_APPICON_NAME = Default;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ProLight/ProLight.entitlements;
