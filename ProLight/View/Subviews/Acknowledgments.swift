@@ -79,7 +79,7 @@ I am the sole developer behind ProLight. Every feature, design decision, and lin
                         .foregroundStyle(.primary.opacity(0.85))
                         
                         Text("""
-This app is dedicated to my late father, Paul, who used ProLight often and was a constant inspiration behind its creation.
+This app is dedicated to my late father, Paul Sr., who used ProLight often and was a constant inspiration behind its creation.
 """)
                         .font(.body.weight(.medium))
                         .multilineTextAlignment(.center)
@@ -97,7 +97,7 @@ Thank you for using ProLight and being part of its journey.
                     .animation(.easeOut(duration: 1).delay(0.4), value: fadeIn)
                     
                     // MARK: Signature
-                    Text("— Paul Roden Jr.")
+                    Text("I miss you Dad. \n — Paul Roden Jr.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .padding(.top, 20)
