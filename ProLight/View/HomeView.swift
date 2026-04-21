@@ -56,7 +56,7 @@ struct HomeView: View {
     @StateObject private var locationManager = LocationManager()
     @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
     @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
-    @AppStorage("isAssistantEnabled") private var isAssistantEnabled: Bool = false /// <-- This is for the forth feature button.
+    @AppStorage("isCampingEnabled") private var isCampingEnabled: Bool = false /// <-- This is for the forth feature button.
     
     @State private var showWeatherSheet: Bool = false
     @State private var showSignalingMirrorSheet: Bool = false
@@ -616,19 +616,6 @@ struct HomeView: View {
                     HapticManager.shared.notify(.impact(.light))
                 }
             
-            /*
-            modeButton(icon: "tent.fill", BGColor: campingPressed ? .green : Color("darkGray"))
-                .onTapGesture {
-                    guard mode != .sos && mode != .strobe else { return }
-                    
-                    HapticManager.shared.notify(.impact(.light))
-                    campingPressed.toggle()
-                    withAnimation {
-                        mode = mode == .camping ? .neutral : .camping
-                    }
-                }
-             */
-            
             modeButton(icon: "light.beacon.max.fill", BGColor: strobePressed ? .blue : Color("darkGray"))
                 .onTapGesture {
                     guard mode != .sos && mode != .camping else { return }
@@ -657,11 +644,16 @@ struct HomeView: View {
                     }
                 }
             
-            if isAssistantEnabled {
-                modeButton(icon: "questionmark.bubble", BGColor: aiPressed ? .purple : Color("darkGray"))
+            if isCampingEnabled {
+                modeButton(icon: "tent.fill", BGColor: campingPressed ? .green : Color("darkGray"))
                     .onTapGesture {
+                        guard mode != .sos && mode != .strobe else { return }
+                        
                         HapticManager.shared.notify(.impact(.light))
-                        aiPressed.toggle()
+                        campingPressed.toggle()
+                        withAnimation {
+                            mode = mode == .camping ? .neutral : .camping
+                        }
                     }
             }
         }
