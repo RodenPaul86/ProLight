@@ -17,11 +17,11 @@ struct WidgetSetupView: View {
                 // MARK: Icon
                 Image(systemName: "widget.small")
                     .font(.system(size: 48))
-                    //.foregroundStyle(Color.theme.accent)
+                    .foregroundStyle(Color("darkGreen").gradient)
                     .padding(.bottom, 4)
                 
                 // MARK: Title and Description
-                Text("Add Widget to Home Screen")
+                Text("Add Widgets to Home Screen")
                     .font(.title2)
                     .fontWeight(.semibold)
                     .multilineTextAlignment(.center)
@@ -42,15 +42,20 @@ struct WidgetSetupView: View {
                     
                     StepView(number: 2,
                              icon: "plus",
-                             title: "Tap the Plus Button",
-                             description: "Look for the \"+\" button in the top-left corner and tap it")
+                             title: "Tap the Plus or Edit Button",
+                             description: "Look for the \"+\" or \"Edit\" button in the top-left corner and tap it")
                     
                     StepView(number: 3,
+                             icon: "widget.small.badge.plus",
+                             title: "Tap the Add Widget Button",
+                             description: "Look for the \"Add Widget\" button top of the menu and tap it")
+                    
+                    StepView(number: 4,
                              icon: "magnifyingglass",
                              title: "Find \(Bundle.main.appName)",
                              description: "Search for \"\(Bundle.main.appName)\" or scroll down to find our app")
                     
-                    StepView(number: 4,
+                    StepView(number: 5,
                              icon: "checkmark",
                              title: "Add Widget",
                              description: "Tap \"Add Widget\" to place it on your home screen. You can move it anywhere you like!")
@@ -96,13 +101,13 @@ struct StepView: View {
             Text("\(number)")
                 .font(.headline)
                 .frame(width: 24, height: 24)
-                //.background(Circle().fill(Color.theme.accent))
+                .background(Circle().fill(Color("darkGreen").gradient))
                 .foregroundColor(.white)
             
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Image(systemName: icon)
-                        .foregroundColor(Color("Default"))
+                        .foregroundColor(.white)
                     Text(title)
                         .font(.headline)
                 }
