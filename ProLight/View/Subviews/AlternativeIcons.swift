@@ -12,11 +12,11 @@ enum AppIcon: String, CaseIterable {
     case defaultIcon = "Default"
     case v2 = "v2.0"
     case v1 = "v1.0"
-    case fusion = "Fusion"
-    case blaze = "Blaze"
-    case mystic = "Mystic"
-    case ember = "Ember"
-    case eclipse = "Eclipse"
+    case fusion = "Blue Fusion"
+    case blaze = "Crimson Blaze"
+    case mystic = "Mystic Shade"
+    case ember = "Orange Ember"
+    case eclipse = "Golden Eclipse"
     
     var iconValue: String? {
         self == .defaultIcon ? nil : rawValue
