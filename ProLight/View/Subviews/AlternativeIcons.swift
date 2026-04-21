@@ -186,9 +186,9 @@ struct AppIconRow: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 60, height: 60)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 10)
+                        RoundedRectangle(cornerRadius: 15)
                             .stroke(isSelected ? Color.theme.accent : Color(.systemGray6).gradient, lineWidth: 1)
                     )
             }
