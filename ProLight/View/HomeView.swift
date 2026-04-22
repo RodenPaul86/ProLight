@@ -59,6 +59,7 @@ struct HomeView: View {
     @AppStorage("isCampingEnabled") private var isCampingEnabled: Bool = false /// <-- This is for the forth feature button.
     
     @State private var showWeatherSheet: Bool = false
+    @State private var showCompassSheet: Bool = false
     @State private var showSignalingMirrorSheet: Bool = false
     
     var selectedUnit: TemperatureUnit {
@@ -199,6 +200,7 @@ struct HomeView: View {
                                     .foregroundStyle(.gray)
                             }
                             .onTapGesture {
+                                HapticManager.shared.notify(.impact(.light))
                                 showWeatherSheet = true
                             }
                             .sheet(isPresented: $showWeatherSheet) {
@@ -207,9 +209,20 @@ struct HomeView: View {
                                     .presentationDragIndicator(.visible) /// <-- Shows the line at top
                             }
                         }
+                        
                         Spacer()
+                        
                         CompassView()
                             .frame(width: 65, height: 65)
+                            .onTapGesture {
+                                //HapticManager.shared.notify(.impact(.light))
+                                //showCompassSheet = true
+                            }
+                            .sheet(isPresented: $showCompassSheet) {
+                                Compass()
+                                    .presentationDetents([.fraction(0.20)])
+                                    .presentationDragIndicator(.visible)
+                            }
                     }
                         .padding(.leading)
                         .padding(.top, -10),

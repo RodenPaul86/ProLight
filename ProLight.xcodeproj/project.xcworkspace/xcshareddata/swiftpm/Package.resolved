@@ -1,13 +1,13 @@
 {
-  "originHash" : "12f6ea6663381006621524faa4be8ea788cc937e9f0ab6f72262c6cd47f9f444",
+  "originHash" : "2d79205ff28b09259c84759ca7bf926f155eea2ec18793d9ff73baf12a3956d4",
   "pins" : [
     {
       "identity" : "lottie-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/airbnb/lottie-ios",
       "state" : {
-        "revision" : "a004050748dc197c56256a14dca49a035d74726c",
-        "version" : "4.5.2"
+        "revision" : "0cb03fd7564d27345bcd96144b811e56212949c6",
+        "version" : "4.6.0"
       }
     },
     {
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/RevenueCat/purchases-ios-spm",
       "state" : {
-        "revision" : "8f5df97653eb361a2097119479332afccf0aa816",
-        "version" : "5.58.0"
+        "revision" : "bd63241b2258ea519020eb32a349db44fb44b119",
+        "version" : "5.68.0"
       }
     },
     {
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/securevale/swift-confidential",
       "state" : {
-        "revision" : "7f571ab0df5b0ffd4b26b92b9dd8f21d6b3a6ca8",
-        "version" : "0.4.1"
+        "revision" : "791e9d042db3ed4070c6a1ccfc44885990874751",
+        "version" : "0.5.2"
       }
     },
     {
@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/securevale/swift-confidential-plugin",
       "state" : {
-        "revision" : "9bf4fb3c87a769e13557aa1b564d7c66d74423b4",
-        "version" : "0.4.1"
+        "revision" : "32e74f2ad1f52b741d3336b186b30cab8ea23f13",
+        "version" : "0.5.2"
       }
     },
     {
@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swiftlang/swift-syntax.git",
       "state" : {
-        "revision" : "f99ae8aa18f0cf0d53481901f88a0991dc3bd4a2",
-        "version" : "601.0.1"
+        "revision" : "9de99a78f099e59caf2b2beec65a4c45d54b2081",
+        "version" : "603.0.1"
       }
     }
   ],
