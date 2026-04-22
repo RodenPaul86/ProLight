@@ -54,12 +54,12 @@ struct CompassView: View {
             let tickInnerRadiusMinor = size / 2 - 5
             
             ZStack {
-                // Outer black circle
+                // MARK: Outer Black Circle
                 Circle()
                     .fill(Color.black)
                     .frame(width: size, height: size)
                 
-                // Tick marks
+                // MARK: Tick Marks
                 ForEach(0..<36) { tick in
                     Rectangle()
                         .fill(tick % 3 == 0 ? Color.white : Color.gray)
@@ -68,7 +68,7 @@ struct CompassView: View {
                         .rotationEffect(.degrees(Double(tick) * 10))
                 }
                 
-                // N/E/S/W labels
+                // MARK: N/E/S/W Labels
                 VStack {
                     Text("N").foregroundColor(.red).font(.system(size: size * 0.10, weight: .bold))
                     Spacer()
@@ -83,13 +83,13 @@ struct CompassView: View {
                 }
                 .frame(width: size * 0.8)
                 
-                // Rotating red arrow ring
+                // MARK: Rotating red arrow ring
                 ZStack {
                     Circle()
                         .stroke(Color.red, lineWidth: size * 0.02)
                         .frame(width: size * 0.9, height: size * 0.9)
                     
-                    // Red pointer at North
+                    // MARK: Red pointer at North
                     Image(systemName: "arrowtriangle.up.fill")
                         .resizable()
                         .frame(width: size * 0.09, height: size * 0.18)
@@ -98,7 +98,7 @@ struct CompassView: View {
                 }
                 .rotationEffect(.degrees(-viewModel.heading))
                 
-                // Center direction text
+                // MARK: Center direction text
                 Text(viewModel.directionText)
                     .font(.system(size: size * 0.18, weight: .bold))
                     .foregroundColor(.white)
