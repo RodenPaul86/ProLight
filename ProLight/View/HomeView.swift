@@ -61,6 +61,7 @@ struct HomeView: View {
     @State private var showWeatherSheet: Bool = false
     @State private var showCompassSheet: Bool = false
     @State private var showSignalingMirrorSheet: Bool = false
+    @State private var showScreenLight: Bool = false
     
     var selectedUnit: TemperatureUnit {
         TemperatureUnit(rawValue: selectedUnitRaw) ?? .fahrenheit
@@ -207,6 +208,9 @@ struct HomeView: View {
                                 WeatherView()
                                     .presentationDetents([.fraction(0.50)]) /// <-- 50% of screen height
                                     .presentationDragIndicator(.visible) /// <-- Shows the line at top
+                            }
+                            .fullScreenCover(isPresented: $showScreenLight) {
+                                ScreenRedLightView()
                             }
                         }
                         
@@ -627,6 +631,7 @@ struct HomeView: View {
             modeButton(icon: "iphone", BGColor: Color("darkGray"))
                 .onTapGesture {
                     HapticManager.shared.notify(.impact(.light))
+                    showScreenLight = true
                 }
             
             modeButton(icon: "light.beacon.max.fill", BGColor: strobePressed ? .blue : Color("darkGray"))
