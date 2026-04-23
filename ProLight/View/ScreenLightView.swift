@@ -116,6 +116,7 @@ struct ScreenLightView: View {
     private var bottomContent: some View {
         VStack(spacing: 24) {
             if !useSolidColor {
+                /*
                 Button(action: { toggleStrobe() }) {
                     Text(isStrobing ? "Stop" : "Strobe")
                         .font(.headline)
@@ -131,6 +132,7 @@ struct ScreenLightView: View {
                         )
                 }
                 .buttonStyle(.plain)
+                */
                 
                 Text(screenDescription)
                     .font(.footnote)

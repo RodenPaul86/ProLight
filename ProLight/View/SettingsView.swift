@@ -55,8 +55,8 @@ struct SettingsView: View {
                     customRow(icon: "figure.walk", firstLabel: "Walking History", destination: AnyView(WorkoutHistoryView()))
 #if DEBUG
                     customRow(icon: "tent", firstLabel: "Camping Tools", showToggle: true, toggleValue: $isCampingEnabled)
-                    customRow(icon: "iphone.pattern.diagonalline.on.rectangle.portrait.dashed", firstLabel: "Red Screen Light", showToggle: true, toggleValue: $isRedScreenEnabled)
 #endif
+                    customRow(icon: "iphone.pattern.diagonalline.on.rectangle.portrait.dashed", firstLabel: "Red Screen Light", showToggle: true, toggleValue: $isRedScreenEnabled)
                 }
                 
                 Section(header: Text("Customization")) {
