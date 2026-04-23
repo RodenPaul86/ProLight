@@ -53,6 +53,8 @@ struct HomeView: View {
     @State private var countdownValue = 3
     @State private var glow: Bool = false
     
+    @StateObject private var thermalMonitor = ThermalMonitor()
+    @StateObject private var powerMonitor = PowerMonitor()
     @StateObject private var locationManager = LocationManager()
     @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
     @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
@@ -249,6 +251,14 @@ struct HomeView: View {
                         .opacity(sosPressed ? 1 : 0)
                 }
                 .padding([.horizontal, .bottom])
+            }
+            .overlay {
+                Rectangle()
+                    .stroke(thermalMonitor.borderColor, lineWidth: thermalMonitor.borderWidth)
+                    .ignoresSafeArea()
+                    .shadow(color: thermalMonitor.borderColor, radius: 10)
+                    .animation(.easeInOut(duration: 0.25), value: thermalMonitor.thermalState)
+                    .allowsHitTesting(false)
             }
         }
         .onAppear {
@@ -563,13 +573,13 @@ struct HomeView: View {
                 .frame(width: 125, height: 90)
                 .overlay(
                     curvedRectangle(topRadius: 5, bottomRadius: 40)
-                        .stroke(Color("lightGreen").opacity(0.6), lineWidth: 2)
+                        .stroke(powerMonitor.isLowPowerMode ? Color.yellow.opacity(0.6) : Color("lightGreen").opacity(0.6), lineWidth: 2)
                 )
             
             VStack {
                 Image(systemName: "power")
                     .font(.system(size: 45))
-                    .foregroundStyle(!flashlightOn ? Color("lightGreen") : .white)
+                    .foregroundStyle(!flashlightOn ? (powerMonitor.isLowPowerMode ? Color.yellow.opacity(0.6) : Color("lightGreen")) : .white)
             }
         }
         .onTapGesture {
