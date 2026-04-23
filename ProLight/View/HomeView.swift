@@ -57,6 +57,7 @@ struct HomeView: View {
     @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
     @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
     @AppStorage("isCampingEnabled") private var isCampingEnabled: Bool = false /// <-- This is for the forth feature button.
+    @AppStorage("isRedScreenEnabled") private var isRedScreenEnabled: Bool = false
     
     @State private var showWeatherSheet: Bool = false
     @State private var showCompassSheet: Bool = false
@@ -167,7 +168,7 @@ struct HomeView: View {
                             campingButton(icon: "binoculars.fill", title: "First Aid", color: .red, rotation: -90, destination: FirstAidListView())
                         }
                         .offset(x: campingOffsetRight)
-                            
+                        
                         strobeView
                             .offset(x: strobeOffset)
                     }
@@ -210,7 +211,11 @@ struct HomeView: View {
                                     .presentationDragIndicator(.visible) /// <-- Shows the line at top
                             }
                             .fullScreenCover(isPresented: $showScreenLight) {
-                                ScreenRedLightView()
+                                if isRedScreenEnabled {
+                                    ScreenLightView(style: .red)
+                                } else {
+                                    ScreenLightView(style: .white)
+                                }
                             }
                         }
                         
@@ -278,20 +283,20 @@ struct HomeView: View {
     }
     
     /*
-    // MARK: Flashlight Indicator
-    private var flashlightIndicator: some View {
-        VStack(spacing: 8) {
-            let scaledOpacity = Double(brightnessLevel) / Double(maxLevel)
-            let shadowRadius = 5 + (15 * scaledOpacity)
-            
-            Image(systemName: flashlightOn ? "flashlight.on.fill" : "flashlight.off.fill")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 22, height: 50)
-                .foregroundColor(flashlightOn ? .white.opacity(scaledOpacity) : .white.opacity(0.1))
-                .shadow(color: flashlightOn ? .white.opacity(scaledOpacity) : .white.opacity(0.0), radius: shadowRadius)
-        }
-    }
+     // MARK: Flashlight Indicator
+     private var flashlightIndicator: some View {
+     VStack(spacing: 8) {
+     let scaledOpacity = Double(brightnessLevel) / Double(maxLevel)
+     let shadowRadius = 5 + (15 * scaledOpacity)
+     
+     Image(systemName: flashlightOn ? "flashlight.on.fill" : "flashlight.off.fill")
+     .resizable()
+     .scaledToFit()
+     .frame(width: 22, height: 50)
+     .foregroundColor(flashlightOn ? .white.opacity(scaledOpacity) : .white.opacity(0.1))
+     .shadow(color: flashlightOn ? .white.opacity(scaledOpacity) : .white.opacity(0.0), radius: shadowRadius)
+     }
+     }
      */
     
     // MARK: SOS View

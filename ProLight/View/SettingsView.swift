@@ -18,6 +18,7 @@ struct SettingsView: View {
     @AppStorage("showTipsForTesting") private var showTipsForTesting: Bool = false
     @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
     @AppStorage("isCampingEnabled") private var isCampingEnabled: Bool = false
+    @AppStorage("isRedScreenEnabled") private var isRedScreenEnabled: Bool = false
     @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
     @AppStorage("selectedButtonSound") private var selectedButtonSound: Bool = true
     @State private var resetOnboarding: Bool = false
@@ -54,6 +55,7 @@ struct SettingsView: View {
                     customRow(icon: "figure.walk", firstLabel: "Walking History", destination: AnyView(WorkoutHistoryView()))
 #if DEBUG
                     customRow(icon: "tent", firstLabel: "Camping Tools", showToggle: true, toggleValue: $isCampingEnabled)
+                    customRow(icon: "iphone.pattern.diagonalline.on.rectangle.portrait.dashed", firstLabel: "Red Screen Light", showToggle: true, toggleValue: $isRedScreenEnabled)
 #endif
                 }
                 
