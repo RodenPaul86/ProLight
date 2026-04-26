@@ -90,7 +90,6 @@ struct FloatingTabView<Content: View, Value: CaseIterable & Hashable & FloatingT
 // MARK: Floating Tab Bar Configuration
 struct FloatingTabConfig {
     var activeTint: Color = .white
-    var activeBackgroundTint: Color = Color("darkGreen")
     var inactiveTint: Color = .gray
     var tabAnimation: Animation = .smooth(duration: 0.35, extraBounce: 0)
     var backgroundColor: Color = Color("darkGray")
@@ -108,6 +107,7 @@ fileprivate struct FloatingTabBar<Value: CaseIterable & Hashable & FloatingTabPr
     @Namespace private var animation
     // For Symbol Effect
     @State private var toggleSymbolEffect: [Bool] = Array(repeating: false, count: Value.allCases.count)
+    @StateObject private var powerMonitor = PowerMonitor()
     
     var body: some View {
         HStack(spacing: 0) {
@@ -124,7 +124,7 @@ fileprivate struct FloatingTabBar<Value: CaseIterable & Hashable & FloatingTabPr
                     .background {
                         if isActive {
                             Capsule(style: .continuous)
-                                .fill(config.activeBackgroundTint.gradient)
+                                .fill(powerMonitor.isLowPowerMode ? Color.yellow.gradient : Color("darkGreen").gradient)
                                 .matchedGeometryEffect(id: "ACTIVETAB", in: animation)
                         }
                     }

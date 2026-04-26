@@ -15,6 +15,7 @@ extension Color {
 
 struct ColorTheme {
     let accent = Color("darkGreen").gradient
+    let lowPower = Color.yellow.gradient
     let background = Color("darkGray")
     let iconText = Color("lightGreen")
 }

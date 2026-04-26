@@ -209,6 +209,7 @@ struct customRow: View {
     var showJoinInsteadOfSafari: Bool? = nil
     var selectedOptionRaw: Binding<String>?
     
+    @StateObject private var powerMonitor = PowerMonitor()
     @State private var isSharing: Bool = false
     
     // MARK: NEW: Safari sheet state
@@ -284,7 +285,7 @@ struct customRow: View {
                 .font(.system(size: 18))
                 .foregroundColor(.white)
                 .frame(width: 32, height: 32)
-                .background(Color.theme.accent)
+                .background(powerMonitor.isLowPowerMode ? Color.theme.lowPower : Color.theme.accent)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             
             Text(firstLabel)
@@ -348,10 +349,11 @@ struct ActivityView: UIViewControllerRepresentable {
 
 // MARK: Custom Banner
 struct customPremiumBanner: View {
+    @StateObject private var powerMonitor = PowerMonitor()
     var onTap: () -> Void
     
     let features = [
-        "Unlock all Features"
+        "Unlock all features!"
     ]
     
     var body: some View {
@@ -374,7 +376,7 @@ struct customPremiumBanner: View {
                         .foregroundColor(.white)
                         .padding(.vertical, 10)
                         .padding(.horizontal, 20)
-                        .background(Color.theme.accent)
+                        .background(powerMonitor.isLowPowerMode ? Color.theme.lowPower : Color.theme.accent)
                         .clipShape(Capsule())
                 }
                 
