@@ -13,115 +13,78 @@ struct WorkoutDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @State private var textBody: String = ""
+    @State private var cameraPosition: MapCameraPosition = .automatic
     let workout: Workout
     
-    @State private var cameraPosition: MapCameraPosition = .automatic
-    
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Metrics Header
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("Distance")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text(String(format: "%.2f mi", workout.distance / 1609.34))
-                        .font(.headline)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                
+                // MARK: - Stats Grid
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    StatCard(icon: "map",              label: "Distance", value: workout.formattedDistance,  color: .cyan)
+                    StatCard(icon: "timer",             label: "Duration", value: workout.duration.formattedDuration, color: .mint)
+                    StatCard(icon: "figure.walk",       label: "Pace",     value: workout.formattedPace + "/mi", color: .mint)
+                    StatCard(icon: "flame.fill",         label: "Calories", value: workout.formattedCalories, color: .orange)
+                    StatCard(icon: "shoeprints.fill",    label: "Steps",    value: workout.formattedSteps,    color: .yellow)
+                    StatCard(icon: "calendar",           label: "Date",     value: workout.date.formatted(date: .abbreviated, time: .omitted), color: .purple)
                 }
                 
-                Spacer()
-                
-                VStack(alignment: .leading) {
-                    Text("Duration")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text(workout.duration.formattedDuration)
-                        .font(.headline)
+                // MARK: - Map
+                Map(position: $cameraPosition, interactionModes: []) {
+                    MapPolyline(coordinates: workout.route)
+                        .stroke(.blue, lineWidth: 4)
+                    
+                    if let start = workout.route.first {
+                        Marker("Start", coordinate: start)
+                            .tint(.green)
+                    }
+                    if let end = workout.route.last {
+                        Marker("End", coordinate: end)
+                            .tint(.red)
+                    }
+                }
+                .frame(height: 260)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .onAppear {
+                    zoomToFitRoute()
+                    textBody = workout.notes
                 }
                 
-                Spacer()
-                
-                VStack(alignment: .leading) {
-                    Text("Pace")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text(paceFormatted())
-                        .font(.headline)
+                // MARK: - Notes
+                VStack(spacing: 0) {
+                    HStack {
+                        Text("Note")
+                            .font(.headline)
+                        Spacer()
+                    }
+                    
+                    TextField("Enter text here...", text: $textBody, axis: .vertical)
+                        .padding(.vertical, 8)
+                        .frame(minHeight: 200, alignment: .top)
                 }
-                
-                Spacer()
-                
-                VStack(alignment: .leading) {
-                    Text("Calories")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text(workout.distance.formattedCaloriesFromMeters())
-                        .font(.headline)
-                }
+                .padding()
+                .background(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .padding(.bottom, 8)
-            
-            // Map
-            Map(position: $cameraPosition, interactionModes: []) {
-                // Polyline
-                MapPolyline(coordinates: workout.route)
-                    .stroke(.blue, lineWidth: 4)
-                
-                // Start & End markers
-                if let start = workout.route.first {
-                    Marker("Start", coordinate: start)
-                        .tint(.green)
-                }
-                if let end = workout.route.last {
-                    Marker("End", coordinate: end)
-                        .tint(.red)
-                }
-            }
-            .frame(height: 250)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .onAppear {
-                zoomToFitRoute()
-                textBody = workout.notes
-            }
-            
-            // Date
-            Text("Date: \(workout.date.formatted(date: .abbreviated, time: .shortened))")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            
-            VStack(spacing: 0) {
-                HStack {
-                    Text("Note:")
-                        .font(.headline)
-                    Spacer()
-                }
-                
-                // MARK: Expanding TextField
-                TextField("Enter text here...", text: $textBody, axis: .vertical)
-                    .padding(.vertical, 8)
-                    .frame(minHeight: 200, alignment: .top) /// <-- Ensures expansion
-            }
-            .padding() // Padding inside the border
-            .background(.ultraThinMaterial)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.gray.opacity(0.4), lineWidth: 1)
-            )
-            .cornerRadius(12)
-            
-            Spacer()
+            .padding()
         }
-        .padding()
         .navigationTitle("Walking Detail")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack {
-                    Button(action: { deleteWorkout() }) {
+                    Button(action: deleteWorkout) {
                         Label("Delete", systemImage: "trash")
+                            .foregroundColor(.red)
                     }
-                    
-                    Button(action: { saveNote() }) {
+                    Button(action: saveNote) {
                         Text("Save")
+                            .fontWeight(.semibold)
                     }
                 }
             }
@@ -129,13 +92,14 @@ struct WorkoutDetailView: View {
     }
     
     // MARK: - Zoom to fit route
+    
     private func zoomToFitRoute() {
         guard !workout.route.isEmpty else { return }
         
-        var minLat = workout.route.first!.latitude
-        var maxLat = workout.route.first!.latitude
-        var minLon = workout.route.first!.longitude
-        var maxLon = workout.route.first!.longitude
+        var minLat = workout.route[0].latitude
+        var maxLat = workout.route[0].latitude
+        var minLon = workout.route[0].longitude
+        var maxLon = workout.route[0].longitude
         
         for coord in workout.route {
             minLat = min(minLat, coord.latitude)
@@ -148,24 +112,14 @@ struct WorkoutDetailView: View {
             latitude: (minLat + maxLat) / 2,
             longitude: (minLon + maxLon) / 2
         )
-        
         let span = MKCoordinateSpan(
             latitudeDelta: (maxLat - minLat) * 1.5,
             longitudeDelta: (maxLon - minLon) * 1.5
         )
-        
-        let region = MKCoordinateRegion(center: center, span: span)
-        cameraPosition = .region(region)
+        cameraPosition = .region(MKCoordinateRegion(center: center, span: span))
     }
     
-    // MARK: - Formatter Helpers
-    private func paceFormatted() -> String {
-        let distanceMiles = workout.distance / 1609.34
-        guard distanceMiles > 0 else { return "--:-- min/mi" }
-        
-        let secondsPerMile = workout.movingTime / distanceMiles
-        return secondsPerMile.formattedPace
-    }
+    // MARK: - Actions
     
     private func deleteWorkout() {
         modelContext.delete(workout)
@@ -177,5 +131,42 @@ struct WorkoutDetailView: View {
         workout.notes = textBody
         try? modelContext.save()
         dismiss()
+    }
+}
+
+// MARK: - Stat Card
+
+private struct StatCard: View {
+    let icon: String
+    let label: String
+    let value: String
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(color)
+                .symbolRenderingMode(.hierarchical)
+            Text(value)
+                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .minimumScaleFactor(0.6)
+                .lineLimit(1)
+                .multilineTextAlignment(.center)
+            Text(label.uppercased())
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundColor(.secondary)
+                .kerning(0.6)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(color.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(color.opacity(0.2), lineWidth: 1)
+                )
+        )
     }
 }

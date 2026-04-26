@@ -39,22 +39,14 @@ struct WorkoutHistoryView: View {
                         NavigationLink {
                             WorkoutDetailView(workout: workout)
                         } label: {
-                            VStack(alignment: .leading) {
-                                Text(workout.date.formatted(date: .abbreviated, time: .shortened))
-                                    .font(.headline)
-                                Text("Distance: \(String(format: "%.2f mi", workout.distance / 1609.34)) • Time: \(formattedTime(workout.duration))")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                            }
+                            WorkoutRowView(workout: workout)
                         }
                     }
-                    .onDelete(perform: deleteWorkouts) // ← Add this
+                    .onDelete(perform: deleteWorkouts)
                 }
             }
         }
-        .onAppear {
-            hideTabBar = true
-        }
+        .onAppear { hideTabBar = true }
         .navigationTitle("Past Walks")
         .navigationBarTitleDisplayMode(.inline)
         .hideFloatingTabBar(hideTabBar)
@@ -62,9 +54,46 @@ struct WorkoutHistoryView: View {
     
     private func deleteWorkouts(at offsets: IndexSet) {
         for index in offsets {
-            let workout = workouts[index]
-            context.delete(workout) // ← Remove from model context
+            context.delete(workouts[index])
         }
+    }
+}
+
+// MARK: - Row View
+
+private struct WorkoutRowView: View {
+    let workout: Workout
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            
+            // Date headline
+            Text(workout.date.formatted(date: .abbreviated, time: .shortened))
+                .font(.headline)
+            
+            // Distance + Duration
+            HStack(spacing: 4) {
+                Image(systemName: "map")
+                    .foregroundColor(.cyan)
+                Text(workout.formattedDistance)
+                
+                Text("•").foregroundColor(.secondary)
+                
+                Image(systemName: "timer")
+                    .foregroundColor(.mint)
+                Text(formattedTime(workout.duration))
+            }
+            .font(.subheadline)
+            .foregroundColor(.secondary)
+            
+            // Pace · Calories · Steps
+            HStack(spacing: 12) {
+                StatBadge(icon: "figure.walk",      value: workout.formattedPace,     color: .mint)
+                StatBadge(icon: "flame.fill",        value: workout.formattedCalories, color: .orange)
+                StatBadge(icon: "shoeprints.fill",   value: workout.formattedSteps,    color: .yellow)
+            }
+        }
+        .padding(.vertical, 4)
     }
     
     private func formattedTime(_ time: TimeInterval) -> String {
@@ -72,5 +101,24 @@ struct WorkoutHistoryView: View {
         formatter.allowedUnits = [.minute, .second]
         formatter.unitsStyle = .abbreviated
         return formatter.string(from: time) ?? "-"
+    }
+}
+
+// MARK: - Stat Badge
+
+private struct StatBadge: View {
+    let icon: String
+    let value: String
+    let color: Color
+    
+    var body: some View {
+        HStack(spacing: 3) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundColor(color)
+            Text(value)
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundColor(.secondary)
+        }
     }
 }
