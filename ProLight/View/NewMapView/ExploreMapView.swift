@@ -1,5 +1,5 @@
 //
-//  mapView.swift
+//  ExploreMapView.swift
 //  ProLight
 //
 //  Created by Paul  on 4/2/26.
@@ -26,7 +26,7 @@ class WorkoutManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var distanceMiles: Double = 0
     @Published var caloriesBurned: Double = 0
     @Published var steps: Int = 0
-    @Published var pace: Double = 0   // min/mile
+    @Published var pace: Double = 0 /// <-- min/mile
     
     private var timer: Timer?
     private var lastLocation: CLLocation?
@@ -253,25 +253,45 @@ struct WorkoutSummarySheet: View {
             }
             
             Button { saveWorkout() } label: {
-                HStack(spacing: 8) {
-                    if isSaved {
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 15, weight: .semibold))
+                if #available(iOS 26.0, *) {
+                    HStack(spacing: 8) {
+                        if isSaved {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 15, weight: .semibold))
+                        }
+                        Text(isSaved ? "Saved!" : "Done")
+                            .font(.system(size: 17, weight: .semibold, design: .rounded))
                     }
-                    Text(isSaved ? "Saved!" : "Done")
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 15)
+                    .foregroundStyle(.black)
+                    .glassEffect(
+                        .regular.interactive()
+                        .tint(isSaved ? .green : .mint),
+                        in: .capsule
+                    )
+                    .animation(.spring(response: 0.3), value: isSaved)
+                } else {
+                    HStack(spacing: 8) {
+                        if isSaved {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 15, weight: .semibold))
+                        }
+                        Text(isSaved ? "Saved!" : "Done")
+                            .font(.system(size: 17, weight: .semibold, design: .rounded))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 15)
+                    .background(isSaved ? Color.green : Color.mint)
+                    .foregroundColor(.black)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .animation(.spring(response: 0.3), value: isSaved)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 15)
-                .background(isSaved ? Color.green : Color.mint)
-                .foregroundColor(.black)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .animation(.spring(response: 0.3), value: isSaved)
             }
             .disabled(isSaved)
             .padding(.horizontal, 20)
             
-            Spacer()
+            //Spacer()
         }
     }
     
@@ -487,8 +507,8 @@ struct mapView: View {
             })
             .sheet(isPresented: $showWorkoutSummary) {
                 WorkoutSummarySheet(workout: workout)
-                    .presentationDetents([.medium])
-                    .presentationCornerRadius(28)
+                    .presentationDetents([.fraction(0.60)]) /// <-- 60% of screen height
+                    .interactiveDismissDisabled(true)
             }
             .safeAreaInset(edge: .bottom) {
                 if routeDisplaying {
@@ -499,7 +519,7 @@ struct mapView: View {
                             mapSelection = routeDestination
                             routeDestination = nil
                             route = nil
-                            cameraPosition = .userLocation(fallback: .automatic) // ← FIXED
+                            cameraPosition = .userLocation(fallback: .automatic)
                         }
                     }
                     .foregroundStyle(.white)
@@ -522,7 +542,7 @@ struct mapView: View {
                 searchResults.removeAll(keepingCapacity: false)
                 showDetails = false
                 withAnimation(.snappy) {
-                    cameraPosition = .userLocation(fallback: .automatic) // ← FIXED
+                    cameraPosition = .userLocation(fallback: .automatic)
                 }
             }
         }
@@ -606,7 +626,7 @@ struct mapView: View {
     func fetchRoute() {
         if let mapSelection {
             let request = MKDirections.Request()
-            request.source = MKMapItem.forCurrentLocation() // ← FIXED: real device location
+            request.source = MKMapItem.forCurrentLocation() /// <-- real device location
             request.destination = mapSelection
             Task {
                 let result = try? await MKDirections(request: request).calculate()
