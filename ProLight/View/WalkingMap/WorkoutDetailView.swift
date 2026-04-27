@@ -81,7 +81,14 @@ struct WorkoutDetailView: View {
         }
         .toolbar {
             if #available(iOS 26.0, *) {
+                ToolbarItem(placement: .bottomBar) {
+                    Button("Share", systemImage: "square.and.arrow.up") {
+                        showingShareSheet = true
+                    }
+                }
+                
                 ToolbarSpacer(.flexible, placement: .bottomBar)
+                
                 ToolbarItem(placement: .bottomBar) {
                     Button("Delete", systemImage: "trash") {
                         deleteWorkout()
@@ -95,11 +102,11 @@ struct WorkoutDetailView: View {
                     }
                     .tint(.red)
                 }
-            }
-            
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Share", systemImage: "square.and.arrow.up") {
-                    showingShareSheet = true
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Share", systemImage: "square.and.arrow.up") {
+                        showingShareSheet = true
+                    }
                 }
             }
             
@@ -107,6 +114,7 @@ struct WorkoutDetailView: View {
                 Button("Save", systemImage: "checkmark") {
                     saveNote()
                 }
+                .disabled(textBody.isEmpty)
             }
         }
     }
