@@ -252,7 +252,7 @@ struct HomeView: View {
                 }
                 .padding([.horizontal, .bottom])
             }
-            .overlay {
+            .overlay { // MARK: Thermal Monitoring System
                 Rectangle()
                     .stroke(thermalMonitor.borderColor, lineWidth: thermalMonitor.borderWidth)
                     .ignoresSafeArea()
