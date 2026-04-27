@@ -47,7 +47,7 @@ struct WorkoutHistoryView: View {
             }
         }
         .onAppear { hideTabBar = true }
-        .navigationTitle("Past Walks")
+        .navigationTitle("Walking History")
         .navigationBarTitleDisplayMode(.inline)
         .hideFloatingTabBar(hideTabBar)
     }
