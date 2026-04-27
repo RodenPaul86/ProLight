@@ -14,6 +14,7 @@ struct WorkoutDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var textBody: String = ""
     @State private var cameraPosition: MapCameraPosition = .automatic
+    @State private var showingShareSheet: Bool = false
     let workout: Workout
     
     var body: some View {
@@ -75,20 +76,58 @@ struct WorkoutDetailView: View {
         }
         .navigationTitle("Walking Detail")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showingShareSheet) {
+            ShareSheet(items: [workoutSummary])
+        }
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                HStack {
-                    Button(action: deleteWorkout) {
-                        Label("Delete", systemImage: "trash")
-                            .foregroundColor(.red)
+            if #available(iOS 26.0, *) {
+                ToolbarSpacer(.flexible, placement: .bottomBar)
+                ToolbarItem(placement: .bottomBar) {
+                    Button("Delete", systemImage: "trash") {
+                        deleteWorkout()
                     }
-                    Button(action: saveNote) {
-                        Text("Save")
-                            .fontWeight(.semibold)
+                    .tint(.red)
+                }
+            } else {
+                ToolbarItem(placement: .destructiveAction) {
+                    Button("Delete", systemImage: "trash") {
+                        deleteWorkout()
                     }
+                    .tint(.red)
+                }
+            }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Share", systemImage: "square.and.arrow.up") {
+                    showingShareSheet = true
+                }
+            }
+            
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Save", systemImage: "checkmark") {
+                    saveNote()
                 }
             }
         }
+    }
+    
+    // MARK: - Share summary
+    
+    private var workoutSummary: String {
+        var lines: [String] = []
+        lines.append("🚶 Walking Workout")
+        lines.append("📅 \(workout.date.formatted(date: .long, time: .omitted))")
+        lines.append("")
+        lines.append("📍 Distance:  \(workout.formattedDistance)")
+        lines.append("⏱️ Duration:  \(workout.duration.formattedDuration)")
+        lines.append("⚡️ Pace:      \(workout.formattedPace)/mi")
+        lines.append("🔥 Calories:  \(workout.formattedCalories)")
+        lines.append("👟 Steps:     \(workout.formattedSteps)")
+        if !workout.notes.isEmpty {
+            lines.append("")
+            lines.append("📝 \(workout.notes)")
+        }
+        return lines.joined(separator: "\n")
     }
     
     // MARK: - Zoom to fit route
@@ -132,6 +171,18 @@ struct WorkoutDetailView: View {
         try? modelContext.save()
         dismiss()
     }
+}
+
+// MARK: - Share Sheet
+
+struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+    
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+    
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 // MARK: - Stat Card
