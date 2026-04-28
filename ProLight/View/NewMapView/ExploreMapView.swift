@@ -352,22 +352,278 @@ private struct SummaryTile: View {
     }
 }
 
+// MARK: - Place Category Model
+
+struct PlaceCategory {
+    let label: String
+    let icon: String
+    let query: String
+}
+
+let placeCategories: [PlaceCategory] = [
+    .init(label: "Restaurants", icon: "fork.knife",              query: "restaurants"),
+    .init(label: "Coffee",      icon: "cup.and.saucer.fill",     query: "coffee"),
+    .init(label: "Parks",       icon: "leaf.fill",               query: "parks"),
+    .init(label: "Gyms",        icon: "dumbbell.fill",           query: "gym"),
+    .init(label: "Gas",         icon: "fuelpump.fill",           query: "gas station"),
+    .init(label: "Pharmacy",    icon: "cross.case.fill",         query: "pharmacy"),
+    .init(label: "Grocery",     icon: "cart.fill",               query: "grocery store"),
+    .init(label: "Hospital",    icon: "staroflife.fill",         query: "hospital"),
+    .init(label: "Hotels",      icon: "bed.double.fill",         query: "hotel"),
+    .init(label: "Parking",     icon: "parkingsign.circle.fill", query: "parking"),
+    .init(label: "Banks",       icon: "banknote.fill",           query: "bank"),
+    .init(label: "Schools",     icon: "graduationcap.fill",      query: "school"),
+    .init(label: "Shopping",    icon: "bag.fill",                query: "shopping mall"),
+    .init(label: "Transit",     icon: "bus.fill",                query: "bus station"),
+    .init(label: "Bars",        icon: "wineglass.fill",          query: "bar"),
+]
+
+// MARK: - Category Chip
+
+private struct CategoryChip: View {
+    let category: PlaceCategory
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            if #available(iOS 26.0, *) {
+                HStack(spacing: 5) {
+                    Image(systemName: category.icon)
+                        .font(.system(size: 11, weight: .semibold))
+                    Text(category.label)
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 7)
+                .glassEffect(
+                    isSelected ? .regular.tint(.mint).interactive() : .regular.interactive(),
+                    in: .capsule
+                )
+                .foregroundColor(isSelected ? .black : .primary)
+            } else {
+                HStack(spacing: 5) {
+                    Image(systemName: category.icon)
+                        .font(.system(size: 11, weight: .semibold))
+                    Text(category.label)
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 7)
+                .background(
+                    Capsule()
+                        .fill(isSelected ? Color.mint : Color(.systemBackground).opacity(0.92))
+                        .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
+                )
+                .foregroundColor(isSelected ? .black : .primary)
+            }
+        }
+        .animation(.spring(response: 0.3), value: isSelected)
+    }
+}
+
+// MARK: - Nearby Result Row
+
+private struct NearbyResultRow: View {
+    let item: MKMapItem
+    let userLocation: CLLocation?
+    let isSelected: Bool
+    let action: () -> Void
+    
+    private var distance: String {
+        guard let userLoc = userLocation else { return "" }
+        let dest = CLLocation(
+            latitude: item.placemark.coordinate.latitude,
+            longitude: item.placemark.coordinate.longitude
+        )
+        let meters = userLoc.distance(from: dest)
+        return meters < 1609
+        ? String(format: "%.0f m away", meters)
+        : String(format: "%.1f mi away", meters / 1609.34)
+    }
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(isSelected ? Color.mint.opacity(0.2) : Color(.secondarySystemBackground))
+                        .frame(width: 42, height: 42)
+                    Image(systemName: poiIcon(for: item))
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(isSelected ? .mint : .secondary)
+                }
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(item.name ?? "Unknown")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.primary)
+                        .lineLimit(1)
+                    if let address = item.placemark.thoroughfare {
+                        Text(address)
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+                }
+                
+                Spacer()
+                
+                if !distance.isEmpty {
+                    Text(distance)
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .foregroundColor(.mint)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Capsule().fill(Color.mint.opacity(0.12)))
+                }
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(.secondary.opacity(0.4))
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(isSelected ? Color.mint.opacity(0.06) : Color.clear)
+        }
+        .buttonStyle(.plain)
+    }
+    
+    private func poiIcon(for item: MKMapItem) -> String {
+        switch item.pointOfInterestCategory {
+        case .restaurant, .cafe, .bakery, .brewery, .foodMarket: return "fork.knife"
+        case .hospital:                                          return "staroflife.fill"
+        case .pharmacy:                                          return "cross.case.fill"
+        case .gasStation:                                        return "fuelpump.fill"
+        case .hotel:                                             return "bed.double.fill"
+        case .parking:                                           return "parkingsign.circle.fill"
+        case .bank, .atm:                                        return "banknote.fill"
+        case .school, .university:                               return "graduationcap.fill"
+        case .publicTransport:                                   return "bus.fill"
+        case .nightlife, .winery:                                return "wineglass.fill"
+        case .fitnessCenter:                                     return "dumbbell.fill"
+        case .park:                                              return "leaf.fill"
+        case .store:                                             return "bag.fill"
+        default:
+            let name = (item.name ?? "").lowercased()
+            if name.contains("coffee")  { return "cup.and.saucer.fill" }
+            if name.contains("park")    { return "leaf.fill" }
+            if name.contains("gym")     { return "dumbbell.fill" }
+            return "mappin.circle.fill"
+        }
+    }
+}
+
+// MARK: - Nearby Results Sheet
+
+struct NearbyResultsSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let results: [MKMapItem]
+    let userLocation: CLLocation?
+    @Binding var mapSelection: MKMapItem?
+    var selectedCategory: String
+    
+    // Sort results by distance from user
+    private var sortedResults: [MKMapItem] {
+        guard let userLoc = userLocation else { return results }
+        return results.sorted {
+            let a = CLLocation(latitude: $0.placemark.coordinate.latitude,
+                               longitude: $0.placemark.coordinate.longitude)
+            let b = CLLocation(latitude: $1.placemark.coordinate.latitude,
+                               longitude: $1.placemark.coordinate.longitude)
+            return userLoc.distance(from: a) < userLoc.distance(from: b)
+        }
+    }
+    
+    var body: some View {
+        NavigationStack {
+            if #available(iOS 26.0, *) {
+                VStack(spacing: 0) {
+                    ScrollView {
+                        LazyVStack(spacing: 0) {
+                            ForEach(sortedResults, id: \.self) { item in
+                                NearbyResultRow(
+                                    item: item,
+                                    userLocation: userLocation,
+                                    isSelected: mapSelection == item
+                                ) {
+                                    mapSelection = item
+                                }
+                                if item != sortedResults.last {
+                                    Divider().padding(.leading, 70)
+                                }
+                            }
+                        }
+                    }
+                }
+                .background(.regularMaterial)
+                .navigationTitle(selectedCategory.isEmpty ? "Nearby" : selectedCategory)
+                .toolbarTitleDisplayMode(.inlineLarge)
+                .navigationSubtitle("\(results.count) result\(results.count == 1 ? "" : "s")")
+            } else {
+                VStack(spacing: 0) {
+                    // Drag handle + header
+                    VStack(spacing: 8) {
+                        
+                        HStack {
+                            Text(selectedCategory.isEmpty ? "Nearby" : selectedCategory)
+                                .font(.system(size: 17, weight: .bold, design: .rounded))
+                            Spacer()
+                            Text("\(results.count) result\(results.count == 1 ? "" : "s")")
+                                .font(.system(size: 13))
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 4)
+                    }
+                    
+                    Divider()
+                    
+                    ScrollView {
+                        LazyVStack(spacing: 0) {
+                            ForEach(sortedResults, id: \.self) { item in
+                                NearbyResultRow(
+                                    item: item,
+                                    userLocation: userLocation,
+                                    isSelected: mapSelection == item
+                                ) {
+                                    mapSelection = item
+                                }
+                                if item != sortedResults.last {
+                                    Divider().padding(.leading, 70)
+                                }
+                            }
+                        }
+                    }
+                }
+                .background(.regularMaterial)
+            }
+        }
+    }
+}
+
 // MARK: - Main Map View
 
 struct mapView: View {
-    // MARK: Map Properties
-    @State private var cameraPosition: MapCameraPosition = .userLocation(fallback: .automatic) // ← FIXED
+    // MARK: Map
+    @State private var cameraPosition: MapCameraPosition = .userLocation(fallback: .automatic)
     @State private var mapSelection: MKMapItem?
     @Namespace private var locationSpace
     @State private var viewingRegion: MKCoordinateRegion?
-    // MARK: Search Bar
+    // MARK: Search
     @State private var searchText: String = ""
     @State private var showSearch: Bool = false
     @State private var searchResults: [MKMapItem] = []
-    // MARK: Map Selection Detail Properties
+    // MARK: Categories
+    @State private var selectedCategory: String = ""
+    // MARK: Nearby sheet
+    @State private var showNearbyResults: Bool = false
+    @State private var userLocation: CLLocation? = nil
+    private let locationHelper = LocationHelper()
+    // MARK: Place detail
     @State private var showDetails: Bool = false
     @State private var lookAroundScene: MKLookAroundScene?
-    // MARK: Route Properties
+    // MARK: Navigation route
     @State private var routeDisplaying: Bool = false
     @State private var route: MKRoute?
     @State private var routeDestination: MKMapItem?
@@ -407,16 +663,47 @@ struct mapView: View {
                 
                 UserAnnotation()
             }
-            .onMapCameraChange({ ctx in
-                viewingRegion = ctx.region
-            })
-            .overlay(alignment: .topTrailing) {
-                HStack(spacing: 10) {
-                    MapCompass(scope: locationSpace)
+            .onMapCameraChange { ctx in viewingRegion = ctx.region }
+            // MARK: Category chips row
+            .safeAreaInset(edge: .top) {
+                if !routeDisplaying && !workout.isActive {
+                    if #available(iOS 26.0, *) {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(placeCategories, id: \.label) { cat in
+                                    CategoryChip(
+                                        category: cat,
+                                        isSelected: selectedCategory == cat.label
+                                    ) {
+                                        selectedCategory = cat.label
+                                        Task { await searchPlaces(query: cat.query) }
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                        }
+                    } else {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(placeCategories, id: \.label) { cat in
+                                    CategoryChip(
+                                        category: cat,
+                                        isSelected: selectedCategory == cat.label
+                                    ) {
+                                        selectedCategory = cat.label
+                                        Task { await searchPlaces(query: cat.query) }
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                        }
+                        .background(.ultraThinMaterial)
+                    }
                 }
-                .buttonBorderShape(.circle)
-                .padding()
             }
+            // MARK: Bottom-trailing buttons
             .overlay(alignment: .bottomTrailing) {
                 VStack(spacing: 10) {
                     MapPitchToggle(scope: locationSpace)
@@ -428,12 +715,8 @@ struct mapView: View {
                             showWorkoutSummary = true
                         } label: {
                             ZStack {
-                                Circle()
-                                    .fill(Color.red.opacity(0.12))
-                                    .frame(width: 46, height: 46)
-                                Circle()
-                                    .strokeBorder(Color.red.opacity(0.35), lineWidth: 1.2)
-                                    .frame(width: 46, height: 46)
+                                Circle().fill(Color.red.opacity(0.12)).frame(width: 46, height: 46)
+                                Circle().strokeBorder(Color.red.opacity(0.35), lineWidth: 1.2).frame(width: 46, height: 46)
                                 Image(systemName: "stop.circle.fill")
                                     .font(.system(size: 26, weight: .medium))
                                     .foregroundColor(.red)
@@ -446,22 +729,14 @@ struct mapView: View {
                     
                     Button {
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.65)) {
-                            if !workout.isActive {
-                                workout.start()
-                            } else if workout.isPaused {
-                                workout.resume()
-                            } else {
-                                workout.pause()
-                            }
+                            if !workout.isActive        { workout.start() }
+                            else if workout.isPaused    { workout.resume() }
+                            else                        { workout.pause() }
                         }
                     } label: {
                         ZStack {
-                            Circle()
-                                .fill(trackButtonColor.opacity(0.15))
-                                .frame(width: 56, height: 56)
-                            Circle()
-                                .strokeBorder(trackButtonColor.opacity(0.35), lineWidth: 1.5)
-                                .frame(width: 56, height: 56)
+                            Circle().fill(trackButtonColor.opacity(0.15)).frame(width: 56, height: 56)
+                            Circle().strokeBorder(trackButtonColor.opacity(0.35), lineWidth: 1.5).frame(width: 56, height: 56)
                             Image(systemName: trackButtonIcon)
                                 .font(.system(size: 30, weight: .semibold))
                                 .foregroundColor(trackButtonColor)
@@ -475,6 +750,7 @@ struct mapView: View {
                 .buttonBorderShape(.circle)
                 .padding()
             }
+            // MARK: Workout stats panel
             .overlay(alignment: .bottomLeading) {
                 if workout.isActive {
                     WorkoutStatsPanel(workout: workout)
@@ -488,28 +764,57 @@ struct mapView: View {
             .mapScope(locationSpace)
             .navigationTitle("Explore Map")
             .toolbarTitleDisplayMode(.inlineLarge)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    // ── Clear button — only visible when results are showing ──
+                    if !searchResults.isEmpty {
+                        Button("Clear", systemImage: "xmark") {
+                            withAnimation(.spring(response: 0.3)) {
+                                searchResults.removeAll()
+                                selectedCategory = ""
+                                showNearbyResults = false
+                            }
+                        }
+                        .tint(.red)
+                    }
+                }
+            }
             .searchable(text: $searchText, isPresented: $showSearch)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar(routeDisplaying ? .hidden : .visible, for: .navigationBar)
             .safeAreaPadding(.bottom, tabBarHeight)
+            // Place detail sheet
             .sheet(isPresented: $showDetails, onDismiss: {
                 withAnimation(.snappy) {
                     if let boundingRect = route?.polyline.boundingMapRect, routeDisplaying {
                         cameraPosition = .rect(boundingRect)
                     }
                 }
-            }, content: {
+            }) {
                 MapDetails()
                     .presentationDetents([.height(300)])
                     .presentationBackgroundInteraction(.enabled(upThrough: .height(300)))
                     .presentationCornerRadius(25)
                     .interactiveDismissDisabled(true)
-            })
+            }
+            // Workout summary sheet
             .sheet(isPresented: $showWorkoutSummary) {
                 WorkoutSummarySheet(workout: workout)
-                    .presentationDetents([.fraction(0.60)]) /// <-- 60% of screen height
+                    .presentationDetents([.fraction(0.62)]) /// <-- 62% of screen height
                     .interactiveDismissDisabled(true)
             }
+            // Nearby results sheet
+            .sheet(isPresented: $showNearbyResults) {
+                NearbyResultsSheet(
+                    results: searchResults,
+                    userLocation: userLocation,
+                    mapSelection: $mapSelection,
+                    selectedCategory: selectedCategory
+                )
+                .presentationDetents([.medium, .large])
+                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+            }
+            // End Route bar
             .safeAreaInset(edge: .bottom) {
                 if routeDisplaying {
                     Button("End Route") {
@@ -531,16 +836,24 @@ struct mapView: View {
                 }
             }
         }
+        .onAppear {
+            locationHelper.onLocationUpdate = { loc in
+                userLocation = loc
+            }
+        }
         .onSubmit(of: .search) {
             Task {
                 guard !searchText.isEmpty else { return }
-                await searchPlaces()
+                selectedCategory = ""
+                await searchPlaces(query: searchText)
             }
         }
         .onChange(of: showSearch, initial: false) {
             if !showSearch {
                 searchResults.removeAll(keepingCapacity: false)
+                selectedCategory = ""
                 showDetails = false
+                showNearbyResults = false
                 withAnimation(.snappy) {
                     cameraPosition = .userLocation(fallback: .automatic)
                 }
@@ -549,10 +862,17 @@ struct mapView: View {
         .onChange(of: mapSelection) { _, newValue in
             showDetails = newValue != nil
             fetchLookAroundPreview()
+            if let item = newValue {
+                moveMapToSelection(item)
+            }
+        }
+        .onChange(of: searchResults) { _, newValue in
+            withAnimation { showNearbyResults = !newValue.isEmpty }
         }
     }
     
-    // MARK: Track button helpers
+    // MARK: - Track button helpers
+    
     private var trackButtonIcon: String {
         if !workout.isActive { return "figure.run.circle.fill" }
         return workout.isPaused ? "play.circle.fill" : "pause.circle.fill"
@@ -563,7 +883,8 @@ struct mapView: View {
         return workout.isPaused ? .cyan : .orange
     }
     
-    // MARK: Map Details
+    // MARK: - Map Details
+    
     @ViewBuilder
     func MapDetails() -> some View {
         VStack(spacing: 15) {
@@ -577,15 +898,15 @@ struct mapView: View {
             .frame(height: 200)
             .clipShape(.rect(cornerRadius: 15))
             .overlay(alignment: .topTrailing) {
-                Button(action: {
+                Button {
                     showDetails = false
                     withAnimation(.snappy) { mapSelection = nil }
-                }, label: {
+                } label: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title)
                         .foregroundStyle(.black)
                         .background(.white, in: .circle)
-                })
+                }
                 .padding(10)
             }
             
@@ -598,10 +919,13 @@ struct mapView: View {
         .padding(15)
     }
     
-    // MARK: Search Places
-    func searchPlaces() async {
+    // MARK: - Search Places (now accepts explicit query)
+    
+    func searchPlaces(query: String? = nil) async {
+        let searchQuery = query ?? searchText
+        guard !searchQuery.isEmpty else { return }
         let request = MKLocalSearch.Request()
-        request.naturalLanguageQuery = searchText
+        request.naturalLanguageQuery = searchQuery
         request.region = viewingRegion ?? MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: 37.3346, longitude: -122.0090),
             latitudinalMeters: 10000,
@@ -611,7 +935,8 @@ struct mapView: View {
         searchResults = results?.mapItems ?? []
     }
     
-    // MARK: Look Around Preview
+    // MARK: - Look Around Preview
+    
     func fetchLookAroundPreview() {
         if let mapSelection {
             lookAroundScene = nil
@@ -622,11 +947,12 @@ struct mapView: View {
         }
     }
     
-    // MARK: Fetch Navigation Route
+    // MARK: - Fetch Navigation Route
+    
     func fetchRoute() {
         if let mapSelection {
             let request = MKDirections.Request()
-            request.source = MKMapItem.forCurrentLocation() /// <-- real device location
+            request.source = MKMapItem.forCurrentLocation()
             request.destination = mapSelection
             Task {
                 let result = try? await MKDirections(request: request).calculate()
@@ -635,9 +961,52 @@ struct mapView: View {
                 withAnimation(.snappy) {
                     routeDisplaying = true
                     showDetails = false
+                    showNearbyResults = false
                 }
             }
         }
+    }
+    
+    private func moveMapToSelection(_ item: MKMapItem) {
+        let coordinate = item.placemark.coordinate
+        
+        // Zoom span — tight enough to be useful, not so tight it clips context
+        let span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+        
+        // Shift the center north so the pin appears in the upper ~65 % of the screen
+        // (above the 300 pt compact sheet). Adjust the multiplier if your sheet height differs.
+        let sheetOffsetFraction: Double = 0.35
+        let offsetLatitude = coordinate.latitude - (span.latitudeDelta * sheetOffsetFraction)
+        
+        let adjustedCenter = CLLocationCoordinate2D(
+            latitude: offsetLatitude,
+            longitude: coordinate.longitude
+        )
+        
+        withAnimation(.easeInOut(duration: 0.5)) {
+            cameraPosition = .region(
+                MKCoordinateRegion(center: adjustedCenter, span: span)
+            )
+        }
+    }
+}
+
+// MARK: - Location Helper (lightweight wrapper to get CLLocation for distance calc)
+
+class LocationHelper: NSObject, CLLocationManagerDelegate {
+    private let manager = CLLocationManager()
+    var onLocationUpdate: ((CLLocation) -> Void)?
+    
+    override init() {
+        super.init()
+        manager.delegate = self
+        manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        manager.startUpdatingLocation()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let loc = locations.last else { return }
+        onLocationUpdate?(loc)
     }
 }
 
