@@ -70,6 +70,10 @@ struct HomeView: View {
         TemperatureUnit(rawValue: selectedUnitRaw) ?? .fahrenheit
     }
     
+    private var deviceCornerRadius: CGFloat {
+        UIScreen.main.value(forKey: "_displayCornerRadius") as? CGFloat ?? 55
+    }
+    
     @State private var mode: ControlMode = .neutral
     
     var tabBarHeight: CGFloat?
@@ -252,9 +256,9 @@ struct HomeView: View {
                 }
                 .padding([.horizontal, .bottom])
             }
-            .overlay { // MARK: Thermal Monitoring System
-                Rectangle()
-                    .stroke(thermalMonitor.borderColor, lineWidth: thermalMonitor.borderWidth)
+            .overlay {
+                RoundedRectangle(cornerRadius: deviceCornerRadius, style: .continuous) // 55pt ≈ iPhone corner radius
+                    .strokeBorder(thermalMonitor.borderColor, lineWidth: thermalMonitor.borderWidth)
                     .ignoresSafeArea()
                     .shadow(color: thermalMonitor.borderColor, radius: 10)
                     .animation(.easeInOut(duration: 0.25), value: thermalMonitor.thermalState)
