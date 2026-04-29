@@ -176,15 +176,27 @@ struct ExploreMapView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     // ── Clear button — only visible when results are showing ──
                     if !searchResults.isEmpty {
-                        Button("Clear", systemImage: "xmark") {
-                            withAnimation(.spring(response: 0.3)) {
-                                searchResults.removeAll()
-                                selectedCategory = ""
-                                showNearbyResults = false
-                                showDetails = false
+                        if #available(iOS 26.0, *) {
+                            Button("Clear All", systemImage: "xmark") {
+                                withAnimation(.spring(response: 0.3)) {
+                                    searchResults.removeAll()
+                                    selectedCategory = ""
+                                    showNearbyResults = false
+                                    showDetails = false
+                                }
                             }
+                            .tint(.red)
+                        } else {
+                            Button("Clear All", action: {
+                                withAnimation(.spring(response: 0.3)) {
+                                    searchResults.removeAll()
+                                    selectedCategory = ""
+                                    showNearbyResults = false
+                                    showDetails = false
+                                }
+                            })
+                            .tint(.red)
                         }
-                        .tint(.red)
                     }
                 }
             }
@@ -219,8 +231,9 @@ struct ExploreMapView: View {
                     mapSelection: $mapSelection,
                     selectedCategory: selectedCategory
                 )
-                .presentationDetents([.medium, .large])
+                .presentationDetents([.medium])
                 .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                .presentationDragIndicator(.visible)
             }
             
             // MARK: - End Route Bar + Turn-by-Turn Banner

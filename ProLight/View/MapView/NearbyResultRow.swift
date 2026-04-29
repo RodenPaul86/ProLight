@@ -123,7 +123,7 @@ struct NearbyResultsSheet: View {
         NavigationStack {
             if #available(iOS 26.0, *) {
                 ScrollView {
-                    LazyVStack(spacing: 0) {
+                    VStack(spacing: 0) {
                         ForEach(sortedResults, id: \.self) { item in
                             NearbyResultRow(
                                 item: item,
@@ -142,6 +142,13 @@ struct NearbyResultsSheet: View {
                 .navigationTitle(selectedCategory.isEmpty ? "Nearby" : selectedCategory)
                 .toolbarTitleDisplayMode(.inlineLarge)
                 .navigationSubtitle("\(results.count) result\(results.count == 1 ? "" : "s")")
+                .toolbar {
+                    ToolbarItem(placement: .destructiveAction) {
+                        Button("Close", systemImage: "xmark") {
+                            dismiss()
+                        }
+                    }
+                }
             } else {
                 VStack(spacing: 0) {
                     // Drag handle + header
