@@ -538,20 +538,18 @@ struct NearbyResultsSheet: View {
     var body: some View {
         NavigationStack {
             if #available(iOS 26.0, *) {
-                VStack(spacing: 0) {
-                    ScrollView {
-                        LazyVStack(spacing: 0) {
-                            ForEach(sortedResults, id: \.self) { item in
-                                NearbyResultRow(
-                                    item: item,
-                                    userLocation: userLocation,
-                                    isSelected: mapSelection == item
-                                ) {
-                                    mapSelection = item
-                                }
-                                if item != sortedResults.last {
-                                    Divider().padding(.leading, 70)
-                                }
+                ScrollView {
+                    LazyVStack(spacing: 0) {
+                        ForEach(sortedResults, id: \.self) { item in
+                            NearbyResultRow(
+                                item: item,
+                                userLocation: userLocation,
+                                isSelected: mapSelection == item
+                            ) {
+                                mapSelection = item
+                            }
+                            if item != sortedResults.last {
+                                Divider().padding(.leading, 70)
                             }
                         }
                     }
@@ -564,7 +562,6 @@ struct NearbyResultsSheet: View {
                 VStack(spacing: 0) {
                     // Drag handle + header
                     VStack(spacing: 8) {
-                        
                         HStack {
                             Text(selectedCategory.isEmpty ? "Nearby" : selectedCategory)
                                 .font(.system(size: 17, weight: .bold, design: .rounded))
@@ -605,6 +602,8 @@ struct NearbyResultsSheet: View {
 // MARK: - Main Map View
 
 struct mapView: View {
+    @State private var hideTabBar: Bool = false
+    @State private var currentStepIndex: Int = 0
     // MARK: Map
     @State private var cameraPosition: MapCameraPosition = .userLocation(fallback: .automatic)
     @State private var mapSelection: MKMapItem?
@@ -773,6 +772,7 @@ struct mapView: View {
                                 searchResults.removeAll()
                                 selectedCategory = ""
                                 showNearbyResults = false
+                                showDetails = false
                             }
                         }
                         .tint(.red)
@@ -792,9 +792,8 @@ struct mapView: View {
                 }
             }) {
                 MapDetails()
-                    .presentationDetents([.height(300)])
-                    .presentationBackgroundInteraction(.enabled(upThrough: .height(300)))
-                    .presentationCornerRadius(25)
+                    .presentationDetents([.height(350)])
+                    .presentationBackgroundInteraction(.enabled(upThrough: .height(350)))
                     .interactiveDismissDisabled(true)
             }
             // Workout summary sheet
@@ -814,25 +813,89 @@ struct mapView: View {
                 .presentationDetents([.medium, .large])
                 .presentationBackgroundInteraction(.enabled(upThrough: .medium))
             }
-            // End Route bar
+            
+            // MARK: - End Route Bar + Turn-by-Turn Banner
+            
             .safeAreaInset(edge: .bottom) {
-                if routeDisplaying {
-                    Button("End Route") {
-                        withAnimation(.snappy) {
-                            routeDisplaying = false
-                            showDetails = true
-                            mapSelection = routeDestination
-                            routeDestination = nil
-                            route = nil
-                            cameraPosition = .userLocation(fallback: .automatic)
+                if routeDisplaying, let route {
+                    VStack(spacing: 0) {
+                        
+                        // Turn-by-turn step banner
+                        if !route.steps.isEmpty {
+                            let step = route.steps[min(currentStepIndex, route.steps.count - 1)]
+                            HStack(spacing: 12) {
+                                Image(systemName: stepIcon(for: step))
+                                    .font(.system(size: 22, weight: .semibold))
+                                    .foregroundStyle(.white)
+                                    .frame(width: 36)
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(step.instructions.isEmpty ? "Head toward destination" : step.instructions)
+                                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                        .foregroundStyle(.white)
+                                        .lineLimit(2)
+                                    if step.distance > 0 {
+                                        Text(step.distance < 1609
+                                             ? String(format: "In %.0f ft", step.distance * 3.28084)
+                                             : String(format: "In %.1f mi", step.distance / 1609.34))
+                                        .font(.system(size: 12, weight: .medium))
+                                        .foregroundStyle(.white.opacity(0.7))
+                                    }
+                                }
+                                
+                                Spacer()
+                                
+                                // Previous / Next step controls
+                                HStack(spacing: 6) {
+                                    Button {
+                                        if currentStepIndex > 0 { currentStepIndex -= 1 }
+                                    } label: {
+                                        Image(systemName: "chevron.left")
+                                            .font(.system(size: 13, weight: .bold))
+                                            .foregroundStyle(currentStepIndex == 0 ? .white.opacity(0.3) : .white)
+                                    }
+                                    .disabled(currentStepIndex == 0)
+                                    
+                                    Button {
+                                        if currentStepIndex < route.steps.count - 1 { currentStepIndex += 1 }
+                                    } label: {
+                                        Image(systemName: "chevron.right")
+                                            .font(.system(size: 13, weight: .bold))
+                                            .foregroundStyle(currentStepIndex == route.steps.count - 1 ? .white.opacity(0.3) : .white)
+                                    }
+                                    .disabled(currentStepIndex == route.steps.count - 1)
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                            .background(.ultraThinMaterial, in: .rect(cornerRadius: 10, style: .continuous))
+                            .clipShape(.rect(cornerRadius: 16, style: .continuous))
+                            .padding(.horizontal, 16)
+                            .padding(.top, 10)
+                        }
+                        
+                        if #available(iOS 26.0, *) {
+                            Button("End Route") {
+                                endRoute()
+                            }
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .glassEffect(.regular.tint(.red).interactive(), in: .capsule)
+                            .padding(.horizontal, 16)
+                            .padding(.top, 10)
+                        } else {
+                            Button("End Route") {
+                                endRoute()
+                            }
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(.red.gradient, in: .rect(cornerRadius: 15))
+                            .padding(.horizontal, 16)
+                            .padding(.top, 10)
                         }
                     }
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(.red.gradient, in: .rect(cornerRadius: 15))
-                    .padding()
-                    .background(.ultraThinMaterial)
                 }
             }
         }
@@ -869,6 +932,7 @@ struct mapView: View {
         .onChange(of: searchResults) { _, newValue in
             withAnimation { showNearbyResults = !newValue.isEmpty }
         }
+        .hideFloatingTabBar(hideTabBar)
     }
     
     // MARK: - Track button helpers
@@ -888,35 +952,31 @@ struct mapView: View {
     @ViewBuilder
     func MapDetails() -> some View {
         VStack(spacing: 15) {
-            ZStack {
-                if lookAroundScene == nil {
-                    ContentUnavailableView("No Preview Available", systemImage: "eye.slash")
-                } else {
-                    LookAroundPreview(scene: $lookAroundScene)
-                }
-            }
-            .frame(height: 200)
-            .clipShape(.rect(cornerRadius: 15))
-            .overlay(alignment: .topTrailing) {
-                Button {
+            Spacer(minLength: 0)
+            LookAroundPreviewCard(
+                lookAroundScene: $lookAroundScene, mapSelection: mapSelection,
+                onDismiss: {
                     showDetails = false
                     withAnimation(.snappy) { mapSelection = nil }
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title)
-                        .foregroundStyle(.black)
-                        .background(.white, in: .circle)
                 }
-                .padding(10)
-            }
+            )
+            .background(
+                RoundedRectangle(cornerRadius: 13, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 13, style: .continuous)
+                            .stroke(.white.opacity(0.25), lineWidth: 1)
+                    )
+            )
             
-            Button("Get Directions", action: fetchRoute)
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical)
-                .background(.blue.gradient, in: .rect(cornerRadius: 15))
+            OpenMapsButton(mapSelection: mapSelection)
+            
+            GetDirectionsButton {
+                fetchRoute()
+                hideTabBar = true
+            }
         }
-        .padding(15)
+        .padding([.vertical, .horizontal], 15)
     }
     
     // MARK: - Search Places (now accepts explicit query)
@@ -950,19 +1010,29 @@ struct mapView: View {
     // MARK: - Fetch Navigation Route
     
     func fetchRoute() {
-        if let mapSelection {
-            let request = MKDirections.Request()
-            request.source = MKMapItem.forCurrentLocation()
-            request.destination = mapSelection
-            Task {
-                let result = try? await MKDirections(request: request).calculate()
-                route = result?.routes.first
-                routeDestination = mapSelection
-                withAnimation(.snappy) {
-                    routeDisplaying = true
-                    showDetails = false
-                    showNearbyResults = false
-                }
+        guard let mapSelection else { return }
+        let request = MKDirections.Request()
+        request.source = MKMapItem.forCurrentLocation()
+        request.destination = mapSelection
+        request.transportType = .walking  // change to .automobile if needed
+        
+        Task {
+            let result = try? await MKDirections(request: request).calculate()
+            guard let calculatedRoute = result?.routes.first else { return }
+            route = calculatedRoute
+            routeDestination = mapSelection
+            
+            withAnimation(.snappy) {
+                routeDisplaying = true
+                showDetails = false
+                showNearbyResults = false
+                // Fit the whole polyline in view with padding
+                cameraPosition = .rect(
+                    calculatedRoute.polyline.boundingMapRect.insetBy(
+                        dx: -calculatedRoute.polyline.boundingMapRect.width  * 0.2,
+                        dy: -calculatedRoute.polyline.boundingMapRect.height * 0.2
+                    )
+                )
             }
         }
     }
@@ -989,6 +1059,37 @@ struct mapView: View {
             )
         }
     }
+    
+    // MARK: - Turn Icon Helper
+    
+    private func stepIcon(for step: MKRoute.Step) -> String {
+        let text = step.instructions.lowercased()
+        if text.contains("left")                           { return "arrow.turn.up.left" }
+        if text.contains("right")                          { return "arrow.turn.up.right" }
+        if text.contains("u-turn")                         { return "arrow.uturn.left" }
+        if text.contains("merge") || text.contains("ramp") { return "arrow.merge" }
+        if text.contains("exit")                           { return "arrow.up.right" }
+        if text.contains("roundabout")                     { return "arrow.triangle.2.circlepath" }
+        if text.contains("destination")                    { return "mappin.circle.fill" }
+        return "arrow.up"
+    }
+    
+    // MARK: - End Route
+
+    private func endRoute() {
+        let destination = routeDestination
+        route = nil
+        routeDestination = nil
+
+        withAnimation(.snappy) {
+            routeDisplaying = false
+            showDetails = true
+            mapSelection = destination
+            currentStepIndex = 0
+            cameraPosition = .userLocation(fallback: .automatic)
+            hideTabBar = false
+        }
+    }
 }
 
 // MARK: - Location Helper (lightweight wrapper to get CLLocation for distance calc)
@@ -1012,4 +1113,135 @@ class LocationHelper: NSObject, CLLocationManagerDelegate {
 
 #Preview {
     mapView()
+}
+
+// MARK: - Look Around Preview Card
+
+private struct LookAroundPreviewCard: View {
+    @Binding var lookAroundScene: MKLookAroundScene?
+    let mapSelection: MKMapItem?
+    let onDismiss: () -> Void
+
+    var body: some View {
+        ZStack {
+            if lookAroundScene == nil {
+                ContentUnavailableView("No Preview Available", systemImage: "eye.slash")
+            } else {
+                LookAroundPreview(scene: $lookAroundScene)
+            }
+        }
+        .frame(height: 200)
+        .clipShape(.rect(cornerRadius: 15))
+        .overlay(alignment: .topTrailing) {
+            Button(action: onDismiss) {
+                if #available(iOS 26.0, *) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 20))
+                        .foregroundStyle(.white)
+                        .frame(width: 45, height: 45)
+                        .glassEffect(.regular.interactive(), in: .circle)
+                } else {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title)
+                        .foregroundStyle(.black)
+                        .background(.white, in: .circle)
+                }
+            }
+            .padding(10)
+        }
+        .overlay(alignment: .bottomLeading) {
+            if #available(iOS 26.0, *) {
+                VStack(alignment: .leading, spacing: 2) {
+                    if let name = mapSelection?.name {
+                        Text(name)
+                            .font(.system(size: 15, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                    }
+                    if let phone = mapSelection?.phoneNumber, !phone.isEmpty {
+                        if let url = URL(string: "tel://\(phone.filter { $0.isNumber })") {
+                            Link(phone, destination: url)
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.85))
+                        }
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(.ultraThinMaterial, in: .rect(cornerRadius: 10, style: .continuous))
+                .glassEffect(.regular, in: .rect(cornerRadius: 10, style: .continuous))
+                .padding(10)
+            } else {
+                VStack(alignment: .leading, spacing: 2) {
+                    if let name = mapSelection?.name {
+                        Text(name)
+                            .font(.system(size: 15, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                    }
+                    if let phone = mapSelection?.phoneNumber, !phone.isEmpty {
+                        if let url = URL(string: "tel://\(phone.filter { $0.isNumber })") {
+                            Link(phone, destination: url)
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.85))
+                        }
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(.ultraThinMaterial, in: .rect(cornerRadius: 10, style: .continuous))
+                .padding(10)
+            }
+        }
+    }
+}
+
+// MARK: - Open Maps Button
+
+private struct OpenMapsButton: View {
+    let mapSelection: MKMapItem?
+
+    var body: some View {
+        Button {
+            mapSelection?.openInMaps()
+        } label: {
+            if #available(iOS 26.0, *) {
+                Text("Open Maps")
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 15)
+                    .foregroundStyle(.white)
+                    .glassEffect(.regular.interactive().tint(.green), in: .capsule)
+            } else {
+                Text("Open Maps")
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 15)
+                    .foregroundStyle(.white)
+                    .background(.green.gradient, in: .rect(cornerRadius: 15))
+            }
+        }
+    }
+}
+
+// MARK: - Get Directions Button
+
+private struct GetDirectionsButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            if #available(iOS 26.0, *) {
+                Text("Get Directions")
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 15)
+                    .foregroundStyle(.white)
+                    .glassEffect(.regular.interactive().tint(.mint), in: .capsule)
+            } else {
+                Text("Get Directions")
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 15)
+                    .foregroundStyle(.white)
+                    .background(.mint.gradient, in: .rect(cornerRadius: 15))
+            }
+        }
+    }
 }
