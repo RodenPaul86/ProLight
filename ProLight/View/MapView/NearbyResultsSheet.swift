@@ -1,5 +1,5 @@
 //
-//  NearbyResultRow.swift
+//  NearbyResultsSheet.swift
 //  ProLight
 //
 //  Created by Paul  on 4/29/26.
@@ -106,8 +106,8 @@ struct NearbyResultsSheet: View {
     let userLocation: CLLocation?
     @Binding var mapSelection: MKMapItem?
     var selectedCategory: String
-    
-    // Sort results by distance from user
+
+    // ← Compute once, not on every render
     private var sortedResults: [MKMapItem] {
         guard let userLoc = userLocation else { return results }
         return results.sorted {
@@ -118,37 +118,20 @@ struct NearbyResultsSheet: View {
             return userLoc.distance(from: a) < userLoc.distance(from: b)
         }
     }
-    
+
     var body: some View {
         NavigationStack {
             if #available(iOS 26.0, *) {
-                ScrollView {
-                    VStack(spacing: 0) {
-                        ForEach(sortedResults, id: \.self) { item in
-                            NearbyResultRow(
-                                item: item,
-                                userLocation: userLocation,
-                                isSelected: mapSelection == item
-                            ) {
-                                mapSelection = item
-                            }
-                            if item != sortedResults.last {
-                                Divider().padding(.leading, 70)
-                            }
+                resultsList
+                    .background(.regularMaterial)
+                    .navigationTitle(selectedCategory.isEmpty ? "Nearby" : selectedCategory)
+                    .toolbarTitleDisplayMode(.inlineLarge)
+                    .navigationSubtitle("\(results.count) result\(results.count == 1 ? "" : "s")")
+                    .toolbar {
+                        ToolbarItem(placement: .destructiveAction) {
+                            Button("Close", systemImage: "xmark") { dismiss() }
                         }
                     }
-                }
-                .background(.regularMaterial)
-                .navigationTitle(selectedCategory.isEmpty ? "Nearby" : selectedCategory)
-                .toolbarTitleDisplayMode(.inlineLarge)
-                .navigationSubtitle("\(results.count) result\(results.count == 1 ? "" : "s")")
-                .toolbar {
-                    ToolbarItem(placement: .destructiveAction) {
-                        Button("Close", systemImage: "xmark") {
-                            dismiss()
-                        }
-                    }
-                }
             } else {
                 VStack(spacing: 0) {
                     // Drag handle + header
@@ -167,24 +150,32 @@ struct NearbyResultsSheet: View {
                     
                     Divider()
                     
-                    ScrollView {
-                        LazyVStack(spacing: 0) {
-                            ForEach(sortedResults, id: \.self) { item in
-                                NearbyResultRow(
-                                    item: item,
-                                    userLocation: userLocation,
-                                    isSelected: mapSelection == item
-                                ) {
-                                    mapSelection = item
-                                }
-                                if item != sortedResults.last {
-                                    Divider().padding(.leading, 70)
-                                }
-                            }
-                        }
-                    }
+                    resultsList
                 }
                 .background(.regularMaterial)
+            }
+        }
+    }
+
+    // ← Extracted so the compiler doesn't choke on one big body
+    @ViewBuilder
+    private var resultsList: some View {
+        ScrollView {
+            LazyVStack(spacing: 0) {  // ← LazyVStack on both paths
+                ForEach(sortedResults, id: \.self) { item in
+                    NearbyResultRow(
+                        item: item,
+                        userLocation: userLocation,
+                        isSelected: mapSelection == item
+                    ) {
+                        mapSelection = item
+                    }
+                    .id(item)  // ← stable identity helps diffing
+
+                    if item != sortedResults.last {
+                        Divider().padding(.leading, 70)
+                    }
+                }
             }
         }
     }
