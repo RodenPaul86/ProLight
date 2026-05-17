@@ -381,20 +381,14 @@ struct ExploreMapView: View {
             NavigationStack {
                 VStack(spacing: 12) {
                     Spacer()
-                    LookAroundPreviewCard(
-                        lookAroundScene: $lookAroundScene, mapSelection: mapSelection,
-                        onDismiss: {
-                            showDetails = false
-                            withAnimation(.snappy) { mapSelection = nil }
-                        }
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                    .background(
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .fill(.ultraThinMaterial)
-                            .shadow(color: .black.opacity(0.12), radius: 18, x: 0, y: 8)
-                    )
-                    .padding(.top, 12)
+                    LookAroundPreviewCard(lookAroundScene: $lookAroundScene)
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        .background(
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .fill(.ultraThinMaterial)
+                                .shadow(color: .black.opacity(0.12), radius: 18, x: 0, y: 8)
+                        )
+                        .padding(.top, 12)
                 }
                 .padding(.horizontal, 16)
                 .navigationTitle(mapSelection?.name ?? "Loading...")
@@ -437,43 +431,55 @@ struct ExploreMapView: View {
                 }
             }
         } else {
-            // Fallback on earlier versions
-        }
-        
-        
-        
-        
-        
-        /*
-        VStack(spacing: 15) {
-            Spacer()
-            LookAroundPreviewCard(
-                lookAroundScene: $lookAroundScene, mapSelection: mapSelection,
-                onDismiss: {
-                    showDetails = false
-                    withAnimation(.snappy) { mapSelection = nil }
+            NavigationStack {
+                VStack(spacing: 12) {
+                    Spacer()
+                    LookAroundPreviewCard(lookAroundScene: $lookAroundScene)
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        .background(
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .fill(.ultraThinMaterial)
+                                .shadow(color: .black.opacity(0.12), radius: 18, x: 0, y: 8)
+                        )
+                        .padding(.top, 12)
                 }
-            )
-            .background(
-                RoundedRectangle(cornerRadius: 13, style: .continuous)
-                    .fill(.ultraThinMaterial)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 13, style: .continuous)
-                            .stroke(.white.opacity(0.25), lineWidth: 1)
-                    )
-            )
-            
-            HStack {
-                OpenMapsButton(mapSelection: mapSelection)
-                
-                GetDirectionsButton {
-                    fetchRoute()
-                    hideTabBar = true
+                .padding(.horizontal, 16)
+                .navigationTitle(mapSelection?.name ?? "Loading...")
+                .toolbarTitleDisplayMode(.inlineLarge)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        if let phone = mapSelection?.phoneNumber, !phone.isEmpty {
+                            Button {
+                                let cleaned = phone.filter(\.isNumber)
+                                if let url = URL(string: "tel://\(cleaned)") {
+                                    openURL(url)
+                                }
+                            } label: {
+                                Image(systemName: "phone.fill")
+                            }
+                        }
+                    }
+                    
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Cancel", systemImage: "xmark") {
+                            showDetails = false
+                            withAnimation(.snappy) { mapSelection = nil }
+                        }
+                    }
+                }
+                .safeAreaInset(edge: .bottom) {
+                    HStack(spacing: 12) {
+                        OpenMapsButton(mapSelection: mapSelection)
+                        
+                        GetDirectionsButton {
+                            fetchRoute()
+                            hideTabBar = true
+                            showDetails = false
+                        }
+                    }
                 }
             }
         }
-        .padding([.vertical, .horizontal], 15)
-         */
     }
     
     // MARK: - Search Places (now accepts explicit query)
@@ -616,8 +622,6 @@ class LocationHelper: NSObject, CLLocationManagerDelegate {
 
 private struct LookAroundPreviewCard: View {
     @Binding var lookAroundScene: MKLookAroundScene?
-    let mapSelection: MKMapItem?
-    let onDismiss: () -> Void
 
     var body: some View {
         ZStack {
@@ -629,67 +633,6 @@ private struct LookAroundPreviewCard: View {
         }
         .frame(height: 200)
         .clipShape(.rect(cornerRadius: 15))
-        .overlay(alignment: .topTrailing) {
-            Button(action: onDismiss) {
-                if #available(iOS 26.0, *) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 20))
-                        .foregroundStyle(.white)
-                        .frame(width: 45, height: 45)
-                        .glassEffect(.regular.interactive(), in: .circle)
-                } else {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title)
-                        .foregroundStyle(.black)
-                        .background(.white, in: .circle)
-                }
-            }
-            .padding(10)
-        }
-        .overlay(alignment: .bottomLeading) {
-            if #available(iOS 26.0, *) {
-                VStack(alignment: .leading, spacing: 2) {
-                    if let name = mapSelection?.name {
-                        Text(name)
-                            .font(.system(size: 15, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .lineLimit(1)
-                    }
-                    if let phone = mapSelection?.phoneNumber, !phone.isEmpty {
-                        if let url = URL(string: "tel://\(phone.filter { $0.isNumber })") {
-                            Link(phone, destination: url)
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundStyle(.white.opacity(0.85))
-                        }
-                    }
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(.ultraThinMaterial, in: .rect(cornerRadius: 10, style: .continuous))
-                .glassEffect(.regular, in: .rect(cornerRadius: 10, style: .continuous))
-                .padding(10)
-            } else {
-                VStack(alignment: .leading, spacing: 2) {
-                    if let name = mapSelection?.name {
-                        Text(name)
-                            .font(.system(size: 15, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .lineLimit(1)
-                    }
-                    if let phone = mapSelection?.phoneNumber, !phone.isEmpty {
-                        if let url = URL(string: "tel://\(phone.filter { $0.isNumber })") {
-                            Link(phone, destination: url)
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundStyle(.white.opacity(0.85))
-                        }
-                    }
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(.ultraThinMaterial, in: .rect(cornerRadius: 10, style: .continuous))
-                .padding(10)
-            }
-        }
     }
 }
 
