@@ -82,8 +82,6 @@ struct WorkoutSummarySheet: View {
             }
             .disabled(isSaved)
             .padding(.horizontal, 20)
-            
-            //Spacer()
         }
     }
     
