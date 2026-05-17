@@ -11,6 +11,7 @@ import CoreLocation
 import SwiftData
 
 struct ExploreMapView: View {
+    @Environment(\.openURL) private var openURL
     @State private var hideTabBar: Bool = false
     @State private var currentStepIndex: Int = 0
     // MARK: Map
@@ -143,7 +144,12 @@ struct ExploreMapView: View {
                         }
                     } label: {
                         ZStack {
-                            Circle().fill(trackButtonColor.opacity(0.15)).frame(width: 56, height: 56)
+                            if #available(iOS 26.0, *) {
+                                Circle().fill(trackButtonColor.opacity(0.15)).frame(width: 56, height: 56)
+                                    .glassEffect(.regular, in: .circle)
+                            } else {
+                                Circle().fill(trackButtonColor.opacity(0.15)).frame(width: 56, height: 56)
+                            }
                             Circle().strokeBorder(trackButtonColor.opacity(0.35), lineWidth: 1.5).frame(width: 56, height: 56)
                             Image(systemName: trackButtonIcon)
                                 .font(.system(size: 30, weight: .semibold))
@@ -200,12 +206,11 @@ struct ExploreMapView: View {
                     }
                 }
             }
-            .searchable(text: $searchText, isPresented: $showSearch)
+            .searchable(text: $searchText, isPresented: $showSearch) /// <-- Search Text
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar(routeDisplaying ? .hidden : .visible, for: .navigationBar)
             .safeAreaPadding(.bottom, tabBarHeight)
-            // Place detail sheet
-            .sheet(isPresented: $showDetails, onDismiss: {
+            .sheet(isPresented: $showDetails, onDismiss: { /// <-- Place detail sheet
                 withAnimation(.snappy) {
                     if let boundingRect = route?.polyline.boundingMapRect, routeDisplaying {
                         cameraPosition = .rect(boundingRect)
@@ -213,17 +218,16 @@ struct ExploreMapView: View {
                 }
             }) {
                 MapDetails()
-                    .presentationDetents([.height(350)])
-                    .presentationBackgroundInteraction(.enabled(upThrough: .height(350)))
+                    .presentationDetents([.fraction(0.45)]) /// <-- 45% of screen height
                     .interactiveDismissDisabled(true)
             }
-            // Workout summary sheet
+            // MARK: Workout summary sheet
             .sheet(isPresented: $showWorkoutSummary) {
                 WorkoutSummarySheet(workout: workout)
                     .presentationDetents([.fraction(0.62)]) /// <-- 62% of screen height
                     .interactiveDismissDisabled(true)
             }
-            // Nearby results sheet
+            // MARK: Nearby results sheet
             .sheet(isPresented: $showNearbyResults) {
                 NearbyResultsSheet(
                     results: searchResults,
@@ -232,7 +236,7 @@ struct ExploreMapView: View {
                     selectedCategory: selectedCategory
                 )
                 .presentationDetents([.medium])
-                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                .interactiveDismissDisabled(true)
                 .presentationDragIndicator(.visible)
             }
             
@@ -373,8 +377,76 @@ struct ExploreMapView: View {
     
     @ViewBuilder
     func MapDetails() -> some View {
+        if #available(iOS 26.0, *) {
+            NavigationStack {
+                VStack(spacing: 12) {
+                    Spacer()
+                    LookAroundPreviewCard(
+                        lookAroundScene: $lookAroundScene, mapSelection: mapSelection,
+                        onDismiss: {
+                            showDetails = false
+                            withAnimation(.snappy) { mapSelection = nil }
+                        }
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .background(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .fill(.ultraThinMaterial)
+                            .shadow(color: .black.opacity(0.12), radius: 18, x: 0, y: 8)
+                    )
+                    .padding(.top, 12)
+                }
+                .padding(.horizontal, 16)
+                .navigationTitle(mapSelection?.name ?? "Loading...")
+                .navigationSubtitle(mapSelection?.phoneNumber ?? "Loading...")
+                .toolbarTitleDisplayMode(.inlineLarge)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        if let phone = mapSelection?.phoneNumber, !phone.isEmpty {
+                            Button {
+                                let cleaned = phone.filter(\.isNumber)
+                                if let url = URL(string: "tel://\(cleaned)") {
+                                    openURL(url)
+                                }
+                            } label: {
+                                Image(systemName: "phone.fill")
+                            }
+                        }
+                    }
+                    
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Cancel", systemImage: "xmark") {
+                            showDetails = false
+                            withAnimation(.snappy) { mapSelection = nil }
+                        }
+                    }
+                }
+                .safeAreaInset(edge: .bottom) {
+                    HStack(spacing: 12) {
+                        OpenMapsButton(mapSelection: mapSelection)
+                        
+                        GetDirectionsButton {
+                            fetchRoute()
+                            hideTabBar = true
+                            showDetails = false
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 12)
+                    .padding(.bottom, 12)
+                }
+            }
+        } else {
+            // Fallback on earlier versions
+        }
+        
+        
+        
+        
+        
+        /*
         VStack(spacing: 15) {
-            Spacer(minLength: 0)
+            Spacer()
             LookAroundPreviewCard(
                 lookAroundScene: $lookAroundScene, mapSelection: mapSelection,
                 onDismiss: {
@@ -391,14 +463,17 @@ struct ExploreMapView: View {
                     )
             )
             
-            OpenMapsButton(mapSelection: mapSelection)
-            
-            GetDirectionsButton {
-                fetchRoute()
-                hideTabBar = true
+            HStack {
+                OpenMapsButton(mapSelection: mapSelection)
+                
+                GetDirectionsButton {
+                    fetchRoute()
+                    hideTabBar = true
+                }
             }
         }
         .padding([.vertical, .horizontal], 15)
+         */
     }
     
     // MARK: - Search Places (now accepts explicit query)
