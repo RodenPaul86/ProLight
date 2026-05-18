@@ -383,7 +383,6 @@ struct ExploreMapView: View {
                             .background(.red.gradient, in: .capsule)
                             .padding(.horizontal)
                             .padding(.top, 8)
-                            .padding(.bottom, 10)
                         }
                     }
                 }
