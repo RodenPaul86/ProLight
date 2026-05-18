@@ -352,10 +352,10 @@ struct ExploreMapView: View {
                                     }
                                 }
                                 .padding(.vertical, 15)
+                                .padding(.horizontal, 15)
                                 .background(.ultraThinMaterial, in: .capsule)
                                 .padding(.horizontal)
                                 .padding(.top, 8)
-                                .padding(.bottom, 10)
                             }
                         }
                         
