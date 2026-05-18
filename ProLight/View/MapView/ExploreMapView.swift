@@ -362,27 +362,24 @@ struct ExploreMapView: View {
                         if #available(iOS 26.0, *) {
                             Button(action: { endRoute() }) {
                                 Text("End Route")
-                                    .font(.system(size: 17))
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 16)
-                                    .foregroundStyle(.white)
+                                    .font(.system(size: 17, weight: .semibold, design: .rounded))
                             }
-                            .buttonStyle(.plain)
-                            .glassEffect(.regular.tint(.red).interactive(), in: .capsule)
-                            .padding(.horizontal)
-                            .padding(.top, 8)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 15)
+                            .foregroundStyle(.white)
+                            .glassEffect(.regular.interactive().tint(.red), in: .capsule)
+                            .padding()
                         } else {
                             Button(action: { endRoute() }) {
                                 Text("End Route")
-                                    .font(.system(size: 17))
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 16)
-                                    .foregroundStyle(.white)
+                                    .font(.system(size: 17, weight: .semibold, design: .rounded))
                             }
-                            .buttonStyle(.plain)
-                            .background(.red.gradient, in: .capsule)
-                            .padding(.horizontal)
-                            .padding(.top, 8)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 15)
+                            .foregroundStyle(.white)
+                            .background(Color.red.gradient)
+                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                            .padding()
                         }
                     }
                 }
