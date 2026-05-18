@@ -136,6 +136,8 @@ struct ExploreMapView: View {
                         .transition(.scale.combined(with: .opacity))
                     }
                     
+                    
+                    
                     Button {
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.65)) {
                             if !workout.isActive        { workout.start() }
@@ -245,81 +247,143 @@ struct ExploreMapView: View {
             .safeAreaInset(edge: .bottom) {
                 if routeDisplaying, let route {
                     VStack(spacing: 0) {
-                        
                         // Turn-by-turn step banner
                         if !route.steps.isEmpty {
                             let step = route.steps[min(currentStepIndex, route.steps.count - 1)]
-                            HStack(spacing: 12) {
-                                Image(systemName: stepIcon(for: step))
-                                    .font(.system(size: 22, weight: .semibold))
-                                    .foregroundStyle(.white)
-                                    .frame(width: 36)
-                                
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(step.instructions.isEmpty ? "Head toward destination" : step.instructions)
-                                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                            if #available(iOS 26.0, *) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: stepIcon(for: step))
+                                        .font(.system(size: 22, weight: .semibold))
                                         .foregroundStyle(.white)
-                                        .lineLimit(2)
-                                    if step.distance > 0 {
-                                        Text(step.distance < 1609
-                                             ? String(format: "In %.0f ft", step.distance * 3.28084)
-                                             : String(format: "In %.1f mi", step.distance / 1609.34))
-                                        .font(.system(size: 12, weight: .medium))
-                                        .foregroundStyle(.white.opacity(0.7))
-                                    }
-                                }
-                                
-                                Spacer()
-                                
-                                // Previous / Next step controls
-                                HStack(spacing: 6) {
-                                    Button {
-                                        if currentStepIndex > 0 { currentStepIndex -= 1 }
-                                    } label: {
-                                        Image(systemName: "chevron.left")
-                                            .font(.system(size: 13, weight: .bold))
-                                            .foregroundStyle(currentStepIndex == 0 ? .white.opacity(0.3) : .white)
-                                    }
-                                    .disabled(currentStepIndex == 0)
+                                        .frame(width: 36)
                                     
-                                    Button {
-                                        if currentStepIndex < route.steps.count - 1 { currentStepIndex += 1 }
-                                    } label: {
-                                        Image(systemName: "chevron.right")
-                                            .font(.system(size: 13, weight: .bold))
-                                            .foregroundStyle(currentStepIndex == route.steps.count - 1 ? .white.opacity(0.3) : .white)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(step.instructions.isEmpty ? "Head toward destination" : step.instructions)
+                                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                            .foregroundStyle(.white)
+                                            .lineLimit(2)
+                                        if step.distance > 0 {
+                                            Text(step.distance < 1609
+                                                 ? String(format: "In %.0f ft", step.distance * 3.28084)
+                                                 : String(format: "In %.1f mi", step.distance / 1609.34))
+                                            .font(.system(size: 12, weight: .medium))
+                                            .foregroundStyle(.white.opacity(0.7))
+                                        }
                                     }
-                                    .disabled(currentStepIndex == route.steps.count - 1)
+                                    
+                                    Spacer()
+                                    
+                                    // MARK: - Previous / Next step controls
+                                    HStack(spacing: 6) {
+                                        Button {
+                                            if currentStepIndex > 0 { currentStepIndex -= 1 }
+                                        } label: {
+                                            Image(systemName: "chevron.left")
+                                                .font(.system(size: 13, weight: .bold))
+                                                .foregroundStyle(currentStepIndex == 0 ? .white.opacity(0.3) : .white)
+                                                .frame(width: 34, height: 34)
+                                                .contentShape(Circle())
+                                        }
+                                        .disabled(currentStepIndex == 0)
+                                        
+                                        Button {
+                                            if currentStepIndex < route.steps.count - 1 { currentStepIndex += 1 }
+                                        } label: {
+                                            Image(systemName: "chevron.right")
+                                                .font(.system(size: 13, weight: .bold))
+                                                .foregroundStyle(currentStepIndex == route.steps.count - 1 ? .white.opacity(0.3) : .white)
+                                                .frame(width: 34, height: 34)
+                                                .contentShape(Circle())
+                                        }
+                                        .disabled(currentStepIndex == route.steps.count - 1)
+                                    }
                                 }
+                                .padding(.vertical, 15)
+                                .padding(.horizontal, 15)
+                                .glassEffect(.regular, in: .capsule)
+                                .padding(.horizontal)
+                                .padding(.top, 8)
+                            } else {
+                                HStack(spacing: 12) {
+                                    Image(systemName: stepIcon(for: step))
+                                        .font(.system(size: 22, weight: .semibold))
+                                        .foregroundStyle(.white)
+                                        .frame(width: 36)
+                                    
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(step.instructions.isEmpty ? "Head toward destination" : step.instructions)
+                                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                            .foregroundStyle(.white)
+                                            .lineLimit(2)
+                                        if step.distance > 0 {
+                                            Text(step.distance < 1609
+                                                 ? String(format: "In %.0f ft", step.distance * 3.28084)
+                                                 : String(format: "In %.1f mi", step.distance / 1609.34))
+                                            .font(.system(size: 12, weight: .medium))
+                                            .foregroundStyle(.white.opacity(0.7))
+                                        }
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    // MARK: - Previous / Next step controls
+                                    HStack(spacing: 6) {
+                                        Button {
+                                            if currentStepIndex > 0 { currentStepIndex -= 1 }
+                                        } label: {
+                                            Image(systemName: "chevron.left")
+                                                .font(.system(size: 20, weight: .bold))
+                                                .foregroundStyle(currentStepIndex == 0 ? .white.opacity(0.3) : .white)
+                                                .frame(width: 34, height: 34)
+                                                .contentShape(Circle())
+                                        }
+                                        .disabled(currentStepIndex == 0)
+                                        
+                                        Button {
+                                            if currentStepIndex < route.steps.count - 1 { currentStepIndex += 1 }
+                                        } label: {
+                                            Image(systemName: "chevron.right")
+                                                .font(.system(size: 20, weight: .bold))
+                                                .foregroundStyle(currentStepIndex == route.steps.count - 1 ? .white.opacity(0.3) : .white)
+                                                .frame(width: 34, height: 34)
+                                                .contentShape(Circle())
+                                        }
+                                        .disabled(currentStepIndex == route.steps.count - 1)
+                                    }
+                                }
+                                .padding(.vertical, 15)
+                                .background(.ultraThinMaterial, in: .capsule)
+                                .padding(.horizontal)
+                                .padding(.top, 8)
+                                .padding(.bottom, 10)
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
-                            .background(.ultraThinMaterial, in: .rect(cornerRadius: 10, style: .continuous))
-                            .clipShape(.rect(cornerRadius: 16, style: .continuous))
-                            .padding(.horizontal, 16)
-                            .padding(.top, 10)
                         }
                         
                         if #available(iOS 26.0, *) {
-                            Button("End Route") {
-                                endRoute()
+                            Button(action: { endRoute() }) {
+                                Text("End Route")
+                                    .font(.system(size: 17))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 16)
+                                    .foregroundStyle(.white)
                             }
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
+                            .buttonStyle(.plain)
                             .glassEffect(.regular.tint(.red).interactive(), in: .capsule)
-                            .padding(.horizontal, 16)
-                            .padding(.top, 10)
+                            .padding(.horizontal)
+                            .padding(.top, 8)
                         } else {
-                            Button("End Route") {
-                                endRoute()
+                            Button(action: { endRoute() }) {
+                                Text("End Route")
+                                    .font(.system(size: 17))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 16)
+                                    .foregroundStyle(.white)
                             }
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
-                            .background(.red.gradient, in: .rect(cornerRadius: 15))
-                            .padding(.horizontal, 16)
-                            .padding(.top, 10)
+                            .buttonStyle(.plain)
+                            .background(.red.gradient, in: .capsule)
+                            .padding(.horizontal)
+                            .padding(.top, 8)
+                            .padding(.bottom, 10)
                         }
                     }
                 }
