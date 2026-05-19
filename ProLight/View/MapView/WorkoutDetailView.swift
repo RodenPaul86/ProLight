@@ -53,24 +53,30 @@ struct WorkoutDetailView: View {
                 }
                 
                 // MARK: - Notes
-                VStack(spacing: 0) {
-                    HStack {
-                        Text("Add a Note")
-                            .font(.headline)
-                        Spacer()
-                    }
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Add a Note")
+                        .font(.headline)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 16)
                     
-                    TextField("What do you want to remember about this walk?", text: $textBody, axis: .vertical)
-                        .padding(.vertical, 8)
-                        .frame(minHeight: 200, alignment: .top)
+                    TextField(
+                        "What do you want to remember about this walk?",
+                        text: $textBody,
+                        axis: .vertical
+                    )
+                    .lineLimit(5...10) // expands from 5 to 10 lines
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 16)
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
                 }
-                .padding()
                 .background(.ultraThinMaterial)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .stroke(Color.white.opacity(0.12), lineWidth: 1)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                )
             }
             .padding()
         }
