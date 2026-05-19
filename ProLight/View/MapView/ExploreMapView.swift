@@ -33,6 +33,7 @@ struct ExploreMapView: View {
     @State private var showDetails: Bool = false
     @State private var lookAroundScene: MKLookAroundScene?
     // MARK: Navigation route
+    @State private var routeReady: Bool = false
     @State private var routeDisplaying: Bool = false
     @State private var route: MKRoute?
     @State private var routeDestination: MKMapItem?
@@ -191,6 +192,7 @@ struct ExploreMapView: View {
                                     selectedCategory = ""
                                     showNearbyResults = false
                                     showDetails = false
+                                    cameraPosition = .userLocation(fallback: .automatic)
                                 }
                             }
                             .tint(.red)
@@ -201,6 +203,7 @@ struct ExploreMapView: View {
                                     selectedCategory = ""
                                     showNearbyResults = false
                                     showDetails = false
+                                    cameraPosition = .userLocation(fallback: .automatic)
                                 }
                             })
                             .tint(.red)
@@ -212,17 +215,32 @@ struct ExploreMapView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar(routeDisplaying ? .hidden : .visible, for: .navigationBar)
             .safeAreaPadding(.bottom, tabBarHeight)
-            .sheet(isPresented: $showDetails, onDismiss: { /// <-- Place detail sheet
-                withAnimation(.snappy) {
-                    if let boundingRect = route?.polyline.boundingMapRect, routeDisplaying {
-                        cameraPosition = .rect(boundingRect)
+            .sheet(isPresented: $showDetails, onDismiss: {
+                if routeReady {
+                    routeReady = false
+                    withAnimation(.snappy) {
+                        routeDisplaying = true
+                        showNearbyResults = false
+                        cameraPosition = .rect(
+                            route!.polyline.boundingMapRect.insetBy(
+                                dx: -route!.polyline.boundingMapRect.width  * 0.2,
+                                dy: -route!.polyline.boundingMapRect.height * 0.2
+                            )
+                        )
+                    }
+                } else {
+                    // existing onDismiss logic
+                    withAnimation(.snappy) {
+                        if let boundingRect = route?.polyline.boundingMapRect, routeDisplaying {
+                            cameraPosition = .rect(boundingRect)
+                        }
                     }
                 }
-            }) {
+            }, content: {
                 MapDetails()
                     .presentationDetents([.fraction(0.45)]) /// <-- 45% of screen height
                     .interactiveDismissDisabled(true)
-            }
+            })
             // MARK: Workout summary sheet
             .sheet(isPresented: $showWorkoutSummary) {
                 WorkoutSummarySheet(workout: workout)
@@ -556,6 +574,7 @@ struct ExploreMapView: View {
         )
         let results = try? await MKLocalSearch(request: request).start()
         searchResults = results?.mapItems ?? []
+        zoomToFitAll()
     }
     
     // MARK: - Look Around Preview
@@ -577,7 +596,7 @@ struct ExploreMapView: View {
         let request = MKDirections.Request()
         request.source = MKMapItem.forCurrentLocation()
         request.destination = mapSelection
-        request.transportType = .walking  // change to .automobile if needed
+        request.transportType = .walking
         
         Task {
             let result = try? await MKDirections(request: request).calculate()
@@ -585,18 +604,10 @@ struct ExploreMapView: View {
             route = calculatedRoute
             routeDestination = mapSelection
             
-            withAnimation(.snappy) {
-                routeDisplaying = true
-                showDetails = false
-                showNearbyResults = false
-                // Fit the whole polyline in view with padding
-                cameraPosition = .rect(
-                    calculatedRoute.polyline.boundingMapRect.insetBy(
-                        dx: -calculatedRoute.polyline.boundingMapRect.width  * 0.2,
-                        dy: -calculatedRoute.polyline.boundingMapRect.height * 0.2
-                    )
-                )
-            }
+            // Don't show route UI yet — wait for sheet dismiss
+            routeReady = true
+            showDetails = false
+            hideTabBar = true
         }
     }
     
@@ -741,6 +752,44 @@ private struct GetDirectionsButton: View {
                     .padding(.vertical, 15)
                     .foregroundStyle(.white)
                     .background(.mint.gradient, in: .rect(cornerRadius: 15))
+            }
+        }
+    }
+}
+
+extension ExploreMapView {
+    private func zoomToFitAll() {
+        let coords = searchResults.map(\.placemark.coordinate)
+        guard !coords.isEmpty else { return }
+        
+        if coords.count == 1 {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                cameraPosition = .region(MKCoordinateRegion(
+                    center: coords[0],
+                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                ))
+            }
+            return
+        }
+        
+        let rect = coords.reduce(MKMapRect.null) { rect, coord in
+            let point = MKMapPoint(coord)
+            return rect.union(MKMapRect(x: point.x, y: point.y, width: 0, height: 0))
+        }
+        
+        let padded = rect.insetBy(dx: -rect.size.width * 0.3, dy: -rect.size.height * 0.3)
+        
+        // First zoom out briefly to give a "pull back" feel
+        withAnimation(.easeInOut(duration: 0.25)) {
+            cameraPosition = .rect(
+                padded.insetBy(dx: -padded.size.width * 0.4, dy: -padded.size.height * 0.4)
+            )
+        }
+        
+        // Then settle into the final position
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            withAnimation(.spring(response: 0.55, dampingFraction: 0.75)) {
+                cameraPosition = .rect(padded)
             }
         }
     }
