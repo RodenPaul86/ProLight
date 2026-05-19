@@ -55,12 +55,12 @@ struct WorkoutDetailView: View {
                 // MARK: - Notes
                 VStack(spacing: 0) {
                     HStack {
-                        Text("Note")
+                        Text("Add a Note")
                             .font(.headline)
                         Spacer()
                     }
                     
-                    TextField("Enter text here...", text: $textBody, axis: .vertical)
+                    TextField("What do you want to remember about this walk?", text: $textBody, axis: .vertical)
                         .padding(.vertical, 8)
                         .frame(minHeight: 200, alignment: .top)
                 }
