@@ -15,8 +15,10 @@ enum IconAppearance: String, CaseIterable {
 
 enum AppIcon: String, CaseIterable {
     case defaultIcon = "Default"
-    case gradient = "v2.0"
+    case lowPower = "Low Power"
+    case gradient = "Concept"
     case classic = "v1.0"
+    case emerald = "Emerald Glow"
     case fusion = "Blue Fusion"
     case blaze = "Crimson Blaze"
     case mystic = "Mystic Shade"
@@ -30,11 +32,13 @@ enum AppIcon: String, CaseIterable {
     var baseImageName: String {
         switch self {
         case .defaultIcon: return "Image 0"
-        case .fusion: return "Image 1"
-        case .blaze: return "Image 2"
-        case .mystic: return "Image 3"
-        case .ember: return "Image 4"
-        case .eclipse: return "Image 5"
+        case .emerald: return "Image 1"
+        case .fusion: return "Image 2"
+        case .blaze: return "Image 3"
+        case .mystic: return "Image 4"
+        case .ember: return "Image 5"
+        case .eclipse: return "Image 6"
+        case .lowPower: return "Image 10"
         case .classic: return "Image 11"
         case .gradient: return "Image 12"
         }
@@ -50,15 +54,19 @@ enum AppIcon: String, CaseIterable {
     }
     
     static var mainIcons: [AppIcon] {
-        [.defaultIcon]
+        [.defaultIcon, .lowPower]
     }
     
     static var classicIcons: [AppIcon] {
-        [.classic, .gradient]
+        [.classic]
+    }
+    
+    static var unreleasedIcon: [AppIcon] {
+        [.gradient]
     }
     
     static var otherIcons: [AppIcon] {
-        [.fusion, .blaze, .mystic, .ember, .eclipse]
+        [.emerald, .fusion, .blaze, .mystic, .ember, .eclipse]
     }
 }
 
@@ -84,37 +92,41 @@ struct AlternativeIcons: View {
             List {
                 Section("Modern") {
                     ForEach(AppIcon.mainIcons, id: \.rawValue) { icon in
-                        AppIconRow(
-                            icon: icon,
-                            currentAppIcon: $currentAppIcon,
-                            isSubscriptionActive: appSubModel.isSubscriptionActive,
-                            isPaywallPresented: $isPaywallPresented,
-                            appearance: appearance
-                        )
+                        AppIconRow(icon: icon,
+                                   currentAppIcon: $currentAppIcon,
+                                   isSubscriptionActive: appSubModel.isSubscriptionActive,
+                                   isPaywallPresented: $isPaywallPresented,
+                                   appearance: appearance)
                     }
                 }
                 
                 Section("Classic") {
                     ForEach(AppIcon.classicIcons, id: \.rawValue) { icon in
-                        AppIconRow(
-                            icon: icon,
-                            currentAppIcon: $currentAppIcon,
-                            isSubscriptionActive: appSubModel.isSubscriptionActive,
-                            isPaywallPresented: $isPaywallPresented,
-                            appearance: appearance
-                        )
+                        AppIconRow(icon: icon,
+                                   currentAppIcon: $currentAppIcon,
+                                   isSubscriptionActive: appSubModel.isSubscriptionActive,
+                                   isPaywallPresented: $isPaywallPresented,
+                                   appearance: appearance)
+                    }
+                }
+                
+                Section("Unreleased") {
+                    ForEach(AppIcon.unreleasedIcon, id: \.rawValue) { icon in
+                        AppIconRow(icon: icon,
+                                   currentAppIcon: $currentAppIcon,
+                                   isSubscriptionActive: appSubModel.isSubscriptionActive,
+                                   isPaywallPresented: $isPaywallPresented,
+                                   appearance: appearance)
                     }
                 }
                 
                 Section("Other") {
                     ForEach(AppIcon.otherIcons, id: \.rawValue) { icon in
-                        AppIconRow(
-                            icon: icon,
-                            currentAppIcon: $currentAppIcon,
-                            isSubscriptionActive: appSubModel.isSubscriptionActive,
-                            isPaywallPresented: $isPaywallPresented,
-                            appearance: appearance
-                        )
+                        AppIconRow(icon: icon,
+                                   currentAppIcon: $currentAppIcon,
+                                   isSubscriptionActive: appSubModel.isSubscriptionActive,
+                                   isPaywallPresented: $isPaywallPresented,
+                                   appearance: appearance)
                     }
                 }
             }
