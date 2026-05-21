@@ -647,7 +647,7 @@ struct HomeView: View {
                     }
                 }
             
-            modeButton(icon: "iphone", BGColor: Color("darkGray"))
+            modeButton(icon: "iphone.pattern.diagonalline", BGColor: Color("darkGray"))
                 .onTapGesture {
                     HapticManager.shared.notify(.impact(.light))
                     showScreenLight = true
