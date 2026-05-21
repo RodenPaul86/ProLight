@@ -11,6 +11,7 @@ import CoreLocation
 import SwiftData
 
 struct ExploreMapView: View {
+    @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
     @Environment(\.openURL) private var openURL
     @State private var hideTabBar: Bool = false
     @State private var currentStepIndex: Int = 0
@@ -121,12 +122,21 @@ struct ExploreMapView: View {
                     
                     if workout.isActive {
                         Button {
+                            if isHapticsEnabled {
+                                HapticManager.shared.notify(.impact(.light))
+                            }
                             workout.stop()
                             showWorkoutSummary = true
                         } label: {
                             ZStack {
-                                Circle().fill(Color.red.opacity(0.12)).frame(width: 46, height: 46)
-                                Circle().strokeBorder(Color.red.opacity(0.35), lineWidth: 1.2).frame(width: 46, height: 46)
+                                if #available(iOS 26.0, *) {
+                                    Circle().fill(Color.red.opacity(0.12)).frame(width: 46, height: 46)
+                                    Circle().strokeBorder(Color.red.opacity(0.35), lineWidth: 1.2).frame(width: 46, height: 46)
+                                        .glassEffect(.regular.interactive(), in: .circle)
+                                } else {
+                                    Circle().fill(Color.red.opacity(0.12)).frame(width: 46, height: 46)
+                                    Circle().strokeBorder(Color.red.opacity(0.35), lineWidth: 1.2).frame(width: 46, height: 46)
+                                }
                                 Image(systemName: "stop.circle.fill")
                                     .font(.system(size: 26, weight: .medium))
                                     .foregroundColor(.red)
@@ -137,9 +147,10 @@ struct ExploreMapView: View {
                         .transition(.scale.combined(with: .opacity))
                     }
                     
-                    
-                    
                     Button {
+                        if isHapticsEnabled {
+                            HapticManager.shared.notify(.impact(.light))
+                        }
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.65)) {
                             if !workout.isActive        { workout.start() }
                             else if workout.isPaused    { workout.resume() }
@@ -149,11 +160,12 @@ struct ExploreMapView: View {
                         ZStack {
                             if #available(iOS 26.0, *) {
                                 Circle().fill(trackButtonColor.opacity(0.15)).frame(width: 56, height: 56)
-                                    .glassEffect(.regular, in: .circle)
+                                Circle().strokeBorder(trackButtonColor.opacity(0.35), lineWidth: 1.5).frame(width: 56, height: 56)
+                                    .glassEffect(.regular.interactive(), in: .circle)
                             } else {
                                 Circle().fill(trackButtonColor.opacity(0.15)).frame(width: 56, height: 56)
+                                Circle().strokeBorder(trackButtonColor.opacity(0.35), lineWidth: 1.5).frame(width: 56, height: 56)
                             }
-                            Circle().strokeBorder(trackButtonColor.opacity(0.35), lineWidth: 1.5).frame(width: 56, height: 56)
                             Image(systemName: trackButtonIcon)
                                 .font(.system(size: 30, weight: .semibold))
                                 .foregroundColor(trackButtonColor)
