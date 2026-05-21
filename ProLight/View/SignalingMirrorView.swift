@@ -19,6 +19,9 @@ struct SignalingMirrorInstructionsView: View {
                     
                     VStack(alignment: .leading, spacing: 16) {
                         
+                        // Warning
+                        CallFirstWarning()
+                        
                         // Steps
                         SectionLabel(text: "How it works")
                         StepsCard()
@@ -26,8 +29,6 @@ struct SignalingMirrorInstructionsView: View {
                         // Tips
                         SectionLabel(text: "Good to know")
                         TipsCard()
-                        
-                        BatteryWarning()
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
@@ -154,26 +155,27 @@ struct StepRow: View {
 
 // MARK: - Tips
 
-private let tips = [
-    "Visible up to 10–15 miles in clear conditions, especially from aircraft.",
-    "Works on overcast days — diffuse light still produces a detectable reflection.",
-    "Aim at the sound of an engine even if you can't see the aircraft."
+private let tips: [(String, String)] = [
+    ("Target the cockpit.", "When signaling an aircraft, aim for the cockpit — not the fuselage."),
+    ("SOS pattern.", "Three short flashes, three long, three short — the universal distress signal."),
+    ("Broken phone still works.", "The metallic layer behind a cracked screen is highly reflective."),
+    ("Practice now.", "Try this at home so you're confident if you ever need it for real.")
 ]
 
 struct TipsCard: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {  // ← alignment here
+        VStack(alignment: .leading, spacing: 0) {
             ForEach(Array(tips.enumerated()), id: \.offset) { index, tip in
                 HStack(alignment: .top, spacing: 9) {
                     Circle()
                         .fill(Color.red)
                         .frame(width: 5, height: 5)
                         .padding(.top, 5)
-                    Text(tip)
+                    (Text(tip.0 + " ").fontWeight(.semibold) + Text(tip.1))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity, alignment: .leading)  // ← and here
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(.horizontal, 13)
                 .padding(.vertical, 9)
@@ -182,7 +184,7 @@ struct TipsCard: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)  // ← and here
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 14))
     }
@@ -209,6 +211,28 @@ struct BatteryWarning: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.red.opacity(0.3), lineWidth: 0.5)
         )
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+// MARK: - Warning
+
+struct CallFirstWarning: View {
+    var body: some View {
+        HStack(alignment: .top, spacing: 9) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.red)
+                .font(.system(size: 15))
+                .padding(.top, 1)
+            Text("**Call first.** If your phone is working, always try calling or texting for help before using it as a mirror.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(13)
+        .background(Color.red.opacity(0.1))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.red.opacity(0.3), lineWidth: 0.5))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
