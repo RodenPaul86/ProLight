@@ -423,9 +423,9 @@ struct HomeView: View {
                     }
             }
             .sheet(isPresented: $showSignalingMirrorSheet) {
-                SignalingMirrorView()
-                    .presentationDetents([.fraction(0.50)]) /// <-- 50% of screen height
-                    .presentationDragIndicator(.visible) /// <-- Shows the line at top
+                SignalingMirrorInstructionsView()
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
             }
         }
     }
