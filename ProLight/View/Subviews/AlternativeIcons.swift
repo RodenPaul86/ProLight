@@ -215,9 +215,15 @@ struct AppIconRow: View {
                     .font(.title2)
                     .foregroundColor(.red)
             } else {
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "")
-                    .font(.title2)
-                    .foregroundStyle(isSelected ? Color.theme.accent : Color(.systemGray6).gradient)
+                ZStack {
+                    Circle()
+                        .frame(width: 20, height: 20)
+                        .foregroundStyle(.white.opacity(0.7))
+                    
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "")
+                        .font(.title2)
+                        .foregroundStyle(isSelected ? Color.theme.accent : Color(.systemGray6).gradient)
+                }
             }
         }
         .contentShape(.rect)
