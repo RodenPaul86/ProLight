@@ -93,9 +93,9 @@ struct SettingsView: View {
                 }
                 
                 Section(header: Text("Legal"), footer: Text("© 2016 - \(Date(), format: .dateTime.year()) Paul Roden Jr. All Rights Reserved, Made in USA 🇺🇸.")) {
-                    customRow(icon: "hand.raised", firstLabel: "Privacy Policy", url: "https://docmatic.app/privacy.html")
-                    customRow(icon: "doc.text", firstLabel: "Terms of Service", url: "https://docmatic.app/terms.html")
-                    customRow(icon: "append.page", firstLabel: "EULA", url: "https://docmatic.app/EULA.html")
+                    customRow(icon: "hand.raised", firstLabel: "Privacy Policy", url: "https://paulrodenjr.dev/prolight/privacypolicy.html")
+                    customRow(icon: "doc.text", firstLabel: "Terms of Service", url: "https://paulrodenjr.dev/prolight/termsofservice.html")
+                    customRow(icon: "append.page", firstLabel: "EULA", url: "https://paulrodenjr.dev/prolight/EULA.html")
                 }
 #if DEBUG
                 Section(header: Text("Debuging Tools"), footer: Text(debugMessage)) { /// <-- Display the debug message
