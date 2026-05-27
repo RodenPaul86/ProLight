@@ -6,7 +6,9 @@
 //
 
 import SwiftUI
+import Charts
 
+// MARK: - Model
 struct cardElements: Identifiable, Equatable {
     let id: Int
     let title: String
@@ -14,18 +16,29 @@ struct cardElements: Identifiable, Equatable {
     let image: String
     let tintColor: Color
     let amount: String
+    var weeklyData: [Double] = []
 }
 
+// MARK: - Activity Card
 struct ActivityCard: View {
     @State var activity: cardElements
-    
+
+    // Pair each value with a day label
+    private var chartData: [(day: String, label: String, value: Double)] {
+        let days = ["M", "T", "W", "T", "F", "S", "S"]
+        let ids  = ["1", "2", "3", "4", "5", "6", "7"]  // unique keys
+        return activity.weeklyData.prefix(7).enumerated().map { i, v in
+            (day: ids[i], label: days[i], value: v)
+        }
+    }
+
     var body: some View {
         ZStack {
             Color(uiColor: .systemGray6)
                 .cornerRadius(15)
-            
-            VStack(alignment: .leading, spacing: 20) {
-                // Top section with icon & title
+
+            VStack(alignment: .leading, spacing: 12) {
+                // MARK: - Top: icon + title
                 HStack {
                     Image(systemName: activity.image)
                         .font(.system(size: 20))
@@ -35,18 +48,45 @@ struct ActivityCard: View {
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
                                 .fill(Color("darkGray"))
                         )
-                    
+
                     Text(activity.title)
                         .font(.headline)
-                    
+
                     Spacer()
                 }
-                
-                // Amount & subtitle
-                VStack(alignment: .leading, spacing: 5) {
+
+                // MARK: - Amount + subtitle
+                VStack(alignment: .leading, spacing: 4) {
                     Text(activity.amount)
                         .font(.title2.bold())
                         .minimumScaleFactor(0.6)
+                    
+                    // MARK: - Bar chart
+                    if !chartData.isEmpty {
+                        Chart {
+                            ForEach(chartData, id: \.day) { entry in
+                                BarMark(
+                                    x: .value("Day", entry.day),
+                                    y: .value("Value", entry.value)
+                                )
+                                .foregroundStyle(activity.tintColor.gradient)
+                                .cornerRadius(3)
+                            }
+                        }
+                        .chartXAxis {
+                            AxisMarks(values: ["1","2","3","4","5","6","7"]) { value in
+                                AxisValueLabel {
+                                    let labels = ["M","T","W","T","F","S","S"]
+                                    let i = Int(value.as(String.self) ?? "1")! - 1
+                                    Text(labels[i])
+                                        .font(.system(size: 9))
+                                }
+                            }
+                        }
+                        .chartYAxis(.hidden)
+                        .frame(height: 50)
+                        .padding(.vertical)
+                    }
                     
                     Text(activity.subtitle)
                         .font(.caption)
