@@ -11,6 +11,7 @@ import CoreLocation
 import SwiftData
 
 struct ExploreMapView: View {
+    @EnvironmentObject var appSubModel: appSubscriptionModel
     @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
     @Environment(\.openURL) private var openURL
     @State private var hideTabBar: Bool = false
@@ -147,34 +148,36 @@ struct ExploreMapView: View {
                         .transition(.scale.combined(with: .opacity))
                     }
                     
-                    Button {
-                        if isHapticsEnabled {
-                            HapticManager.shared.notify(.impact(.light))
-                        }
-                        withAnimation(.spring(response: 0.4, dampingFraction: 0.65)) {
-                            if !workout.isActive        { workout.start() }
-                            else if workout.isPaused    { workout.resume() }
-                            else                        { workout.pause() }
-                        }
-                    } label: {
-                        ZStack {
-                            if #available(iOS 26.0, *) {
-                                Circle().fill(trackButtonColor.opacity(0.15)).frame(width: 56, height: 56)
-                                Circle().strokeBorder(trackButtonColor.opacity(0.35), lineWidth: 1.5).frame(width: 56, height: 56)
-                                    .glassEffect(.regular.interactive(), in: .circle)
-                            } else {
-                                Circle().fill(trackButtonColor.opacity(0.15)).frame(width: 56, height: 56)
-                                Circle().strokeBorder(trackButtonColor.opacity(0.35), lineWidth: 1.5).frame(width: 56, height: 56)
+                    if appSubModel.isSubscriptionActive {
+                        Button {
+                            if isHapticsEnabled {
+                                HapticManager.shared.notify(.impact(.light))
                             }
-                            Image(systemName: trackButtonIcon)
-                                .font(.system(size: 30, weight: .semibold))
-                                .foregroundColor(trackButtonColor)
-                                .symbolRenderingMode(.hierarchical)
+                            withAnimation(.spring(response: 0.4, dampingFraction: 0.65)) {
+                                if !workout.isActive        { workout.start() }
+                                else if workout.isPaused    { workout.resume() }
+                                else                        { workout.pause() }
+                            }
+                        } label: {
+                            ZStack {
+                                if #available(iOS 26.0, *) {
+                                    Circle().fill(trackButtonColor.opacity(0.15)).frame(width: 56, height: 56)
+                                    Circle().strokeBorder(trackButtonColor.opacity(0.35), lineWidth: 1.5).frame(width: 56, height: 56)
+                                        .glassEffect(.regular.interactive(), in: .circle)
+                                } else {
+                                    Circle().fill(trackButtonColor.opacity(0.15)).frame(width: 56, height: 56)
+                                    Circle().strokeBorder(trackButtonColor.opacity(0.35), lineWidth: 1.5).frame(width: 56, height: 56)
+                                }
+                                Image(systemName: trackButtonIcon)
+                                    .font(.system(size: 30, weight: .semibold))
+                                    .foregroundColor(trackButtonColor)
+                                    .symbolRenderingMode(.hierarchical)
+                            }
                         }
+                        .shadow(color: trackButtonColor.opacity(0.4), radius: 12, y: 4)
+                        .scaleEffect(workout.isActive && !workout.isPaused ? 1.06 : 1.0)
+                        .animation(.spring(response: 0.4, dampingFraction: 0.6), value: workout.isActive)
                     }
-                    .shadow(color: trackButtonColor.opacity(0.4), radius: 12, y: 4)
-                    .scaleEffect(workout.isActive && !workout.isPaused ? 1.06 : 1.0)
-                    .animation(.spring(response: 0.4, dampingFraction: 0.6), value: workout.isActive)
                 }
                 .buttonBorderShape(.circle)
                 .padding()

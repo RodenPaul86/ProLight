@@ -28,6 +28,7 @@ enum SOSState: Equatable {
 }
 
 struct HomeView: View {
+    @EnvironmentObject var appSubModel: appSubscriptionModel
     @Environment(\.modelContext) private var modelContext
     @Environment(\.requestReview) private var requestReview
     @Environment(\.scenePhase) private var scenePhase
@@ -183,61 +184,56 @@ struct HomeView: View {
                 }
                 .overlay (
                     HStack(alignment: .top) {
-                        if let weather = locationManager.currentWeather {
-                            let temp = selectedUnit == .fahrenheit
-                            ? weather.temperature.converted(to: .fahrenheit)
-                            : weather.temperature.converted(to: .celsius)
+                        if appSubModel.isSubscriptionActive {
+                            if let weather = locationManager.currentWeather {
+                                let temp = selectedUnit == .fahrenheit
+                                ? weather.temperature.converted(to: .fahrenheit)
+                                : weather.temperature.converted(to: .celsius)
+                                
+                                VStack(alignment: .leading) {
+                                    if !locationManager.cityName.isEmpty {
+                                        Text("\(locationManager.cityName), \(locationManager.stateName)")
+                                            .font(.caption)
+                                            .foregroundStyle(.gray)
+                                    } else {
+                                        Text("Loading...")
+                                            .font(.caption)
+                                            .foregroundStyle(.gray)
+                                    }
+                                    
+                                    Text("\(Int(temp.value))°")
+                                        .font(.title3.bold())
+                                        .foregroundStyle(.white)
+                                    
+                                    Text(weather.condition.description)
+                                        .font(.caption)
+                                        .foregroundStyle(.gray)
+                                }
+                                .onTapGesture {
+                                    HapticManager.shared.notify(.impact(.light))
+                                    showWeatherSheet = true
+                                }
+                                .sheet(isPresented: $showWeatherSheet) {
+                                    WeatherView()
+                                        .presentationDetents([.fraction(0.50)]) /// <-- 50% of screen height
+                                        .presentationDragIndicator(.visible) /// <-- Shows the line at top
+                                }
+                            }
                             
-                            VStack(alignment: .leading) {
-                                if !locationManager.cityName.isEmpty {
-                                    Text("\(locationManager.cityName), \(locationManager.stateName)")
-                                        .font(.caption)
-                                        .foregroundStyle(.gray)
-                                } else {
-                                    Text("Loading...")
-                                        .font(.caption)
-                                        .foregroundStyle(.gray)
+                            Spacer()
+                            
+                            CompassView()
+                                .frame(width: 65, height: 65)
+                                .onTapGesture {
+                                    //HapticManager.shared.notify(.impact(.light))
+                                    //showCompassSheet = true
                                 }
-                                
-                                Text("\(Int(temp.value))°")
-                                    .font(.title3.bold())
-                                    .foregroundStyle(.white)
-                                
-                                Text(weather.condition.description)
-                                    .font(.caption)
-                                    .foregroundStyle(.gray)
-                            }
-                            .onTapGesture {
-                                HapticManager.shared.notify(.impact(.light))
-                                showWeatherSheet = true
-                            }
-                            .sheet(isPresented: $showWeatherSheet) {
-                                WeatherView()
-                                    .presentationDetents([.fraction(0.50)]) /// <-- 50% of screen height
-                                    .presentationDragIndicator(.visible) /// <-- Shows the line at top
-                            }
-                            .fullScreenCover(isPresented: $showScreenLight) {
-                                if isRedScreenEnabled {
-                                    ScreenLightView(style: .red)
-                                } else {
-                                    ScreenLightView(style: .white)
+                                .sheet(isPresented: $showCompassSheet) {
+                                    Compass()
+                                        .presentationDetents([.fraction(0.20)])
+                                        .presentationDragIndicator(.visible)
                                 }
-                            }
                         }
-                        
-                        Spacer()
-                        
-                        CompassView()
-                            .frame(width: 65, height: 65)
-                            .onTapGesture {
-                                //HapticManager.shared.notify(.impact(.light))
-                                //showCompassSheet = true
-                            }
-                            .sheet(isPresented: $showCompassSheet) {
-                                Compass()
-                                    .presentationDetents([.fraction(0.20)])
-                                    .presentationDragIndicator(.visible)
-                            }
                     }
                         .padding(.leading)
                         .padding(.top, -10),
@@ -263,6 +259,13 @@ struct HomeView: View {
                     .shadow(color: thermalMonitor.borderColor, radius: 10)
                     .animation(.easeInOut(duration: 0.25), value: thermalMonitor.thermalState)
                     .allowsHitTesting(false)
+            }
+            .fullScreenCover(isPresented: $showScreenLight) {
+                if isRedScreenEnabled {
+                    ScreenLightView(style: .red)
+                } else {
+                    ScreenLightView(style: .white)
+                }
             }
         }
         .onAppear {
