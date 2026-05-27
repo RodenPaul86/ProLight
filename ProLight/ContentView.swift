@@ -31,7 +31,7 @@ struct ContentView: View {
             switch tab {
             case .home: HomeView(tabBarHeight: tabBarHeight)
             case .map: ExploreMapView(tabBarHeight: tabBarHeight)
-            case .fitness: UserActivityView()
+            case .fitness: UserActivityView(tabBarHeight: tabBarHeight)
             case .settings: SettingsView(tabBarHeight: tabBarHeight)
             }
         }

@@ -12,6 +12,8 @@ struct UserActivityView: View {
     @State private var activitiesArray: [cardElements] = []
     @State private var draggingItem: cardElements?
     
+    var tabBarHeight: CGFloat?
+    
     let columns = Array(repeating: GridItem(.flexible(), spacing: 20), count: 2)
     
     var body: some View {
@@ -38,6 +40,7 @@ struct UserActivityView: View {
             }
             .navigationTitle("Fitness Stats")
             .toolbarTitleDisplayMode(.inlineLarge)
+            .safeAreaPadding(.bottom, tabBarHeight)
             .onAppear {
                 loadArrayFromDict()
             }
