@@ -233,6 +233,9 @@ struct HomeView: View {
                                         .presentationDetents([.fraction(0.20)])
                                         .presentationDragIndicator(.visible)
                                 }
+                        } else {
+                            adBannerView()
+                                .padding([.top, .horizontal], 0)
                         }
                     }
                         .padding(.leading)
