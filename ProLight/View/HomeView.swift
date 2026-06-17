@@ -29,6 +29,7 @@ enum SOSState: Equatable {
 
 struct HomeView: View {
     @EnvironmentObject var appSubModel: appSubscriptionModel
+    @State private var isPaywallPresented: Bool = false
     @Environment(\.modelContext) private var modelContext
     @Environment(\.requestReview) private var requestReview
     @Environment(\.scenePhase) private var scenePhase
@@ -235,7 +236,6 @@ struct HomeView: View {
                                 }
                         } else {
                             adBannerView()
-                                .padding([.top, .horizontal], 0)
                         }
                     }
                         .padding(.leading)

@@ -24,6 +24,8 @@ enum AppTab: String, CaseIterable, FloatingTabProtocol {
 }
 
 struct ContentView: View {
+    @EnvironmentObject var appSubModel: appSubscriptionModel
+    @State private var isPaywallPresented: Bool = false
     @State private var activeTab: AppTab = .home
     
     var body: some View {
@@ -35,6 +37,7 @@ struct ContentView: View {
             case .settings: SettingsView(tabBarHeight: tabBarHeight)
             }
         }
+        
     }
 }
 

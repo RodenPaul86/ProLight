@@ -26,6 +26,9 @@ struct ProLightApp: App {
                 .preferredColorScheme(.dark)
                 .environmentObject(appSubModel)
                 .environmentObject(healthManager)
+                .task {
+                    appSubModel.refreshSubscriptionStatus()
+                }
         }
         .modelContainer(for: Workout.self) /// <-- registers Workout as a SwiftData model
     }

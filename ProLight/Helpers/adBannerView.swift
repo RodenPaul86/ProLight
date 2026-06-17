@@ -23,8 +23,9 @@ struct adBannerView: View {
                 Image(images[index])
                     .resizable()
                     .scaledToFill()
-                    .tag(index)
+                    .frame(maxWidth: .infinity, maxHeight: 50)
                     .clipped()
+                    .tag(index)
                     .onTapGesture {
                         isPaywallPresented = true
                         if isHapticsEnabled {
