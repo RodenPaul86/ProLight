@@ -1012,3 +1012,4 @@ extension HomeView {
         sosState = .idle
     }
 }
+
