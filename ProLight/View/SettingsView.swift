@@ -18,6 +18,7 @@ struct SettingsView: View {
     @AppStorage("showTipsForTesting") private var showTipsForTesting: Bool = false
     @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
     @AppStorage("isCampingEnabled") private var isCampingEnabled: Bool = false
+    @AppStorage("preferredLightState") private var lightState: Bool = true
     @AppStorage("isRedScreenEnabled") private var isRedScreenEnabled: Bool = false
     @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
     @AppStorage("selectedButtonSound") private var selectedButtonSound: Bool = true
@@ -51,12 +52,15 @@ struct SettingsView: View {
                     .listRowInsets(EdgeInsets())
                 }
                 
-                Section(header: Text("General")) {
+                Section(header: Text("General"), footer: Text("")/*Text("When enabled, the flashlight will automatically turn on each time you open the app. Turn this off to manually switch on the flashlight.")*/) {
                     customRow(icon: "figure.walk", firstLabel: "Walking History", destination: AnyView(WorkoutHistoryView()))
-#if DEBUG
+#if debug
                     customRow(icon: "tent", firstLabel: "Camping Tools", showToggle: true, toggleValue: $isCampingEnabled)
 #endif
                     customRow(icon: "iphone.pattern.diagonalline.on.rectangle.portrait.dashed", firstLabel: "Red Screen Light", showToggle: true, toggleValue: $isRedScreenEnabled)
+#if debug
+                    customRow(icon: "apps.iphone", firstLabel: "After Launch", showToggle: true, toggleValue: $lightState)
+#endif
                 }
                 
                 Section(header: Text("Customization")) {
@@ -76,9 +80,9 @@ struct SettingsView: View {
                     }
                     
                     customRow(icon: "point.3.filled.connected.trianglepath.dotted", firstLabel: "Share this App", shareURL: URL(string: "https://apps.apple.com/us/app/prolight/id1173567157"))
-                    
-                    //customRow(icon: "questionmark.bubble", firstLabel: "Frequently Asked Questions", destination: AnyView(FAQView()))
-                    
+#if debug
+                    customRow(icon: "questionmark.bubble", firstLabel: "Frequently Asked Questions", destination: AnyView(EmptyView()))
+#endif
                     customRow(icon: "envelope", firstLabel: "Contact Support", destination: AnyView(feedbackView()))
                 }
                 
@@ -89,7 +93,7 @@ struct SettingsView: View {
                         showStoreView.toggle()
                     }
                     
-                    customRow(icon: "paperplane", firstLabel: "Join TestFlight (Beta)", url: "https://testflight.apple.com/join/8rtJj2JX", showJoinInsteadOfSafari: true)
+                    customRow(icon: "paperplane", firstLabel: "Join Our Beta ", url: "https://testflight.apple.com/join/8rtJj2JX", showJoinInsteadOfSafari: true)
                 }
                 
                 Section(header: Text("Legal"), footer: Text("© 2016 - \(Date(), format: .dateTime.year()) Paul Roden Jr. All Rights Reserved, Made in USA 🇺🇸.")) {
@@ -97,7 +101,7 @@ struct SettingsView: View {
                     customRow(icon: "doc.text", firstLabel: "Terms of Service", url: "https://paulrodenjr.dev/prolight/termsofservice.html")
                     customRow(icon: "append.page", firstLabel: "EULA", url: "https://paulrodenjr.dev/prolight/EULA.html")
                 }
-#if DEBUG
+#if debug
                 Section(header: Text("Debuging Tools"), footer: Text(debugMessage)) { /// <-- Display the debug message
                     
                     customRow(icon: "ladybug", firstLabel: "RC Debug Overlay") {

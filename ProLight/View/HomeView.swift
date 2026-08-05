@@ -11,6 +11,7 @@ import AVFoundation
 import WeatherKit
 import CoreLocation
 import ActivityKit
+import StoreKit
 
 // MARK: - Control State
 enum ControlMode {
@@ -61,6 +62,7 @@ struct HomeView: View {
     @AppStorage("preferredTempUnit") private var selectedUnitRaw: String = TemperatureUnit.fahrenheit.rawValue
     @AppStorage("isHapticsEnabled") private var isHapticsEnabled: Bool = true
     @AppStorage("isCampingEnabled") private var isCampingEnabled: Bool = false /// <-- This is for the forth feature button.
+    @AppStorage("preferredLightState") private var lightState: Bool = true /// <-- This is for the Light flashlight.
     @AppStorage("isRedScreenEnabled") private var isRedScreenEnabled: Bool = false
     
     @State private var showWeatherSheet: Bool = false
@@ -152,6 +154,9 @@ struct HomeView: View {
     
     var body: some View {
         NavigationStack {
+            navTools
+                .padding(.horizontal)
+            
             ZStack {
                 VStack(spacing: 40) {
                     Spacer()
@@ -183,65 +188,6 @@ struct HomeView: View {
                     .animation(.easeInOut(duration: 0.3), value: mode)
                     modeButtons
                 }
-                .overlay (
-                    HStack(alignment: .top) {
-                        if appSubModel.isSubscriptionActive {
-                            if let weather = locationManager.currentWeather {
-                                let temp = selectedUnit == .fahrenheit
-                                ? weather.temperature.converted(to: .fahrenheit)
-                                : weather.temperature.converted(to: .celsius)
-                                
-                                VStack(alignment: .leading) {
-                                    if !locationManager.cityName.isEmpty {
-                                        Text("\(locationManager.cityName), \(locationManager.stateName)")
-                                            .font(.caption)
-                                            .foregroundStyle(.gray)
-                                    } else {
-                                        Text("Loading...")
-                                            .font(.caption)
-                                            .foregroundStyle(.gray)
-                                    }
-                                    
-                                    Text("\(Int(temp.value))°")
-                                        .font(.title3.bold())
-                                        .foregroundStyle(.white)
-                                    
-                                    Text(weather.condition.description)
-                                        .font(.caption)
-                                        .foregroundStyle(.gray)
-                                }
-                                .onTapGesture {
-                                    HapticManager.shared.notify(.impact(.light))
-                                    showWeatherSheet = true
-                                }
-                                .sheet(isPresented: $showWeatherSheet) {
-                                    WeatherView()
-                                        .presentationDetents([.fraction(0.50)]) /// <-- 50% of screen height
-                                        .presentationDragIndicator(.visible) /// <-- Shows the line at top
-                                }
-                            }
-                            
-                            Spacer()
-                            
-                            CompassView()
-                                .frame(width: 65, height: 65)
-                                .onTapGesture {
-                                    //HapticManager.shared.notify(.impact(.light))
-                                    //showCompassSheet = true
-                                }
-                                .sheet(isPresented: $showCompassSheet) {
-                                    Compass()
-                                        .presentationDetents([.fraction(0.20)])
-                                        .presentationDragIndicator(.visible)
-                                }
-                        } else {
-                            adBannerView()
-                        }
-                    }
-                        .padding(.leading)
-                        .padding(.top, -10),
-                    alignment: .topLeading
-                )
                 .padding()
                 .safeAreaPadding(.bottom, tabBarHeight)
                 .hideFloatingTabBar(sosPressed ? true : false)
@@ -298,6 +244,72 @@ struct HomeView: View {
                 
             @unknown default:
                 break
+            }
+        }
+    }
+    @ViewBuilder
+    private var navTools: some View {
+        HStack(alignment: .top) {
+            if !appSubModel.isSubscriptionActive {
+                if let weather = locationManager.currentWeather {
+                    let temp = selectedUnit == .fahrenheit
+                    ? weather.temperature.converted(to: .fahrenheit)
+                    : weather.temperature.converted(to: .celsius)
+                    
+                    VStack(alignment: .leading) {
+                        if !locationManager.cityName.isEmpty {
+                            Text("\(locationManager.cityName), \(locationManager.stateName)")
+                                .font(.caption)
+                                .foregroundStyle(.gray)
+                        } else {
+                            Text("Loading...")
+                                .font(.caption)
+                                .foregroundStyle(.gray)
+                        }
+                        
+                        Text("\(Int(temp.value))°")
+                            .font(.title3.bold())
+                            .foregroundStyle(.white)
+                        
+                        Text(weather.condition.description)
+                            .font(.caption)
+                            .foregroundStyle(.gray)
+                    }
+                    .onTapGesture {
+                        HapticManager.shared.notify(.impact(.light))
+                        showWeatherSheet = true
+                    }
+                    .sheet(isPresented: $showWeatherSheet) {
+                        WeatherView()
+                            .presentationDetents([.fraction(0.50)]) /// <-- 50% of screen height
+                            .presentationDragIndicator(.visible) /// <-- Shows the line at top
+                    }
+                }
+                
+                Spacer()
+                
+                CompassView()
+                    .frame(width: 65, height: 65)
+                    .onTapGesture {
+                        //HapticManager.shared.notify(.impact(.light))
+                        //showCompassSheet = true
+                    }
+                    .sheet(isPresented: $showCompassSheet) {
+                        Compass()
+                            .presentationDetents([.fraction(0.20)])
+                            .presentationDragIndicator(.visible)
+                    }
+            } else {
+                if #available(iOS 26.0, *) {
+                    SubscriptionOfferView(id: "") {
+                        Image(systemName: "crown.fill")
+                            .foregroundStyle(.orange)
+                    }
+                    .padding()
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                } else {
+                    adBannerView()
+                }
             }
         }
     }

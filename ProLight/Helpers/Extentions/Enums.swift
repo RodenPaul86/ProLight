@@ -20,3 +20,19 @@ enum TemperatureUnit: String, CaseIterable, Identifiable {
         }
     }
 }
+
+enum LightStates: String, CaseIterable, Identifiable {
+    case on = "On"
+    case off = "Off"
+    case previous = "Previous"
+    
+    var id: String { self.rawValue }
+    
+    var displayName: String {
+        switch self {
+        case .on: return "Light On"
+        case .off: return "Light Off"
+        case .previous: return "Previous State"
+        }
+    }
+}
