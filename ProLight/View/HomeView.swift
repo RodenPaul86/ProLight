@@ -247,10 +247,13 @@ struct HomeView: View {
             }
         }
     }
+    
+    // MARK: Navbar Tools
+    
     @ViewBuilder
     private var navTools: some View {
         HStack(alignment: .top) {
-            if !appSubModel.isSubscriptionActive {
+            if appSubModel.isSubscriptionActive {
                 if let weather = locationManager.currentWeather {
                     let temp = selectedUnit == .fahrenheit
                     ? weather.temperature.converted(to: .fahrenheit)
@@ -301,7 +304,7 @@ struct HomeView: View {
                     }
             } else {
                 if #available(iOS 26.0, *) {
-                    SubscriptionOfferView(id: "") {
+                    SubscriptionOfferView(id: "app.prolight.premium.annually") {
                         Image(systemName: "crown.fill")
                             .foregroundStyle(.orange)
                     }
