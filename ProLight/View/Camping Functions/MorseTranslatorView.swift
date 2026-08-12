@@ -100,14 +100,20 @@ struct MorseTranslatorWithAudioView: View {
                 .padding(.horizontal)
                 
                 // Output
+                // NOTE: previously this was wrapped in its own ScrollView, nested inside the
+                // screen's outer ScrollView. That made it very easy for a vertical drag that
+                // started over the output box to get "captured" by the inner scroll view,
+                // making the outer page feel unscrollable from that spot. Since the output box
+                // sits inside a page that's already scrollable, we just let it grow with the
+                // content instead of scrolling independently.
                 Group {
                     Text("Output").font(.headline).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal)
-                    ScrollView {
-                        Text(vm.output).frame(maxWidth: .infinity, alignment: .leading).padding(12)
-                    }
-                    .frame(minHeight: 120)
-                    .background(RoundedRectangle(cornerRadius: 10).stroke(Color.secondary.opacity(0.2)))
-                    .padding(.horizontal)
+                    Text(vm.output)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(12)
+                        .frame(minHeight: 120, alignment: .top)
+                        .background(RoundedRectangle(cornerRadius: 10).stroke(Color.secondary.opacity(0.2)))
+                        .padding(.horizontal)
                 }
                 
                 // Controls: WPM + Play
@@ -145,9 +151,11 @@ struct MorseTranslatorWithAudioView: View {
                 
                 VStack(alignment: .leading) {
                     Text("WPM: \(vm.wpm)")
+                    // NOTE: previously there was also an `.onChange(of: vm.wpmDouble) { vm.updateWPM() }`
+                    // here, which was redundant: `wpmDouble`'s setter assigns `wpm`, and `wpm`'s own
+                    // `didSet` already calls `updateDurations()`. Removed the duplicate trigger.
                     Slider(value: $vm.wpmDouble, in: 5...40, step: 1)
                         .frame(minWidth: 180)
-                        .onChange(of: vm.wpmDouble) { _, _ in vm.updateWPM() }
                 }
                 .padding(.horizontal)
                 
@@ -165,6 +173,11 @@ struct MorseTranslatorWithAudioView: View {
         .onAppear {
             hideTabBar = true
             vm.start()
+        }
+        .onDisappear {
+            // Previously this was never reset, so the floating tab bar would stay hidden
+            // after navigating away from this screen.
+            hideTabBar = false
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -267,7 +280,7 @@ final class MorseAudioViewModel: ObservableObject {
         }
         var encodeWordSeparator: String {
             switch self {
-            case .singleSpace: return " " // letter separator + letter separator would yield ambiguous; we'll use single space between letters and double space between words when requested
+            case .singleSpace: return " "
             case .doubleSpace: return "  "
             case .slash: return " / "
             }
@@ -282,9 +295,23 @@ final class MorseAudioViewModel: ObservableObject {
     }
     
     // MARK: Published
-    @Published var input: String = "" { didSet { publishInputChange() } }
+    // `isSwapping` guards against `input`/`mode` didSet handlers re-triggering a translation
+    // while `swap()` is in the middle of reassigning both properties (see swap() below).
+    private var isSwapping = false
+    
+    @Published var input: String = "" {
+        didSet {
+            guard !isSwapping else { return }
+            publishInputChange()
+        }
+    }
     @Published private(set) var output: String = ""
-    @Published var mode: Mode = .auto { didSet { computeTranslation() } }
+    @Published var mode: Mode = .auto {
+        didSet {
+            guard !isSwapping else { return }
+            computeTranslation()
+        }
+    }
     @Published var autoTranslate: Bool = true
     @Published var separatorMode: SeparatorMode = .slash { didSet { computeTranslation() } }
     @Published var isFlashEnabled: Bool = false
@@ -304,12 +331,24 @@ final class MorseAudioViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var player: MorsePlayer?
     
+    // Debounce pipeline for auto-translate. Previously a new `Just(input).debounce(...)`
+    // pipeline was created on every keystroke; since `Just` only emits once, debounce had
+    // nothing to coalesce against, so translation ran on every keystroke instead of after a
+    // pause, and `cancellables` grew forever. Now we feed a single long-lived subject and
+    // subscribe to it exactly once (see init()).
+    private let inputSubject = PassthroughSubject<String, Never>()
+    
     // computed separator descriptions
     var letterSeparatorDescription: String {
         return "letters: space, words: " + (separatorMode == .slash ? "/": (separatorMode == .doubleSpace ? "two spaces" : "single space"))
     }
     
     init() {
+        inputSubject
+            .debounce(for: .milliseconds(180), scheduler: RunLoop.main)
+            .sink { [weak self] _ in self?.computeTranslation() }
+            .store(in: &cancellables)
+        
         computeTranslation()
         updateDurations()
     }
@@ -344,10 +383,7 @@ final class MorseAudioViewModel: ObservableObject {
     
     private func publishInputChange() {
         if autoTranslate {
-            Just(input)
-                .debounce(for: .milliseconds(180), scheduler: RunLoop.main)
-                .sink { [weak self] _ in self?.computeTranslation() }
-                .store(in: &cancellables)
+            inputSubject.send(input)
         } else {
             computeTranslationIfNeeded()
         }
@@ -373,11 +409,17 @@ final class MorseAudioViewModel: ObservableObject {
     }
     
     func swap() {
+        // Both `input` and `mode` are reassigned here. Without the `isSwapping` guard, setting
+        // `input` would kick off the debounced auto-translate pipeline (or an immediate
+        // recompute), and setting `mode` would call `computeTranslation()` directly — either of
+        // which would silently overwrite the freshly-swapped `output` a moment later.
+        isSwapping = true
         let oldInput = input
         input = output
         output = oldInput
         if mode == .encode { mode = .decode }
         else if mode == .decode { mode = .encode }
+        isSwapping = false
     }
     
     // MARK: - Audio control
@@ -412,7 +454,7 @@ struct MorseCoder {
         "0":"-----","1":".----","2":"..---","3":"...--","4":"....-","5":".....",
         "6":"-....","7":"--...","8":"---..","9":"----.",
         ".":".-.-.-",",":"--..--","?":"..--..","'":".----.","!":"-.-.--","/":"-..-.",
-        "(":"-.--.",")":"-.--.-","&":".-... ",":":"---...",";":"-.-.-.","=":"-...-",
+        "(":"-.--.",")":"-.--.-","&":".-...",":":"---...",";":"-.-.-.","=":"-...-",
         "+":".-.-.", "-":"-....-","_":"..--.-","\"":".-..-.","$":"...-..-","@":".--.-."
     ]
     
@@ -441,16 +483,10 @@ struct MorseCoder {
             return encodedLetters.joined(separator: " ") // letters separated by single space
         }
         
-        // For word separation use the chosen mode
-        switch separatorMode {
-        case .singleSpace:
-            // use two spaces for words to reduce ambiguity between letter space and word space
-            return encodedWords.joined(separator: "  ")
-        case .doubleSpace:
-            return encodedWords.joined(separator: "  ")
-        case .slash:
-            return encodedWords.joined(separator: " / ")
-        }
+        // Use the separator mode's own word-separator string instead of duplicating the
+        // switch here. Previously `.singleSpace` and `.doubleSpace` both hard-coded "  ",
+        // making "Single Space" indistinguishable from "Double Space" in the actual output.
+        return encodedWords.joined(separator: separatorMode.encodeWordSeparator)
     }
     
     // Decodes morse into text; be permissive about separators
@@ -483,7 +519,9 @@ struct MorseCoder {
                 if let ch = morseToChar[symbol] {
                     decoded.append(ch)
                 } else {
-                    decoded.append("�")
+                    // Previously this used "�" while encode used "?" for unknown symbols.
+                    // Using the same placeholder in both directions keeps behavior consistent.
+                    decoded.append("?")
                 }
             }
             if !decoded.isEmpty { decodedWords.append(decoded) }
@@ -513,6 +551,12 @@ final class MorsePlayer {
     
     private var isPlaying = false
     private var completion: (() -> Void)?
+    
+    // Previously the DispatchWorkItem scheduling the "playback finished" callback was never
+    // stored, so calling stop() and then play() again before it fired left the *old* work
+    // item alive: it would later call playerNode.stop() mid-way through the *new* playback and
+    // invoke the *old* completion handler. Storing and cancelling it in stop() fixes that.
+    private var completionWorkItem: DispatchWorkItem?
     
     init() {
         sampleRate = Double(engine.outputNode.outputFormat(forBus: 0).sampleRate)
@@ -588,8 +632,19 @@ final class MorsePlayer {
             let ptr = buffer.floatChannelData![0]
             let increment = 2.0 * Double.pi * frequency / sampleRate
             var phase = 0.0
+            // Short linear fade in/out (~4ms, capped to a third of the buffer) to avoid the
+            // audible clicks/pops a hard-edged sine burst produces at each dot/dash boundary.
+            let fadeSamples = min(Int(frameCount) / 3, Int(0.004 * sampleRate))
             for i in 0..<Int(frameCount) {
-                ptr[i] = Float(sin(phase) * Double(amplitude))
+                var envelope = 1.0
+                if fadeSamples > 0 {
+                    if i < fadeSamples {
+                        envelope = Double(i) / Double(fadeSamples)
+                    } else if i >= Int(frameCount) - fadeSamples {
+                        envelope = Double(Int(frameCount) - i) / Double(fadeSamples)
+                    }
+                }
+                ptr[i] = Float(sin(phase) * Double(amplitude) * envelope)
                 phase += increment
                 if phase > Double.pi * 2.0 { phase -= Double.pi * 2.0 }
             }
@@ -623,7 +678,7 @@ final class MorsePlayer {
                     switch nextTok {
                     case .element:
                         buffers.append(silentBuffer(duration: intraElementGap))
-                    case .gap(let g):
+                    case .gap:
                         // if gap is letter, we will add inter-letter gap later when processing the gap token
                         break
                     }
@@ -643,7 +698,6 @@ final class MorsePlayer {
         }
         
         // Schedule buffers
-        var delay: TimeInterval = 0
         for buf in buffers {
             playerNode.scheduleBuffer(buf, at: nil, options: [], completionHandler: nil)
             // we intentionally schedule without precise start times; AVAudioPlayerNode will play them in queued order
@@ -653,14 +707,18 @@ final class MorsePlayer {
         // Schedule a final callback when node completes playback of queued buffers.
         // Since AVAudioPlayerNode doesn't have a clear 'completion for all buffers' callback, we'll compute total time and dispatch after that.
         let totalDuration = buffers.reduce(0) { $0 + TimeInterval(Double($1.frameLength) / sampleRate) }
-        DispatchQueue.main.asyncAfter(deadline: .now() + totalDuration + 0.05) { [weak self] in
+        let workItem = DispatchWorkItem { [weak self] in
             self?.playerNode.stop()
             self?.isPlaying = false
             completion?()
         }
+        completionWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + totalDuration + 0.05, execute: workItem)
     }
     
     func stop() {
+        completionWorkItem?.cancel()
+        completionWorkItem = nil
         playerNode.stop()
         isPlaying = false
     }
@@ -687,4 +745,6 @@ struct ActivityViewController: UIViewControllerRepresentable {
 }
 
 // MARK: - Preview
-
+#Preview {
+    MorseTranslatorWithAudioView()
+}
